@@ -1,9 +1,9 @@
-from __future__ import annotations
-
 from typing import Literal, Optional
+
 from pydantic import BaseModel, Field, field_validator
 
-
+# Every item has to land in one of these buckets. Anything the model invents
+# outside the list fails validation, which is what we want.
 Category = Literal[
     "photo",
     "receipt",
@@ -22,32 +22,25 @@ Confidence = Literal["low", "medium", "high"]
 
 
 class JobItem(BaseModel):
-    item_id: str = Field(description="Stable short identifier such as item_001")
+    item_id: str
     category: Category
-    date: Optional[str] = Field(
-        default=None,
-        description="ISO date YYYY-MM-DD, or null when absent/uncertain",
-    )
+    date: Optional[str] = Field(default=None, description="YYYY-MM-DD, or null if absent")
     people: list[str] = Field(default_factory=list)
     location: Optional[str] = None
     amount: Optional[float] = Field(default=None, ge=0)
-    currency: Optional[str] = Field(
-        default=None,
-        description="Three-letter currency code such as USD, EUR, GBP",
-    )
+    currency: Optional[str] = None
     title: str
     summary: str
     action_required: bool = False
     action: Optional[str] = None
     priority: Priority = "medium"
     confidence: Confidence = "medium"
-    source_excerpt: str = Field(
-        description="Short excerpt from the original input supporting this item"
-    )
+    source_excerpt: str
 
     @field_validator("currency")
     @classmethod
-    def normalize_currency(cls, value: Optional[str]) -> Optional[str]:
+    def normalize_currency(cls, value):
+        # The model returns "usd" sometimes and "USD" others.
         return value.upper() if value else value
 
 
