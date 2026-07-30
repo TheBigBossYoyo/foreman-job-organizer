@@ -1,0 +1,82 @@
+{
+  "project_name": "Wilson interior painting",
+  "client_name": "Wilson",
+  "property_address": null,
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Living room painting update",
+      "summary": "The living room is done except for touch-ups.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "the living room is done except for touch-ups."
+    },
+    {
+      "item_id": "item_002",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Wilson"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Bedroom color issue",
+      "summary": "The homeowner reported the bedroom color looks wrong.",
+      "action_required": true,
+      "action": "Identify the correct paint code and verify with the homeowner.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "the bedroom color looks wrong"
+    },
+    {
+      "item_id": "item_003",
+      "category": "receipt",
+      "date": null,
+      "people": [],
+      "location": "Paint House",
+      "amount": 118.9,
+      "currency": "TND",
+      "title": "Painting supplies receipt",
+      "summary": "Receipt for rollers, tape, and primer from Paint House.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "rollers, tape and primer, 118.90 TND."
+    },
+    {
+      "item_id": "item_004",
+      "category": "issue",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Bedroom color confirmation",
+      "summary": "Need to confirm the correct bedroom color before continuing.",
+      "action_required": true,
+      "action": "Confirm the correct bedroom color with the homeowner.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "Need to confirm the correct bedroom color before continuing."
+    }
+  ],
+  "open_actions": [
+    "Identify the correct paint code and verify with the homeowner.",
+    "Confirm the correct bedroom color with the homeowner."
+  ],
+  "overall_summary": "The living room painting is nearly complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
+  "warnings": [
+    "The receipt date was not provided.",
+    "The exact dates for the painting work were not provided."
+  ]
+}

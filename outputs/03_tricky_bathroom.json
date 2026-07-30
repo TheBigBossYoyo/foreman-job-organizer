@@ -1,0 +1,102 @@
+{
+  "project_name": "Chen bathroom renovation",
+  "client_name": "Maya Chen",
+  "property_address": "44 Pine Avenue",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": "2026-07-27",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Demolition completion",
+      "summary": "Demolition finished, revealing moisture behind the shower wall.",
+      "action_required": true,
+      "action": "Assess and address the moisture issue behind the shower wall.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "Demolition finished. Moisture found behind shower wall."
+    },
+    {
+      "item_id": "item_002",
+      "category": "photo",
+      "date": "2026-07-27",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Moisture damage photo",
+      "summary": "Photo documentation of dark staining near the lower-left shower framing.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "dark staining near lower-left shower framing."
+    },
+    {
+      "item_id": "item_003",
+      "category": "client_update",
+      "date": "2026-07-27",
+      "people": [
+        "Maya Chen"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Moisture issue inquiry",
+      "summary": "Client inquiry about whether the moisture issue affects Friday's tile start.",
+      "action_required": true,
+      "action": "Respond to the client regarding the impact of the moisture issue on the project schedule.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "Client asks whether the moisture issue changes Friday's tile start."
+    },
+    {
+      "item_id": "item_004",
+      "category": "inspection",
+      "date": null,
+      "people": [
+        "Inspector Lopez"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Inspector availability",
+      "summary": "Inspector Lopez may be available on Thursday afternoon.",
+      "action_required": true,
+      "action": "Confirm Inspector Lopez's availability for Thursday afternoon.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "Inspector Lopez may be available Thursday afternoon."
+    },
+    {
+      "item_id": "item_005",
+      "category": "delivery",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Vanity delay",
+      "summary": "The vanity is delayed due to the supplier not providing a confirmed arrival date.",
+      "action_required": true,
+      "action": "Follow up with the supplier to obtain a confirmed arrival date for the vanity.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "Vanity delayed; supplier did not give a confirmed arrival date."
+    }
+  ],
+  "open_actions": [
+    "Assess and address the moisture issue behind the shower wall.",
+    "Respond to the client regarding the impact of the moisture issue on the project schedule.",
+    "Confirm Inspector Lopez's availability for Thursday afternoon.",
+    "Follow up with the supplier to obtain a confirmed arrival date for the vanity."
+  ],
+  "overall_summary": "Demolition is complete, but a moisture issue was found. The client inquired about the impact on the schedule, and there are pending actions regarding the inspector's availability and the delayed vanity.",
+  "warnings": [
+    "The exact calendar date for Friday was not provided.",
+    "The date for Inspector Lopez's potential availability was not specified."
+  ]
+}

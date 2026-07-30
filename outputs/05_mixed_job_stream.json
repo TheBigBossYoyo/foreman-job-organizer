@@ -1,0 +1,99 @@
+{
+  "project_name": "Greenfield deck build",
+  "client_name": "Omar Greenfield",
+  "property_address": "7 Meadow Court",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "delivery",
+      "date": "2026-07-25",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Lumber delivery",
+      "summary": "Lumber delivery arrived with some warped boards.",
+      "action_required": true,
+      "action": "Inspect and document the warped boards.",
+      "priority": "medium",
+      "confidence": "high",
+      "source_excerpt": "three boards appear warped."
+    },
+    {
+      "item_id": "item_002",
+      "category": "photo",
+      "date": "2026-07-25",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Warped lumber photo",
+      "summary": "A photo was taken of the warped lumber.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "three boards appear warped."
+    },
+    {
+      "item_id": "item_003",
+      "category": "payment",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": 1250.0,
+      "currency": "USD",
+      "title": "Invoice payment",
+      "summary": "Invoice 1048 was paid.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "Invoice 1048 was paid: $1,250.00."
+    },
+    {
+      "item_id": "item_004",
+      "category": "inspection",
+      "date": "2026-07-26",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "City inspection",
+      "summary": "The city inspection failed due to missing stair handrail bolts.",
+      "action_required": true,
+      "action": "Obtain replacement bolts and reschedule the inspection.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "City inspection failed because two stair handrail bolts were missing."
+    },
+    {
+      "item_id": "item_005",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Omar Greenfield"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Revised completion date request",
+      "summary": "The client requested the revised completion date.",
+      "action_required": true,
+      "action": "Provide the client with the revised completion date.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "Please send the revised completion date."
+    }
+  ],
+  "open_actions": [
+    "Inspect and document the warped boards.",
+    "Obtain replacement bolts and reschedule the inspection.",
+    "Provide the client with the revised completion date."
+  ],
+  "overall_summary": "Lumber was delivered with some warped boards, an invoice was paid, the city inspection failed, and the client requested a revised completion date.",
+  "warnings": [
+    "The invoice payment date was not provided.",
+    "The exact date for the revised completion date was not provided."
+  ]
+}

@@ -1,6 +1,6 @@
 sample,status,items,actions,notes
-01_easy_kitchen.txt,pass,4,0,Demo mode was used; connect Groq for stronger extraction.
-02_easy_roof.txt,pass,4,1,Demo mode was used; connect Groq for stronger extraction.
-03_tricky_bathroom.txt,pass,5,1,Demo mode was used; connect Groq for stronger extraction.
-04_tricky_painting.txt,pass,4,1,Demo mode was used; connect Groq for stronger extraction.
-05_mixed_job_stream.txt,pass,6,1,Demo mode was used; connect Groq for stronger extraction.
+01_easy_kitchen.txt,pass,4,0,The receipt date for drywall and screws was not provided.; The date for the client update on the quartz countertop sample was not provided.
+02_easy_roof.txt,pass,4,0,
+03_tricky_bathroom.txt,pass,5,4,The exact calendar date for Friday was not provided.; The date for Inspector Lopez's potential availability was not specified.
+04_tricky_painting.txt,pass,4,2,The receipt date was not provided.; The exact dates for the painting work were not provided.
+05_mixed_job_stream.txt,pass,5,3,The invoice payment date was not provided.; The exact date for the revised completion date was not provided.

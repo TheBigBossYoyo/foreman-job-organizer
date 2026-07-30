@@ -1,0 +1,79 @@
+{
+  "project_name": "Alvarez kitchen renovation",
+  "client_name": "Sofia Alvarez",
+  "property_address": "18 Cedar Lane",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": "2026-07-21",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Cabinet removal",
+      "summary": "The crew completed cabinet removal and disposed of debris.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "Crew completed cabinet removal and disposed of debris."
+    },
+    {
+      "item_id": "item_002",
+      "category": "receipt",
+      "date": null,
+      "people": [],
+      "location": "BuildRight",
+      "amount": 142.75,
+      "currency": "USD",
+      "title": "Drywall and screws receipt",
+      "summary": "Receipt for drywall and screws from BuildRight.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "BuildRight, drywall and screws, $142.75."
+    },
+    {
+      "item_id": "item_003",
+      "category": "delivery",
+      "date": "2026-07-22",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "New cabinet delivery",
+      "summary": "New cabinets were delivered in good condition.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "New cabinets delivered in good condition."
+    },
+    {
+      "item_id": "item_004",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Sofia Alvarez"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Quartz countertop sample approval",
+      "summary": "Sofia approved the quartz countertop sample.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "medium",
+      "source_excerpt": "Sofia approved the quartz countertop sample."
+    }
+  ],
+  "open_actions": [],
+  "overall_summary": "The crew completed cabinet removal, new cabinets were delivered, a receipt for drywall and screws was recorded, and the client approved the quartz countertop sample.",
+  "warnings": [
+    "The receipt date for drywall and screws was not provided.",
+    "The date for the client update on the quartz countertop sample was not provided."
+  ]
+}

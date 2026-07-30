@@ -5,8 +5,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .streamlit/secrets.toml
-outputs/*.json
-!outputs/.gitkeep
+# Batch outputs are a deliverable and stay tracked.
+# Ad-hoc saves from the Streamlit app are not.
+outputs/streamlit_*.json
 
 # Program-provided guideline packets, not our work
 *.docx
