@@ -47,4 +47,6 @@ each before measuring anything.
 
 Scoring: compare field by field, report a percentage rather than an impression.
 
-Weakest field to keep improving: [fill in after the first real scored run].
+Weakest field to keep improving: dates. The model fills in a date that is not
+in the text, either by copying the line above or by inventing a year for a
+"7/27" style date. 5 of the 9 errors in the Week 3 scoring were this.

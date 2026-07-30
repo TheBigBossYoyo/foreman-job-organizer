@@ -28,7 +28,7 @@
       "amount": null,
       "currency": null,
       "title": "Shingle repair photo",
-      "summary": "A photo was taken of the completed shingle repair on the north slope.",
+      "summary": "A photo of the completed shingle repair on the north slope.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -43,8 +43,8 @@
       "location": "Roofing Depot",
       "amount": 486.2,
       "currency": "USD",
-      "title": "Shingle and nail receipt",
-      "summary": "A receipt for shingles and nails from Roofing Depot.",
+      "title": "Shingles and nails receipt",
+      "summary": "Receipt for shingles and nails from Roofing Depot.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -60,7 +60,7 @@
       "amount": null,
       "currency": null,
       "title": "Final cleanup",
-      "summary": "The final cleanup was completed.",
+      "summary": "The final cleanup is complete.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -69,6 +69,6 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "The north slope shingles were replaced, a photo was taken, a receipt for materials was recorded, and the final cleanup was completed.",
+  "overall_summary": "The damaged shingles on the north slope were replaced, a photo was taken, a receipt for materials was recorded, and the final cleanup is complete.",
   "warnings": []
 }

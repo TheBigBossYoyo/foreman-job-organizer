@@ -1,8 +1,8 @@
 # Foreman AI Job Organizer — Option C
 
-A VTSP technical-track prototype that converts a messy stream of construction
-job information—notes, texts, receipts, photo captions, deliveries, inspections,
-payments, and scheduling updates—into validated structured output.
+A VTSP technical-track prototype. It takes the running record of a construction
+job, the notes and texts and receipts that pile up while the work happens, and
+turns it into a timeline you can actually read.
 
 ## What it produces
 
@@ -18,52 +18,36 @@ payments, and scheduling updates—into validated structured output.
 Use only made-up sample data. Never use real Foreman customer, employee, or
 company data.
 
-## Fastest setup
+## Setup
 
-### 1. Install Python packages
+Install the packages:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 2. Run immediately in demo mode
-
-No API key is needed:
-
-```bash
-streamlit run app.py
-```
-
-The app automatically enables rule-based demo mode if no Groq key is present.
-
-### 3. Enable real AI extraction with Groq
-
-1. Create a free Groq API key.
-2. Copy `.env.example` to `.env`.
-3. Put the key in `.env`:
+Then add a Groq API key. Copy `.env.example` to `.env` and fill it in:
 
 ```text
 GROQ_API_KEY=your_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-4. Restart Streamlit and disable **Demo mode** in the sidebar.
+`.env` is gitignored. Never commit the key.
 
-The model name is configurable because providers can retire or replace models.
+Run the app:
+
+```bash
+streamlit run app.py
+```
 
 ## Run the batch processor
 
-Process every `.txt` file in `data/samples` and save JSON outputs plus a CSV
+Processes every `.txt` in `data/samples`, writes one JSON per sample plus a CSV
 results log:
 
 ```bash
 python -m src.batch
-```
-
-Force no-key demo mode:
-
-```bash
-python -m src.batch --demo
 ```
 
 ## Run tests
@@ -75,14 +59,13 @@ pytest
 ## Repository structure
 
 ```text
-foreman_job_organizer/
+Foreman Job Organizer/
 ├── app.py
 ├── data/
 │   └── samples/
 ├── outputs/
 ├── src/
 │   ├── batch.py
-│   ├── demo_mode.py
 │   ├── organizer.py
 │   ├── prompts.py
 │   └── schema.py
@@ -96,16 +79,48 @@ foreman_job_organizer/
 ## Core pipeline
 
 1. Take raw text.
-2. Build an explicit extraction prompt with a strict JSON schema.
-3. Call Groq, or use rule-based demo mode.
-4. Extract and parse the JSON safely.
+2. Build the prompt: instructions, the schema, a worked example, the missing-data rule.
+3. Call Groq.
+4. Slice out the JSON object and parse it.
 5. Validate required fields and allowed values with Pydantic.
-6. Return a structured result or flag the error.
-7. Save results individually or process a folder in one robust batch run.
+6. Return the result, or raise with the reason it failed.
+7. `src/batch.py` runs the whole folder and logs a row per sample.
 
 ## Missing-data rule
 
-When information is absent or genuinely ambiguous, the AI must return `null`
-and add an explanatory warning. It must not guess. Ambiguous or risky items
-should be flagged for human review.
+When something is absent or genuinely ambiguous, return `null` and add a
+warning. Do not guess. If even a human would be unsure, flag it for review
+rather than committing to an answer.
 
+## Accuracy so far
+
+Rough Week 3 count, scored by reading each output against its source text.
+125 fields across the 5 samples:
+
+| Measure | Result |
+| --- | --- |
+| Field-level accuracy | 116/125 (93%) |
+| Samples fully correct, no errors | 1/5 |
+
+The gap between those two numbers is the interesting part: most fields are
+right, but only one document is completely clean, because the errors are spread
+thin rather than concentrated in one bad sample.
+
+**Weakest field: dates.** 5 of the 9 errors are the model assigning a date that
+is not literally in the text. Two kinds:
+
+- Inheriting a date from the line above. In `02_easy_roof` the receipt and photo
+  have no date of their own and were given the previous line's date at high
+  confidence with no warning. The same shape in `01_easy_kitchen` correctly
+  returned `null`, so the behaviour is inconsistent rather than wrong-by-design.
+- Inventing a year. `03_tricky_bathroom` says `7/27` and nothing else; the model
+  returned `2026-07-27`. The prompt already says to use `null` when the year
+  cannot be safely inferred, and it did not follow that here.
+
+Other errors: the client name in `04_tricky_painting` was inferred from the
+project title when no client is named, one vendor location was missed, one photo
+was categorized as an issue, and one unconfirmed site visit was not flagged as
+an action.
+
+Fixing the date rule is the first job in Week 4, and it is the before/after
+measurement for the accuracy write-up.

@@ -1,5 +1,5 @@
 {
-  "project_name": "Wilson interior painting",
+  "project_name": "wilson interior painting",
   "client_name": "Wilson",
   "property_address": null,
   "items": [
@@ -12,71 +12,70 @@
       "amount": null,
       "currency": null,
       "title": "Living room painting update",
-      "summary": "The living room is done except for touch-ups.",
+      "summary": "The living room painting is complete except for touch-ups.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "the living room is done except for touch-ups."
+      "source_excerpt": "living room done except touch ups"
     },
     {
       "item_id": "item_002",
-      "category": "client_update",
+      "category": "issue",
       "date": null,
       "people": [
-        "Wilson"
+        "homeowner"
       ],
       "location": null,
       "amount": null,
       "currency": null,
       "title": "Bedroom color issue",
-      "summary": "The homeowner reported the bedroom color looks wrong.",
+      "summary": "The homeowner reported that the bedroom color looks wrong, but did not specify the color code.",
       "action_required": true,
-      "action": "Identify the correct paint code and verify with the homeowner.",
+      "action": "Confirm the correct bedroom color with the homeowner.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "the bedroom color looks wrong"
+      "source_excerpt": "homeowner says the bedroom color looks wrong - didnt say which code"
     },
     {
       "item_id": "item_003",
       "category": "receipt",
       "date": null,
       "people": [],
-      "location": "Paint House",
+      "location": null,
       "amount": 118.9,
       "currency": "TND",
       "title": "Painting supplies receipt",
-      "summary": "Receipt for rollers, tape, and primer from Paint House.",
+      "summary": "A receipt for painting supplies, including rollers, tape, and primer, was recorded.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "rollers, tape and primer, 118.90 TND."
+      "source_excerpt": "paint house receipt - rollers, tape, primer - 118.90 TND"
     },
     {
       "item_id": "item_004",
-      "category": "issue",
+      "category": "schedule",
       "date": null,
       "people": [],
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Bedroom color confirmation",
-      "summary": "Need to confirm the correct bedroom color before continuing.",
+      "title": "Work pause",
+      "summary": "Work needs to be paused until the bedroom color is confirmed.",
       "action_required": true,
-      "action": "Confirm the correct bedroom color with the homeowner.",
+      "action": "Confirm the bedroom color before proceeding with the work.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "Need to confirm the correct bedroom color before continuing."
+      "source_excerpt": "need to confirm bedroom color before we keep going"
     }
   ],
   "open_actions": [
-    "Identify the correct paint code and verify with the homeowner.",
-    "Confirm the correct bedroom color with the homeowner."
+    "Confirm the correct bedroom color with the homeowner.",
+    "Confirm the bedroom color before proceeding with the work."
   ],
-  "overall_summary": "The living room painting is nearly complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
+  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and work needs to be paused until it is resolved.",
   "warnings": [
-    "The receipt date was not provided.",
-    "The exact dates for the painting work were not provided."
+    "The date of the painting update, issue report, receipt, and work pause was not provided."
   ]
 }
