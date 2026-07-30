@@ -1,0 +1,10 @@
+Project: Greenfield deck build
+Client: Omar Greenfield
+Address: 7 Meadow Court
+
+2026-07-25 - Lumber delivery arrived at 09:10.
+Photo: three boards appear warped.
+Invoice 1048 was paid: $1,250.00.
+2026-07-26 - City inspection failed because two stair handrail bolts were missing.
+Crew will return after replacement bolts arrive.
+Client text: "Please send the revised completion date."

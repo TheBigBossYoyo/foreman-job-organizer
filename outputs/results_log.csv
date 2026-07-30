@@ -1,0 +1,6 @@
+sample,status,items,actions,notes
+01_easy_kitchen.txt,pass,4,0,Demo mode was used; connect Groq for stronger extraction.
+02_easy_roof.txt,pass,4,1,Demo mode was used; connect Groq for stronger extraction.
+03_tricky_bathroom.txt,pass,5,1,Demo mode was used; connect Groq for stronger extraction.
+04_tricky_painting.txt,pass,4,1,Demo mode was used; connect Groq for stronger extraction.
+05_mixed_job_stream.txt,pass,6,1,Demo mode was used; connect Groq for stronger extraction.

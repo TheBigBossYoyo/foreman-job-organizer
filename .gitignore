@@ -1,0 +1,12 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/secrets.toml
+outputs/*.json
+!outputs/.gitkeep
+
+# Program-provided guideline packets, not our work
+*.docx
