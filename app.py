@@ -7,7 +7,13 @@ import streamlit as st
 
 from src.organizer import JobOrganizerError, organize_job_stream
 
+SAMPLE_DIR = Path("data/samples")
+
 st.set_page_config(page_title="Foreman AI Job Organizer", page_icon="🏗️", layout="wide")
+
+
+def load_sample(name):
+    return (SAMPLE_DIR / name).read_text(encoding="utf-8")
 
 st.title("🏗️ Foreman AI Job Organizer")
 st.caption("Paste the running record of a job and get back a timeline you can read.")
@@ -28,19 +34,21 @@ company data.
 """
     )
 
-default_text = """Project: Chen bathroom renovation
-Client: Maya Chen
-Address: 44 Pine Avenue
+    st.header("Samples")
+    sample_names = sorted(path.name for path in SAMPLE_DIR.glob("*.txt"))
+    if sample_names:
+        chosen = st.selectbox("Test file", sample_names)
+        if st.button("Load into the box"):
+            st.session_state["raw_text"] = load_sample(chosen)
+    else:
+        st.caption(f"No .txt files found in {SAMPLE_DIR}.")
 
-2026-07-27 - Crew note: Demolition is complete. Found moisture behind the shower wall.
-Photo: dark staining around the lower-left corner of the shower framing.
-Receipt: BuildMart, cement board and waterproofing membrane, $326.40.
-Client text: "Please confirm whether the moisture issue changes the Friday tile start."
-2026-07-28 - Inspector Lopez can visit at 2:30 PM on Thursday.
-Delivery update: Vanity is delayed and now expected 2026-08-03.
-"""
+# Open on the first sample so the box is never empty, and so what you see is a
+# real test file rather than a copy that drifts out of date.
+if "raw_text" not in st.session_state:
+    st.session_state["raw_text"] = load_sample(sample_names[0]) if sample_names else ""
 
-raw_text = st.text_area("Paste a messy job stream", value=default_text, height=300)
+raw_text = st.text_area("Paste a messy job stream", height=300, key="raw_text")
 
 if st.button("Organize job", type="primary", use_container_width=True):
     try:
