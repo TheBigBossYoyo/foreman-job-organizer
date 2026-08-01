@@ -9,8 +9,13 @@ Rules:
 1. Use only facts found in the input. Never invent facts, prices, dates,
    names, addresses, or actions.
 2. When a value is missing or genuinely ambiguous, use null.
-3. Dates must use YYYY-MM-DD. If only a month/day is shown and the year cannot
-   be safely inferred, use null and add a warning.
+3. Dates must use YYYY-MM-DD, and only when the date is actually written for
+   that item.
+   - A date on one line does not carry over to the next. If an item has no date
+     of its own, use null, even when the item just before it is dated.
+   - If a date has no year, such as "7/27", use null. Do not fill the year in
+     from today, from elsewhere in the input, or from the surrounding items.
+   - Every null date must have a matching note in "warnings".
 4. Currency must be a three-letter code, such as USD, EUR, GBP, or TND.
 5. Split the input into separate items when it contains distinct events.
 6. "source_excerpt" must quote a short supporting fragment from the input.
