@@ -61,12 +61,31 @@ if st.button("Organize job", type="primary", use_container_width=True):
 if "result" in st.session_state:
     result = st.session_state["result"]
 
+    # Dates were the weakest field in the Week 3 scoring, and a missing date or a
+    # low confidence label is exactly where the model tends to have guessed. Put
+    # those items in front of the reviewer instead of leaving them to be found.
+    needs_review = {
+        item["item_id"] for item in result["items"]
+        if item["date"] is None or item["confidence"] == "low"
+    }
+    if needs_review:
+        flagged_ids = ", ".join(sorted(needs_review))
+        st.info(
+            f"{len(needs_review)} of {len(result['items'])} items need a human "
+            f"check ({flagged_ids}). They are missing a date or came back at low "
+            f"confidence."
+        )
+
+    for warning in result["warnings"]:
+        st.warning(warning)
+
     left, right = st.columns([2, 1])
 
     with left:
         st.subheader("Organized timeline")
         for item in result["items"]:
             header = (
+                f"{'⚠ ' if item['item_id'] in needs_review else ''}"
                 f"{item['item_id']} · {item['category'].replace('_', ' ').title()} · "
                 f"{item['title']}"
             )
@@ -95,11 +114,6 @@ if "result" in st.session_state:
                 st.checkbox(action, value=False)
         else:
             st.success("No open actions detected.")
-
-        if result["warnings"]:
-            st.subheader("Warnings")
-            for warning in result["warnings"]:
-                st.warning(warning)
 
     st.download_button(
         "Download JSON",
