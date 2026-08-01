@@ -1,0 +1,12 @@
+{
+  "project_name": "Chen bathroom reno",
+  "client_name": "Maya Chen",
+  "property_address": "44 Pine Ave",
+  "items": [
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "photo", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "client_update", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "schedule", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "delivery", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}

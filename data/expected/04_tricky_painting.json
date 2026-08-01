@@ -1,0 +1,11 @@
+{
+  "project_name": "wilson interior painting",
+  "client_name": null,
+  "property_address": null,
+  "items": [
+    {"category": "contractor_update", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "receipt", "date": null, "action_required": false, "amount": 118.90, "currency": "TND"},
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}

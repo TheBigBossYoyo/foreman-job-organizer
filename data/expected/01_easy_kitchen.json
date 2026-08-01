@@ -1,0 +1,11 @@
+{
+  "project_name": "Alvarez kitchen renovation",
+  "client_name": "Sofia Alvarez",
+  "property_address": "18 Cedar Lane",
+  "items": [
+    {"category": "contractor_update", "date": "2026-07-21", "action_required": false, "amount": null, "currency": null},
+    {"category": "receipt", "date": null, "action_required": false, "amount": 142.75, "currency": "USD"},
+    {"category": "delivery", "date": "2026-07-22", "action_required": false, "amount": null, "currency": null},
+    {"category": "client_update", "date": null, "action_required": false, "amount": null, "currency": null}
+  ]
+}

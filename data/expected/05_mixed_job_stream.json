@@ -1,0 +1,12 @@
+{
+  "project_name": "Greenfield deck build",
+  "client_name": "Omar Greenfield",
+  "property_address": "7 Meadow Court",
+  "items": [
+    {"category": "delivery", "date": "2026-07-25", "action_required": false, "amount": null, "currency": null},
+    {"category": "photo", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "payment", "date": null, "action_required": false, "amount": 1250.00, "currency": "USD"},
+    {"category": "inspection", "date": "2026-07-26", "action_required": true, "amount": null, "currency": null},
+    {"category": "client_update", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "project_name": "Patel roof repair",
+  "client_name": "Arjun Patel",
+  "property_address": "210 Lake Road",
+  "items": [
+    {"category": "contractor_update", "date": "2026-07-23", "action_required": false, "amount": null, "currency": null},
+    {"category": "photo", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "receipt", "date": null, "action_required": false, "amount": 486.20, "currency": "USD"},
+    {"category": "contractor_update", "date": "2026-07-24", "action_required": false, "amount": null, "currency": null}
+  ]
+}
