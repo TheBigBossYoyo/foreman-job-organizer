@@ -6,23 +6,23 @@
     {
       "item_id": "item_001",
       "category": "contractor_update",
-      "date": "2026-07-27",
+      "date": null,
       "people": [],
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Demo completion and moisture discovery",
+      "title": "Demo completion",
       "summary": "Demo was completed and moisture was found behind the shower wall.",
       "action_required": true,
-      "action": "Assess and address the moisture issue behind the shower wall.",
+      "action": "Assess the moisture issue and determine the impact on the project timeline.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "opened up the shower wall and there is moisture behind it"
+      "source_excerpt": "7/27 demo done. opened up the shower wall and there is moisture behind it"
     },
     {
       "item_id": "item_002",
       "category": "photo",
-      "date": "2026-07-27",
+      "date": null,
       "people": [],
       "location": null,
       "amount": null,
@@ -33,7 +33,7 @@
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "dark staining, lower left of the shower framing"
+      "source_excerpt": "photo_0431.jpg - dark staining, lower left of the shower framing"
     },
     {
       "item_id": "item_003",
@@ -45,10 +45,10 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Moisture impact on tile start date",
-      "summary": "The client inquired whether the moisture issue would delay the tile start date on Friday.",
+      "title": "Schedule inquiry",
+      "summary": "The client inquired whether the moisture issue would delay the tile start on Friday.",
       "action_required": true,
-      "action": "Respond to the client regarding the potential delay in tile start date.",
+      "action": "Respond to the client regarding the potential delay.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "does the moisture thing push the tile start on friday??"
@@ -63,7 +63,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Lopez site visit",
+      "title": "Lopez visit",
       "summary": "Lopez may visit the site on Thursday to assess the situation.",
       "action_required": false,
       "action": null,
@@ -79,23 +79,23 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Vanity delivery delay",
+      "title": "Vanity delay",
       "summary": "The vanity supplier reported a delay without providing a firm delivery date.",
       "action_required": true,
-      "action": "Follow up with the supplier to obtain a revised delivery date for the vanity.",
+      "action": "Follow up with the supplier to obtain a revised delivery date.",
       "priority": "medium",
       "confidence": "high",
       "source_excerpt": "vanity - supplier called, delayed, wouldnt give me a firm date"
     }
   ],
   "open_actions": [
-    "Assess and address the moisture issue behind the shower wall.",
-    "Respond to the client regarding the potential delay in tile start date.",
-    "Follow up with the supplier to obtain a revised delivery date for the vanity."
+    "Assess the moisture issue and determine the impact on the project timeline.",
+    "Respond to the client regarding the potential delay.",
+    "Follow up with the supplier to obtain a revised delivery date."
   ],
-  "overall_summary": "The demo was completed, revealing moisture behind the shower wall. The client inquired about the impact on the tile start date, and there are issues with the vanity delivery.",
+  "overall_summary": "The demo was completed, revealing a moisture issue, and the client inquired about potential delays. The vanity supplier reported a delay, and Lopez may visit the site on Thursday.",
   "warnings": [
-    "The exact calendar date for Friday was not provided.",
-    "The date of Lopez's potential site visit was not confirmed."
+    "The date of the demo completion was not provided in the standard format.",
+    "The exact calendar dates for Friday and Thursday were not provided."
   ]
 }

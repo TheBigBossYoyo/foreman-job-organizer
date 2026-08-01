@@ -1,6 +1,6 @@
 {
   "project_name": "wilson interior painting",
-  "client_name": "Wilson",
+  "client_name": null,
   "property_address": null,
   "items": [
     {
@@ -12,7 +12,7 @@
       "amount": null,
       "currency": null,
       "title": "Living room painting update",
-      "summary": "The living room painting is complete except for touch-ups.",
+      "summary": "The living room painting is done except for touch-ups.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -34,7 +34,7 @@
       "action_required": true,
       "action": "Confirm the correct bedroom color with the homeowner.",
       "priority": "high",
-      "confidence": "high",
+      "confidence": "medium",
       "source_excerpt": "homeowner says the bedroom color looks wrong - didnt say which code"
     },
     {
@@ -74,8 +74,8 @@
     "Confirm the correct bedroom color with the homeowner.",
     "Confirm the bedroom color before proceeding with the work."
   ],
-  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and work needs to be paused until it is resolved.",
+  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
   "warnings": [
-    "The date of the painting update, issue report, receipt, and work pause was not provided."
+    "The dates for the living room painting update, bedroom color issue, receipt, and work pause were not provided."
   ]
 }

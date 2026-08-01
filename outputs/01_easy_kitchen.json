@@ -71,9 +71,9 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "The crew completed cabinet removal, new cabinets were delivered, a receipt for drywall and screws was recorded, and the client approved the quartz countertop sample.",
+  "overall_summary": "The crew completed cabinet removal, a receipt for drywall and screws was recorded, new cabinets were delivered, and the client approved the quartz countertop sample.",
   "warnings": [
-    "The receipt date for drywall and screws was not provided.",
-    "The date of the client update for the quartz countertop sample approval was not provided."
+    "The receipt date was not provided.",
+    "The date of the client update was not provided."
   ]
 }
