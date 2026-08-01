@@ -51,6 +51,13 @@ if "raw_text" not in st.session_state:
 raw_text = st.text_area("Paste a messy job stream", height=300, key="raw_text")
 
 if st.button("Organize job", type="primary", use_container_width=True):
+    # Clear the last run before starting. Otherwise a failed call leaves the
+    # previous timeline sitting under the error message, and ticked-off actions
+    # carry over onto a completely different job.
+    st.session_state.pop("result", None)
+    for key in [key for key in st.session_state if key.startswith("action_")]:
+        del st.session_state[key]
+
     try:
         with st.spinner("Organizing the job stream..."):
             result = organize_job_stream(raw_text)
@@ -110,8 +117,10 @@ if "result" in st.session_state:
 
         st.subheader("Open actions")
         if result["open_actions"]:
-            for action in result["open_actions"]:
-                st.checkbox(action, value=False)
+            # Keyed by position, because two open actions can read the same and
+            # Streamlit raises on duplicate widget ids built from the label.
+            for index, action in enumerate(result["open_actions"]):
+                st.checkbox(action, key=f"action_{index}")
         else:
             st.success("No open actions detected.")
 
