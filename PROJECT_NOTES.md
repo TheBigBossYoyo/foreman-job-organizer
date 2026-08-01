@@ -39,14 +39,23 @@ and source excerpt agree with the input without invented information.
 Return null and add a warning. Never guess.
 
 ## Week 4 plan
-Interface: text box for the pasted stream, timeline and open actions on screen,
-JSON download.
+Interface: done early. app.py has the text box, the timeline, the open actions
+and the JSON download, plus a sample picker and a flag on any item with a
+missing date or low confidence.
 
-Test set: expand from 5 to 8-10 samples and hand-write the correct output for
-each before measuring anything.
+Scoring: done. `python -m src.score` gives the field count and the miss list, so
+the number can be rerun after every prompt change instead of recounted.
 
-Scoring: compare field by field, report a percentage rather than an impression.
+Test set: still 5 samples, expand to 8-10. The answers live in data/expected
+now, so a new sample means writing its expected file at the same time.
 
-Weakest field to keep improving: dates. The model fills in a date that is not
-in the text, either by copying the line above or by inventing a year for a
-"7/27" style date. 5 of the 9 errors in the Week 3 scoring were this.
+Weakest field: dates, and now specifically inheritance. Inventing a year is
+fixed. Copying the date off the line above is not, and adding another sentence
+to the prompt did not move it at all, so the next attempt should not be another
+sentence. Two options worth trying:
+
+- Feed the model one line at a time so there is no line above to copy from.
+- Check it in code after the fact: if the date does not appear inside that
+  item's own source_excerpt, clear it and add a warning.
+
+The second is cheaper and testable without an API call, so try it first.
