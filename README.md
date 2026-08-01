@@ -50,6 +50,15 @@ results log:
 python -m src.batch
 ```
 
+## Score the outputs
+
+Compares everything in `outputs/` against the hand-written answers in
+`data/expected/` and prints the misses:
+
+```bash
+python -m src.score
+```
+
 ## Run tests
 
 ```bash
@@ -62,13 +71,15 @@ pytest
 Foreman Job Organizer/
 ├── app.py
 ├── data/
+│   ├── expected/
 │   └── samples/
 ├── outputs/
 ├── src/
 │   ├── batch.py
 │   ├── organizer.py
 │   ├── prompts.py
-│   └── schema.py
+│   ├── schema.py
+│   └── score.py
 ├── tests/
 ├── .env.example
 ├── .gitignore
@@ -94,33 +105,48 @@ rather than committing to an answer.
 
 ## Accuracy so far
 
-Rough Week 3 count, scored by reading each output against its source text.
-125 fields across the 5 samples:
+`python -m src.score` compares `outputs/` against `data/expected/`. 125 fields
+across the 5 samples: three header fields each, then category, date,
+action_required, amount and source_excerpt for every one of the 22 items.
 
 | Measure | Result |
 | --- | --- |
-| Field-level accuracy | 116/125 (93%) |
-| Samples fully correct, no errors | 1/5 |
+| Field accuracy | 115/125 (92%) |
+| Samples with no errors | 1/5 |
 
-The gap between those two numbers is the interesting part: most fields are
-right, but only one document is completely clean, because the errors are spread
-thin rather than concentrated in one bad sample.
+The gap between those two numbers is the interesting part. Most fields are
+right, but only one document is completely clean, because the errors spread
+thin rather than piling up in one bad sample.
 
-**Weakest field: dates.** 5 of the 9 errors are the model assigning a date that
-is not literally in the text. Two kinds:
+### What the date rule change did
 
-- Inheriting a date from the line above. In `02_easy_roof` the receipt and photo
-  have no date of their own and were given the previous line's date at high
-  confidence with no warning. The same shape in `01_easy_kitchen` correctly
-  returned `null`, so the behaviour is inconsistent rather than wrong-by-design.
-- Inventing a year. `03_tricky_bathroom` says `7/27` and nothing else; the model
-  returned `2026-07-27`. The prompt already says to use `null` when the year
-  cannot be safely inferred, and it did not follow that here.
+Dates were the weakest field, in two shapes. Rewriting rule 3 to spell both out
+fixed one of them and left the other untouched. Both counts below come from the
+same scorer, so they are comparable:
 
-Other errors: the client name in `04_tricky_painting` was inferred from the
-project title when no client is named, one vendor location was missed, one photo
-was categorized as an issue, and one unconfirmed site visit was not flagged as
-an action.
+| | Before | After |
+| --- | --- | --- |
+| Field accuracy | 112/125 (90%) | 115/125 (92%) |
 
-Fixing the date rule is the first job in Week 4, and it is the before/after
-measurement for the accuracy write-up.
+- **Invented years: fixed.** `03_tricky_bathroom` says `7/27` and nothing else.
+  The model used to return `2026-07-27`. It now returns `null` with a warning.
+- **Invented client name: fixed too, unexpectedly.** `04_tricky_painting` names
+  no client, and the model used to answer `Wilson` by reading it off the project
+  title. Telling it not to fill in years from elsewhere seems to have made it
+  more careful about the header fields generally.
+- **Inherited dates: not fixed.** In `02_easy_roof` the photo and receipt lines
+  still take the date of the dated line above them. `05_mixed_job_stream` does
+  it for the photo but not for the invoice on the very next line, so it is not
+  even consistent with itself. The model is treating a dated line as a heading
+  for the block underneath, and telling it not to has not been enough.
+
+### What is still wrong
+
+Ten misses. Three are the inherited dates above. Four are category
+disagreements, and some of those are genuinely arguable, such as whether
+"demo done ... there is moisture behind it" is a contractor update or an issue.
+Those judgements live in `data/expected/` and can be challenged. The rest are
+missed action flags.
+
+Inheritance is the Week 4 target, and it will need something other than another
+sentence in the prompt.
