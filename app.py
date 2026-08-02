@@ -9,6 +9,7 @@ from src.aggregate import summarize
 from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import resolve_chain
 from src.schema import JobOrganizationResult
+from src.text import normalize
 
 SAMPLE_DIR = Path("data/samples")
 
@@ -91,7 +92,7 @@ CSS = """
 /* ---- timeline ---- */
 .jo-row {
   display: grid; grid-template-columns: 3.9rem .9rem 1fr;
-  column-gap: .8rem; padding-bottom: 1.5rem;
+  column-gap: .85rem; padding-bottom: 1.15rem;
 }
 .jo-when {
   text-align: right; font-size: .76rem; font-weight: 600; color: #64748B;
@@ -105,8 +106,8 @@ CSS = """
   box-shadow: 0 0 0 3px #fff; z-index: 1;
 }
 .jo-rail::after {
-  content: ""; position: absolute; left: .385rem; top: .55rem; bottom: -1.5rem;
-  width: 1.5px; background: #ECEEF1;
+  content: ""; position: absolute; left: .385rem; top: .55rem; bottom: -1.15rem;
+  width: 1.5px; background: #E2E8F0;
 }
 .jo-row:last-child .jo-rail::after { display: none; }
 
@@ -114,8 +115,11 @@ CSS = """
 .jo-cat {
   font-size: .66rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
 }
+/* Sits next to the category, not pushed to the far edge. Right-aligning it
+   across a 700px column left it stranded a long way from the item it belongs
+   to, reading as a stray number rather than that item's cost. */
 .jo-amt {
-  margin-left: auto; font-size: .87rem; font-weight: 700; color: #0F172A;
+  font-size: .87rem; font-weight: 700; color: #0F172A;
   font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .jo-flag {
@@ -155,6 +159,25 @@ def format_date(iso_date):
         return datetime.strptime(iso_date, "%Y-%m-%d").strftime("%d %b")
     except ValueError:
         return iso_date
+
+
+def is_restatement(summary, excerpt):
+    """True when the summary just says the source line again.
+
+    On a plainly written line the model's summary is the line with a word
+    changed, so showing both prints the same sentence twice under a title that
+    is a third version of it. When that happens only the quote is kept: it is
+    the evidence, and it is what the input actually said.
+    """
+    left, right = normalize(summary), normalize(excerpt)
+    if not left or not right:
+        return False
+    if left in right or right in left:
+        return True
+
+    left_words, right_words = set(left.split()), set(right.split())
+    shared = len(left_words & right_words)
+    return shared / max(len(left_words), len(right_words)) >= 0.7
 
 
 def render_numbers(summary):
@@ -226,7 +249,9 @@ def render_row(item):
 
     parts.append("</div>")
     parts.append(f'<div class="jo-title">{escape(item["title"])}</div>')
-    parts.append(f'<div class="jo-sum">{escape(item["summary"])}</div>')
+
+    if not is_restatement(item["summary"], item["source_excerpt"]):
+        parts.append(f'<div class="jo-sum">{escape(item["summary"])}</div>')
 
     if item["action_required"] and item["action"]:
         parts.append(f'<div class="jo-act">{escape(item["action"])}</div>')
@@ -272,7 +297,7 @@ with st.expander("Job stream", expanded="result" not in st.session_state):
         "stream", height=260, key="raw_text", label_visibility="collapsed"
     )
 
-if st.button("Organize", type="primary", use_container_width=True):
+if st.button("Organize", type="primary"):
     # Clear the last run first. Otherwise a failure leaves the previous timeline
     # under the error, and ticked actions carry onto a different job.
     st.session_state.pop("result", None)
@@ -282,6 +307,9 @@ if st.button("Organize", type="primary", use_container_width=True):
     try:
         with st.spinner("Organizing..."):
             st.session_state["result"] = organize_job_stream(raw_text).model_dump()
+        # The input expander was already drawn open earlier in this same run, so
+        # without a rerun it stays open and pushes the result down the page.
+        st.rerun()
     except (ValueError, JobOrganizerError) as exc:
         st.error(str(exc))
 
