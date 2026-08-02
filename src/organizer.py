@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from . import providers
 from .dates import ground_dates
+from .guardrails import enforce_all
 from .prompts import SYSTEM_PROMPT, build_user_prompt
 from .schema import JobOrganizationResult
 
@@ -66,7 +67,11 @@ def organize_job_stream(raw_text, model=None):
     # Validation only proves the shape is right. A date can pass every check
     # here and still have been copied off a neighbouring line, so compare each
     # one against the line it came from and drop the ones that are not there.
-    return ground_dates(result, raw_text)
+    ground_dates(result, raw_text)
+
+    # Guardrails run last, so the no_date flag reflects the dates that actually
+    # survived rather than the ones the model claimed.
+    return enforce_all(result)
 
 
 def save_result(result, path):
