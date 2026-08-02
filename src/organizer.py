@@ -5,6 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
+from .dates import ground_dates
 from .prompts import SYSTEM_PROMPT, build_user_prompt
 from .schema import JobOrganizationResult
 
@@ -81,9 +82,14 @@ def organize_job_stream(raw_text, model=None):
     # JSON can be well formed and still be wrong for us: an invented category,
     # a negative amount, a missing summary. Check it before anyone uses it.
     try:
-        return JobOrganizationResult.model_validate(parsed)
+        result = JobOrganizationResult.model_validate(parsed)
     except ValidationError as exc:
         raise JobOrganizerError(f"Output validation failed:\n{exc}")
+
+    # Validation only proves the shape is right. A date can pass every check
+    # here and still have been copied off a neighbouring line, so drop the ones
+    # the item does not actually say.
+    return ground_dates(result)
 
 
 def save_result(result, path):
