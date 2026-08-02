@@ -17,7 +17,9 @@
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "lumber delivery showed up"
+      "source_excerpt": "lumber delivery showed up",
+      "flags": [],
+      "compliance_notes": null
     },
     {
       "item_id": "item_002",
@@ -33,7 +35,11 @@
       "action": "Document the warped boards and arrange replacements.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "3 boards look warped, see pic"
+      "source_excerpt": "3 boards look warped, see pic",
+      "flags": [
+        "no_date"
+      ],
+      "compliance_notes": null
     },
     {
       "item_id": "item_003",
@@ -44,12 +50,16 @@
       "amount": 1250.0,
       "currency": "USD",
       "title": "Lumber payment",
-      "summary": "Payment for lumber, invoice 1048.",
+      "summary": "Payment for lumber, invoice 1048, has been made.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "inv 1048 PAID $1,250.00"
+      "source_excerpt": "inv 1048 PAID $1,250.00",
+      "flags": [
+        "no_date"
+      ],
+      "compliance_notes": null
     },
     {
       "item_id": "item_004",
@@ -62,10 +72,12 @@
       "title": "City inspection",
       "summary": "The city inspection failed due to two missing bolts on the stair handrail.",
       "action_required": true,
-      "action": "Install the replacement bolts and schedule a re-inspection.",
+      "action": "Obtain replacement bolts and reschedule the city inspection.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "city inspection FAILED. two bolts missing on the stair handrail."
+      "source_excerpt": "city inspection FAILED. two bolts missing on the stair handrail.",
+      "flags": [],
+      "compliance_notes": null
     },
     {
       "item_id": "item_005",
@@ -83,18 +95,24 @@
       "action": "Provide the client with the revised completion date once confirmed.",
       "priority": "medium",
       "confidence": "medium",
-      "source_excerpt": "can you send me the revised completion date"
+      "source_excerpt": "can you send me the revised completion date",
+      "flags": [
+        "no_date"
+      ],
+      "compliance_notes": null
     }
   ],
   "open_actions": [
     "Document the warped lumber and arrange replacements.",
-    "Install the replacement bolts and schedule a re-inspection.",
+    "Obtain replacement bolts and reschedule the city inspection.",
     "Provide the client with the revised completion date once confirmed."
   ],
-  "overall_summary": "Lumber delivery arrived with warped boards, a payment was made, the city inspection failed, and the client requested the revised completion date.",
+  "overall_summary": "Lumber was delivered with warped boards, a payment was made, the city inspection failed, and the client requested the revised completion date.",
   "warnings": [
     "The payment date was not provided.",
     "The exact revised completion date was not provided.",
-    "item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one."
-  ]
+    "item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one.",
+    "3 of 5 items were flagged for review by the guardrails."
+  ],
+  "provider": "groq"
 }
