@@ -1,4 +1,10 @@
-from src.aggregate import derived_actions, spend_by_currency, summarize, timeline
+from src.aggregate import (
+    derived_actions,
+    ordered_items,
+    spend_by_currency,
+    summarize,
+    timeline,
+)
 from src.schema import JobItem, JobOrganizationResult
 
 
@@ -30,13 +36,37 @@ def test_timeline_orders_by_date():
     assert [row["date"] for row in rows] == ["2026-07-21", "2026-07-24"]
 
 
-def test_undated_items_sink_to_the_bottom_but_are_kept():
+def test_an_undated_item_stays_between_the_dated_ones_around_it():
+    # The receipt sits under the 21st and above the 22nd in the input, so that
+    # is when it happened, even though its line carries no date.
     rows = timeline([
-        make_item(item_id="item_001", date=None, title="Undated"),
+        make_item(item_id="item_001", date="2026-07-21", title="Cabinet removal"),
+        make_item(item_id="item_002", date=None, title="Receipt"),
+        make_item(item_id="item_003", date="2026-07-22", title="Delivery"),
+        make_item(item_id="item_004", date=None, title="Client approval"),
+    ])
+
+    assert [row["title"] for row in rows] == [
+        "Cabinet removal", "Receipt", "Delivery", "Client approval"
+    ]
+
+
+def test_placing_an_undated_item_does_not_give_it_a_date():
+    rows = timeline([
+        make_item(item_id="item_001", date="2026-07-21", title="Dated"),
+        make_item(item_id="item_002", date=None, title="Undated"),
+    ])
+
+    assert rows[1]["date"] is None
+
+
+def test_an_undated_item_before_any_date_stays_at_the_top():
+    order = ordered_items([
+        make_item(item_id="item_001", date=None, title="Opening note"),
         make_item(item_id="item_002", date="2026-07-21", title="Dated"),
     ])
 
-    assert [row["title"] for row in rows] == ["Dated", "Undated"]
+    assert [item.title for item in order] == ["Opening note", "Dated"]
 
 
 def test_undated_items_keep_their_input_order():
@@ -46,6 +76,15 @@ def test_undated_items_keep_their_input_order():
     ])
 
     assert [row["title"] for row in rows] == ["First", "Second"]
+
+
+def test_dated_items_still_sort_when_the_model_emits_them_out_of_order():
+    order = ordered_items([
+        make_item(item_id="item_001", date="2026-07-24", title="Later"),
+        make_item(item_id="item_002", date="2026-07-21", title="Earlier"),
+    ])
+
+    assert [item.title for item in order] == ["Earlier", "Later"]
 
 
 def test_currencies_are_totalled_separately():

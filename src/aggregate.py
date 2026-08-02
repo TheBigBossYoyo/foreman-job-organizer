@@ -11,15 +11,33 @@ result without spending another API call.
 from .guardrails import needs_review
 
 
-def timeline(items):
-    """Chronological. Undated items sink to the bottom, in the order they came.
+def ordered_items(items):
+    """Chronological, with undated items held where the source put them.
 
-    Undated does not mean unimportant — it usually means the source line never
-    said when. They stay visible rather than being dropped or guessed at.
+    An undated line still says something about when it happened: it sits
+    between two dated lines in the input, so it belongs between them. Sinking
+    every undated item to the bottom threw that away, and on a stream where
+    most lines carry no date it left the list in barely any order at all.
+
+    So an undated item sorts as if it shared the date of the last dated item
+    above it. That is an ordering decision only. Its date field stays null and
+    it is still shown as undated. We are placing it, not dating it.
     """
-    dated = sorted((item for item in items if item.date), key=lambda item: item.date)
-    undated = [item for item in items if not item.date]
+    anchor = ""
+    keys = {}
 
+    for position, item in enumerate(items):
+        if item.date:
+            anchor = item.date
+        # An undated item before the first date keeps the empty anchor, which
+        # sorts ahead of every real date, matching where it appears.
+        keys[id(item)] = (anchor, position)
+
+    return sorted(items, key=lambda item: keys[id(item)])
+
+
+def timeline(items):
+    """The rows a reader sees, in the order they should be read."""
     return [
         {
             "date": item.date,
@@ -30,7 +48,7 @@ def timeline(items):
             "currency": item.currency,
             "flags": item.flags,
         }
-        for item in dated + undated
+        for item in ordered_items(items)
     ]
 
 
