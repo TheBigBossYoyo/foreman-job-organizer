@@ -5,7 +5,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from src.aggregate import summarize
+from src.aggregate import ordered_items, summarize
 from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
@@ -189,6 +189,19 @@ def load_sample(name):
     return (SAMPLE_DIR / name).read_text(encoding="utf-8")
 
 
+def load_selected_sample():
+    """Put the chosen sample in the box, and drop the result it does not match.
+
+    Leaving the old timeline up under a different job's text is worse than
+    showing nothing: everything on screen would describe a job that is no
+    longer the one in the input.
+    """
+    st.session_state["raw_text"] = load_sample(st.session_state["sample_choice"])
+    st.session_state.pop("result", None)
+    for key in [key for key in st.session_state if key.startswith("action_")]:
+        del st.session_state[key]
+
+
 def format_date(iso_date):
     """2026-07-21 becomes 21 Jul, which scans far better down a narrow column."""
     if not iso_date:
@@ -328,9 +341,16 @@ with st.sidebar:
     sample_names = sorted(path.name for path in SAMPLE_DIR.glob("*.txt"))
     if sample_names:
         st.markdown('<div class="jo-side-h">Sample</div>', unsafe_allow_html=True)
-        chosen = st.selectbox("Sample", sample_names, label_visibility="collapsed")
-        if st.button("Load", use_container_width=True):
-            st.session_state["raw_text"] = load_sample(chosen)
+        st.selectbox(
+            "Sample",
+            sample_names,
+            key="sample_choice",
+            on_change=load_selected_sample,
+            label_visibility="collapsed",
+        )
+        # Still useful after editing the box by hand: picking the same name
+        # again fires no change event, so there has to be a way back.
+        st.button("Reload", use_container_width=True, on_click=load_selected_sample)
 
     # All three, always, with the reason each is or is not answering. A provider
     # that is simply missing from the list cannot be told apart from one this
@@ -391,14 +411,15 @@ if "result" in st.session_state:
     render_job_head(result)
     render_numbers(summary)
 
-    # Chronological, undated last in arrival order. It is a timeline, so it
-    # should read as one rather than follow the order the model emitted.
-    ordered = sorted(
-        result["items"], key=lambda item: (item["date"] is None, item["date"] or "")
-    )
+    # Ordered by src.aggregate, so the screen and the exported JSON agree about
+    # what order this job happened in.
+    ordered = ordered_items(JobOrganizationResult.model_validate(result).items)
     # One markdown call for the whole list: Streamlit pads every separate call
     # with its own container, which breaks the rail into disconnected pieces.
-    st.markdown("".join(render_row(item) for item in ordered), unsafe_allow_html=True)
+    st.markdown(
+        "".join(render_row(item.model_dump()) for item in ordered),
+        unsafe_allow_html=True,
+    )
 
     if summary["open_actions"]:
         st.markdown('<div class="jo-h">Open actions</div>', unsafe_allow_html=True)
