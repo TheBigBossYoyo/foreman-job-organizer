@@ -7,7 +7,7 @@ import streamlit as st
 
 from src.aggregate import summarize
 from src.organizer import JobOrganizerError, organize_job_stream
-from src.providers import resolve_chain
+from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
 from src.text import normalize
 
@@ -16,9 +16,18 @@ SAMPLE_DIR = Path("data/samples")
 st.set_page_config(page_title="Job Organizer", page_icon="🏗️", layout="centered")
 
 PROVIDER_LABELS = {
-    "anthropic": "Claude",
+    "anthropic": "Anthropic Claude",
     "groq": "Groq",
-    "local": "no model",
+    "local": "Local engine",
+}
+
+# Green only for the one actually answering. A configured-but-idle backup and an
+# unconfigured provider are different facts and should not share a colour.
+STATE_COLORS = {
+    "active": "#16A34A",
+    "standby": "#CBD5E1",
+    "no key": "#FCA5A5",
+    "off": "#E2E8F0",
 }
 
 CATEGORY_LABELS = {
@@ -142,6 +151,28 @@ CSS = """
 .jo-h {
   font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
   color: #94A3B8; margin: 2.2rem 0 .9rem;
+}
+
+/* ---- sidebar ---- */
+[data-testid="stSidebar"] { background: #FAFBFC; border-right: 1px solid #ECEEF1; }
+[data-testid="stSidebar"] .block-container { padding-top: 2.4rem; }
+.jo-side-mark { font-size: 1.05rem; font-weight: 700; color: #0F172A; letter-spacing: -.01em; }
+.jo-side-sub { font-size: .74rem; color: #94A3B8; margin-top: .1rem; margin-bottom: 1.4rem; }
+.jo-side-h {
+  font-size: .64rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #94A3B8; margin: 1.5rem 0 .5rem;
+}
+.jo-prov { display: flex; align-items: center; gap: .5rem; padding: .28rem 0; }
+.jo-prov-dot { width: .5rem; height: .5rem; border-radius: 50%; flex: 0 0 auto; }
+.jo-prov-name { font-size: .84rem; color: #334155; }
+.jo-prov-name.dim { color: #94A3B8; }
+.jo-prov-state {
+  margin-left: auto; font-size: .66rem; font-weight: 600; letter-spacing: .04em;
+  text-transform: uppercase; color: #94A3B8;
+}
+.jo-privacy {
+  font-size: .72rem; color: #94A3B8; line-height: 1.5;
+  border-top: 1px solid #ECEEF1; padding-top: .9rem; margin-top: 1.6rem;
 }
 </style>
 """
@@ -267,25 +298,47 @@ st.markdown(CSS, unsafe_allow_html=True)
 
 chain = resolve_chain()
 st.markdown(
-    f'<div class="jo-top"><span class="jo-name">Job Organizer</span>'
-    f'<span class="jo-engine">{escape(PROVIDER_LABELS.get(chain[0], chain[0]))}</span></div>',
+    f'<div class="jo-top"><span class="jo-name">Organize a job stream</span>'
+    f'<span class="jo-engine">via {escape(PROVIDER_LABELS.get(chain[0], chain[0]))}</span></div>',
     unsafe_allow_html=True,
 )
 
 with st.sidebar:
+    st.markdown(
+        '<div class="jo-side-mark">🏗️ Job Organizer</div>'
+        '<div class="jo-side-sub">Foreman · VTSP technical track</div>',
+        unsafe_allow_html=True,
+    )
+
     sample_names = sorted(path.name for path in SAMPLE_DIR.glob("*.txt"))
     if sample_names:
-        chosen = st.selectbox("Sample", sample_names)
+        st.markdown('<div class="jo-side-h">Sample</div>', unsafe_allow_html=True)
+        chosen = st.selectbox("Sample", sample_names, label_visibility="collapsed")
         if st.button("Load", use_container_width=True):
             st.session_state["raw_text"] = load_sample(chosen)
 
-    st.divider()
-    st.caption("**Providers**  \n" + " → ".join(
-        PROVIDER_LABELS.get(provider, provider) for provider in chain
-    ))
+    # All three, always, with the reason each is or is not answering. A provider
+    # that is simply missing from the list cannot be told apart from one this
+    # app never supported.
+    st.markdown('<div class="jo-side-h">Providers</div>', unsafe_allow_html=True)
+    rows = "".join(
+        f'<div class="jo-prov">'
+        f'<span class="jo-prov-dot" style="background:{STATE_COLORS[state]}"></span>'
+        f'<span class="jo-prov-name{"" if state == "active" else " dim"}">'
+        f'{escape(PROVIDER_LABELS[name])}</span>'
+        f'<span class="jo-prov-state">{escape(state)}</span></div>'
+        for name, state in provider_status()
+    )
+    st.markdown(rows, unsafe_allow_html=True)
+
     if chain == ["local"]:
         st.warning("No API key. Output is keyword-matched, not organized by a model.")
-    st.caption("Made-up sample data only. Never paste real customer or company data.")
+
+    st.markdown(
+        '<div class="jo-privacy">Made-up sample data only. Never paste real '
+        'customer or company data.</div>',
+        unsafe_allow_html=True,
+    )
 
 if "raw_text" not in st.session_state:
     st.session_state["raw_text"] = load_sample(sample_names[0]) if sample_names else ""
