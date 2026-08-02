@@ -47,17 +47,104 @@ CATEGORY_COLORS = {
     "other": "#64748B",
 }
 
-# Neutral greys at low alpha rather than fixed colours, so the cards sit
-# correctly on a light or a dark background without a second stylesheet.
+BRAND = "#EA580C"
+
+# The theme is pinned to light in .streamlit/config.toml, so these can be real
+# colours rather than alpha guesses that have to survive both themes.
 CARD_CSS = """
 <style>
+/* Streamlit's default top padding leaves the header floating. */
+.block-container { padding-top: 2rem; max-width: 1180px; }
+#MainMenu, footer { visibility: hidden; }
+
+.jo-bar {
+  background: linear-gradient(90deg, #EA580C 0%, #F97316 100%);
+  border-radius: 12px;
+  padding: 0.9rem 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 2rem;
+}
+.jo-bar-mark {
+  font-size: 1.6rem;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  padding: 0.2rem 0.45rem;
+  line-height: 1;
+}
+.jo-bar-name { color: #fff; font-weight: 800; font-size: 1.15rem; line-height: 1.2; }
+.jo-bar-sub { color: rgba(255, 255, 255, 0.85); font-size: 0.8rem; }
+.jo-bar-right { margin-left: auto; color: #fff; font-size: 0.8rem; font-weight: 600; }
+
+.jo-hero {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #111827;
+  margin-bottom: 0.7rem;
+}
+.jo-hero em { color: #EA580C; font-style: normal; }
+.jo-lede {
+  font-size: 1.03rem;
+  line-height: 1.6;
+  color: #4B5563;
+  max-width: 46rem;
+  margin-bottom: 1.1rem;
+}
+.jo-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.6rem; }
+.jo-pill {
+  border: 1px solid rgba(234, 88, 12, 0.35);
+  background: rgba(234, 88, 12, 0.07);
+  color: #C2410C;
+  border-radius: 999px;
+  padding: 0.32rem 0.85rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.jo-stats { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.4rem 0 1.6rem; }
+.jo-stat {
+  flex: 1 1 8.5rem;
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.jo-stat-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+.jo-stat-value.accent { color: #EA580C; }
+.jo-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6B7280;
+  margin-top: 0.3rem;
+}
+
+.jo-section {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0.4rem 0 0.8rem;
+}
+
 .jo-card {
-  border: 1px solid rgba(128, 128, 128, 0.22);
+  border: 1px solid #E5E7EB;
   border-left: 4px solid var(--jo-accent, #64748B);
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 0.6rem;
-  background: rgba(128, 128, 128, 0.06);
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.7rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 .jo-head {
   display: flex;
@@ -96,8 +183,8 @@ CARD_CSS = """
   background: rgba(220, 38, 38, 0.15);
   color: #DC2626;
 }
-.jo-title { font-weight: 600; line-height: 1.35; }
-.jo-summary { opacity: 0.85; line-height: 1.5; margin-top: 0.15rem; }
+.jo-title { font-weight: 700; line-height: 1.35; color: #111827; }
+.jo-summary { color: #4B5563; line-height: 1.55; margin-top: 0.2rem; }
 .jo-action {
   margin-top: 0.5rem;
   padding: 0.4rem 0.6rem;
@@ -175,15 +262,85 @@ def load_sample(name):
 
 st.markdown(CARD_CSS, unsafe_allow_html=True)
 
-st.title("🏗️ Foreman AI Job Organizer")
-st.caption("Paste the running record of a job and get back a timeline you can read.")
+
+def render_shell(chain):
+    """Brand bar, headline and capability pills.
+
+    The bar names the provider that would answer right now. It is read from the
+    resolved chain rather than typed in, so it cannot claim a model that is not
+    actually configured.
+    """
+    leader = PROVIDER_LABELS.get(chain[0], chain[0])
+    badge = "Local engine · no model" if chain[0] == "local" else f"Ready · {leader}"
+
+    st.markdown(
+        f"""
+<div class="jo-bar">
+  <span class="jo-bar-mark">🏗️</span>
+  <div>
+    <div class="jo-bar-name">Foreman Job Organizer</div>
+    <div class="jo-bar-sub">Structured job records from an unstructured pile</div>
+  </div>
+  <div class="jo-bar-right">{escape(badge)}</div>
+</div>
+
+<div class="jo-hero">Every job leaves a <em>paper trail</em>.<br>Most of it is texts.</div>
+<div class="jo-lede">
+  Site notes, receipts, photo captions, a supplier who called and would not commit
+  to a date. Paste the pile. Every item is categorized, dated where a date was
+  actually written, and quoted back to the line it came from.
+</div>
+<div class="jo-pills">
+  <span class="jo-pill">Categorized timeline</span>
+  <span class="jo-pill">Amounts &amp; dates extracted</span>
+  <span class="jo-pill">Every fact traceable to its source line</span>
+  <span class="jo-pill">Nothing invented</span>
+  <span class="jo-pill">Structured JSON out</span>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+def render_stats(result, summary):
+    """The numbers strip. Every value is computed from this run's own result.
+
+    Deliberately no job count and no lifetime totals: this app organizes one
+    stream at a time and stores nothing, so any such figure would be invented.
+    """
+    spend = summary["spend"]
+    if spend:
+        currency, total = next(iter(spend.items()))
+        spend_value = f"{total:,.2f}"
+        spend_label = f"recorded spend ({currency})"
+    else:
+        spend_value = "—"
+        spend_label = "no amounts found"
+
+    flagged = summary["needs_review"]
+    cards = [
+        (str(summary["item_count"]), "items organized", True),
+        (spend_value, spend_label, False),
+        (str(flagged), "need review", flagged > 0),
+        (f"{summary['undated']}/{summary['item_count']}", "without a date", False),
+    ]
+
+    blocks = "".join(
+        f'<div class="jo-stat">'
+        f'<div class="jo-stat-value{" accent" if accent else ""}">{escape(value)}</div>'
+        f'<div class="jo-stat-label">{escape(label)}</div></div>'
+        for value, label, accent in cards
+    )
+    st.markdown(f'<div class="jo-stats">{blocks}</div>', unsafe_allow_html=True)
+
+chain = resolve_chain()
+render_shell(chain)
 
 with st.sidebar:
     st.header("Settings")
     # Show the whole chain, not just the winner. Knowing that Anthropic is
     # missing and Groq is carrying the run is the difference between a result
     # you trust and one you check.
-    chain = resolve_chain()
     st.write("**Providers, in order:**")
     for position, provider in enumerate(chain, 1):
         label = PROVIDER_LABELS.get(provider, provider)
@@ -263,10 +420,13 @@ if "result" in st.session_state:
             "keyword and needs checking."
         )
 
+    summary = summarize(JobOrganizationResult.model_validate(result))
+    render_stats(result, summary)
+
     left, right = st.columns([2, 1])
 
     with left:
-        st.subheader("Organized timeline")
+        st.markdown('<div class="jo-section">Timeline</div>', unsafe_allow_html=True)
 
         # Chronological, with undated items last in the order they arrived. It
         # is a timeline, so it should read as one rather than follow whatever
@@ -285,40 +445,51 @@ if "result" in st.session_state:
         )
 
     with right:
-        st.subheader("Job overview")
+        st.markdown('<div class="jo-section">This job</div>', unsafe_allow_html=True)
+
         # "Not stated" rather than "Not found". The field is blank because the
         # source never said, which is the missing-data rule working, not the
         # app failing to locate something that was there.
+        rows = []
         for label, key in [
             ("Project", "project_name"),
             ("Client", "client_name"),
             ("Address", "property_address"),
         ]:
             value = result[key]
-            if value:
-                st.write(f"**{label}:** {value}")
-            else:
-                st.write(f"**{label}:** :grey[not stated in the source]")
-        st.write(result["overall_summary"])
-
-        summary = summarize(JobOrganizationResult.model_validate(result))
-
-        st.subheader("Totals")
-        c1, c2 = st.columns(2)
-        c1.metric("Items", summary["item_count"])
-        c2.metric("Need review", summary["needs_review"])
-        if summary["spend"]:
-            # One line per currency. A single combined total would be a number
-            # that appears nowhere in the input.
-            for currency, total in summary["spend"].items():
-                st.write(f"**Spend ({currency}):** {total:,.2f}")
-        if summary["date_range"]["start"]:
-            st.caption(
-                f"Dated {summary['date_range']['start']} to "
-                f"{summary['date_range']['end']} · {summary['undated']} undated"
+            shown = (
+                escape(value) if value
+                else '<span style="color:#9CA3AF">not stated in the source</span>'
+            )
+            rows.append(
+                f'<div style="margin-bottom:.4rem">'
+                f'<span class="jo-stat-label" style="margin:0">{label}</span><br>{shown}</div>'
             )
 
-        st.subheader("Open actions")
+        dates = summary["date_range"]
+        if dates["start"]:
+            span = (
+                dates["start"] if dates["start"] == dates["end"]
+                else f'{dates["start"]} → {dates["end"]}'
+            )
+            rows.append(
+                f'<div><span class="jo-stat-label" style="margin:0">Dates covered</span>'
+                f'<br>{escape(span)}</div>'
+            )
+
+        st.markdown(
+            f'<div class="jo-card" style="--jo-accent:{BRAND}">{"".join(rows)}</div>',
+            unsafe_allow_html=True,
+        )
+        st.write(result["overall_summary"])
+
+        # The stats strip shows the first currency only. If a job mixes them,
+        # the rest still have to appear somewhere rather than silently vanish.
+        extra = list(summary["spend"].items())[1:]
+        for currency, total in extra:
+            st.write(f"**Also {currency}:** {total:,.2f}")
+
+        st.markdown('<div class="jo-section">Open actions</div>', unsafe_allow_html=True)
         if summary["open_actions"]:
             # Keyed by position, because two open actions can read the same and
             # Streamlit raises on duplicate widget ids built from the label.
