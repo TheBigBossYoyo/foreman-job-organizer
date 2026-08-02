@@ -87,9 +87,9 @@ def organize_job_stream(raw_text, model=None):
         raise JobOrganizerError(f"Output validation failed:\n{exc}")
 
     # Validation only proves the shape is right. A date can pass every check
-    # here and still have been copied off a neighbouring line, so drop the ones
-    # the item does not actually say.
-    return ground_dates(result)
+    # here and still have been copied off a neighbouring line, so compare each
+    # one against the line it came from and drop the ones that are not there.
+    return ground_dates(result, raw_text)
 
 
 def save_result(result, path):

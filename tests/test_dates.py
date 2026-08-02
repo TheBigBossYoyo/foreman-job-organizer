@@ -1,5 +1,18 @@
-from src.dates import date_is_grounded, ground_dates, parse_iso
+from src.dates import (
+    date_is_grounded,
+    date_is_grounded_in_source,
+    ground_dates,
+    parse_iso,
+    source_lines_for,
+)
 from src.schema import JobOrganizationResult
+
+SAMPLE = """Project: Alvarez kitchen renovation
+
+2026-07-21 - Crew completed cabinet removal and disposed of debris.
+Receipt: BuildRight, drywall and screws, $142.75.
+2026-07-22 - New cabinets delivered in good condition.
+"""
 
 
 def make_result(items):
@@ -93,3 +106,49 @@ def test_items_that_never_had_a_date_are_left_alone():
 
     assert result.items[0].date is None
     assert result.warnings == ["An existing warning."]
+
+
+def test_finds_the_line_an_excerpt_was_taken_from():
+    lines = source_lines_for("Crew completed cabinet removal and disposed of debris.", SAMPLE)
+
+    assert len(lines) == 1
+    assert lines[0].startswith("2026-07-21")
+
+
+def test_an_excerpt_that_is_not_in_the_sample_matches_no_line():
+    assert source_lines_for("Crew repainted the ceiling.", SAMPLE) == []
+
+
+def test_the_excerpt_drops_the_date_prefix_but_the_line_keeps_it():
+    # This is the regression that made the first version of the check lower the
+    # score: the date is real, but the model's quote leaves it out.
+    excerpt = "Crew completed cabinet removal and disposed of debris."
+
+    assert not date_is_grounded("2026-07-21", excerpt)
+    assert date_is_grounded_in_source("2026-07-21", excerpt, SAMPLE)
+
+
+def test_an_inherited_date_is_still_dropped_against_the_source():
+    # The receipt sits under a dated line but carries no date of its own.
+    excerpt = "Receipt: BuildRight, drywall and screws, $142.75."
+
+    assert not date_is_grounded_in_source("2026-07-21", excerpt, SAMPLE)
+
+
+def test_an_excerpt_missing_from_the_source_falls_back_to_the_excerpt():
+    # Nothing to locate it against, so we judge on what we have rather than
+    # throwing away a date we cannot assess.
+    assert date_is_grounded_in_source("2026-07-21", "7/21 something else entirely", SAMPLE)
+
+
+def test_ground_dates_with_a_source_keeps_real_dates_and_drops_copied_ones():
+    result = make_result([
+        make_item("item_001", "2026-07-21", "Crew completed cabinet removal and disposed of debris."),
+        make_item("item_002", "2026-07-21", "Receipt: BuildRight, drywall and screws, $142.75."),
+        make_item("item_003", "2026-07-22", "New cabinets delivered in good condition."),
+    ])
+
+    ground_dates(result, SAMPLE)
+
+    assert [item.date for item in result.items] == ["2026-07-21", None, "2026-07-22"]
+    assert any("item_002" in warning for warning in result.warnings)

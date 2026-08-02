@@ -6,12 +6,24 @@ comes back carrying the same date. Rewriting the prompt rule did not move it at
 all, so this checks it in code instead.
 
 The rule is narrow on purpose. We are not parsing the date out of the text, only
-asking whether the date the model already gave us appears in that item's own
-excerpt. If it does not, the model got it from somewhere else and we drop it.
+asking whether the date the model already gave us appears where that item came
+from. If it does not, the model got it from somewhere else and we drop it.
+
+The comparison runs against the item's line in the sample, not against its
+source_excerpt. The first version of this check used the excerpt and made the
+score worse, because the model quotes "Crew completed cabinet removal" and
+leaves the "2026-07-21 - " in front of it out. Judging by the excerpt threw away
+correct dates. The line the excerpt was taken from still has the prefix.
 """
 
 import re
 from datetime import date as date_cls
+
+from .text import normalize
+
+# A source line shorter than this is not enough to identify an item by. Without
+# the guard, a stray "ok" line matches almost any excerpt that contains it.
+MIN_LINE_MATCH = 8
 
 MONTH_NAMES = [
     "january", "february", "march", "april", "may", "june",
@@ -64,8 +76,41 @@ def date_is_grounded(iso_date, excerpt):
     return False
 
 
-def ground_dates(result):
-    """Drop any item date that is not written in that item's own excerpt.
+def source_lines_for(excerpt, source_text):
+    """The lines of the sample that this excerpt was taken from.
+
+    Usually one line contains the whole excerpt. A quote that runs across a line
+    break is the other way round, so we accept containment in both directions.
+    """
+    target = normalize(excerpt or "")
+    if not target:
+        return []
+
+    found = []
+    for line in source_text.splitlines():
+        line_text = normalize(line)
+        if not line_text:
+            continue
+        if target in line_text:
+            found.append(line)
+        elif len(line_text) >= MIN_LINE_MATCH and line_text in target:
+            found.append(line)
+    return found
+
+
+def date_is_grounded_in_source(iso_date, excerpt, source_text):
+    """True when the date appears on the sample line this item came from."""
+    lines = source_lines_for(excerpt, source_text)
+    if not lines:
+        # We could not find the item in the sample, so we have nothing better to
+        # judge against. Fall back to the excerpt rather than drop a date we
+        # cannot actually assess.
+        return date_is_grounded(iso_date, excerpt)
+    return any(date_is_grounded(iso_date, line) for line in lines)
+
+
+def ground_dates(result, source_text=None):
+    """Drop any item date that is not written where that item came from.
 
     Mutates and returns the result. Every dropped date leaves a warning, so a
     reviewer can see the item lost a date rather than never having had one.
@@ -75,14 +120,20 @@ def ground_dates(result):
     for item in result.items:
         if item.date is None:
             continue
-        if not date_is_grounded(item.date, item.source_excerpt):
+
+        if source_text:
+            keep = date_is_grounded_in_source(item.date, item.source_excerpt, source_text)
+        else:
+            keep = date_is_grounded(item.date, item.source_excerpt)
+
+        if not keep:
             dropped.append((item.item_id, item.date))
             item.date = None
 
     for item_id, lost in dropped:
         result.warnings.append(
-            f"{item_id}: dropped the date {lost}. It is not written in this "
-            f"item's own text, so it was most likely copied from another line."
+            f"{item_id}: dropped the date {lost}. It is not written on this "
+            f"item's own line, so it was most likely copied from another one."
         )
 
     return result

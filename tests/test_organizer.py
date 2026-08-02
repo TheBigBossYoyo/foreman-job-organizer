@@ -38,7 +38,15 @@ def test_empty_input_is_rejected_before_calling_the_api():
 
 
 def test_the_pipeline_drops_a_date_the_item_does_not_state(monkeypatch):
-    """An end-to-end check that grounding runs, with the API call stubbed out."""
+    """An end-to-end check that grounding runs, with the API call stubbed out.
+
+    The excerpts here leave the date prefix out, the way the model really
+    writes them, so this exercises the match against the source line.
+    """
+    stream = (
+        "2026-07-23 - tore off the old shingles\n"
+        "photo_0102.jpg - felt down, looks clean\n"
+    )
     reply = json.dumps({
         "items": [
             {
@@ -47,7 +55,7 @@ def test_the_pipeline_drops_a_date_the_item_does_not_state(monkeypatch):
                 "date": "2026-07-23",
                 "title": "Tear off",
                 "summary": "The old shingles came off.",
-                "source_excerpt": "7/23 - tore off the old shingles",
+                "source_excerpt": "tore off the old shingles",
             },
             {
                 "item_id": "item_002",
@@ -63,7 +71,7 @@ def test_the_pipeline_drops_a_date_the_item_does_not_state(monkeypatch):
     })
     monkeypatch.setattr(organizer, "call_groq", lambda raw_text, model=None: reply)
 
-    result = organize_job_stream("does not matter, the call is stubbed")
+    result = organize_job_stream(stream)
 
     assert result.items[0].date == "2026-07-23"
     assert result.items[1].date is None
