@@ -60,6 +60,33 @@ The wider lesson: two prompt rewrites did not move inheritance at all, and
 twenty lines of code fixed it completely. Rules the model has to remember are
 weaker than rules the pipeline enforces.
 
+## The merge
+
+Two prototypes lived in this repo for a day: this one and a teammate's Python
+port of a PHP web app. Merged rather than chosen between.
+
+Kept from here: the scorer and answer key, the source-line date check, the
+Pydantic contract, the batch runner. Taken from there: the provider chain with
+its no-key fallback, guardrails enforced in code, the aggregation layer.
+
+Declined on purpose: their 13-category schema and their samples. Both are
+defensible, and adopting either would have invalidated data/expected and made
+the number incomparable with 112, 115 and 118. A richer schema is worth having;
+it is not worth losing the only measurement chain the project has.
+
+Their split-on-blank-lines chunker was the other thing left behind. It fused
+five events into one item on a dense sample, and no test of theirs could catch
+it because every one of their own samples has a blank line between entries.
+
+## Reproducibility
+
+Temperature 0 is not deterministic. Three consecutive runs of the same five
+samples scored 117, 118, 118. The number is 118 ± 1, which means a one-field
+change is noise and should not be reported as an improvement. Worth re-checking
+if the test set ever grows, since a bigger denominator should damp this.
+
+## Next
+
 Weakest field now: category, five of the seven remaining misses. Different in
 kind from dates, because some of them are arguable rather than wrong — calling
 "demo done, there is moisture behind it" an issue instead of a contractor
