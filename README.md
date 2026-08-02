@@ -76,10 +76,12 @@ Foreman Job Organizer/
 ├── outputs/
 ├── src/
 │   ├── batch.py
+│   ├── dates.py
 │   ├── organizer.py
 │   ├── prompts.py
 │   ├── schema.py
-│   └── score.py
+│   ├── score.py
+│   └── text.py
 ├── tests/
 ├── .env.example
 ├── .gitignore
@@ -94,8 +96,9 @@ Foreman Job Organizer/
 3. Call Groq.
 4. Slice out the JSON object and parse it.
 5. Validate required fields and allowed values with Pydantic.
-6. Return the result, or raise with the reason it failed.
-7. `src/batch.py` runs the whole folder and logs a row per sample.
+6. Drop any date that is not written on the item's own source line (`src/dates.py`).
+7. Return the result, or raise with the reason it failed.
+8. `src/batch.py` runs the whole folder and logs a row per sample.
 
 ## Missing-data rule
 
@@ -111,42 +114,47 @@ action_required, amount and source_excerpt for every one of the 22 items.
 
 | Measure | Result |
 | --- | --- |
-| Field accuracy | 115/125 (92%) |
-| Samples with no errors | 1/5 |
+| Field accuracy | 118/125 (94%) |
+| Samples with no errors | 2/5 |
+| Date fields correct | 22/22 |
 
-The gap between those two numbers is the interesting part. Most fields are
-right, but only one document is completely clean, because the errors spread
-thin rather than piling up in one bad sample.
+### How the date problem was actually solved
 
-### What the date rule change did
+Dates were the weakest field, in two shapes: invented years (`7/27` became
+`2026-07-27`) and inherited dates (an undated line took the date of the line
+above it). Every number below comes from the same scorer, so they compare
+directly.
 
-Dates were the weakest field, in two shapes. Rewriting rule 3 to spell both out
-fixed one of them and left the other untouched. Both counts below come from the
-same scorer, so they are comparable:
+| Attempt | Result |
+| --- | --- |
+| Week 3 baseline | 112/125 (90%) |
+| Rewrote the prompt rule | 115/125 (92%) |
+| Checked the date against the item's excerpt | 112/125 (90%) |
+| Checked the date against the item's source line | **118/125 (94%)** |
 
-| | Before | After |
-| --- | --- | --- |
-| Field accuracy | 112/125 (90%) | 115/125 (92%) |
+**The prompt fixed half of it.** Spelling both failure shapes out in rule 3
+stopped the invented years. Inheritance did not move at all, and a second
+rewrite did not move it either — the model reads a dated line as a heading for
+the block underneath it.
 
-- **Invented years: fixed.** `03_tricky_bathroom` says `7/27` and nothing else.
-  The model used to return `2026-07-27`. It now returns `null` with a warning.
-- **Invented client name: fixed too, unexpectedly.** `04_tricky_painting` names
-  no client, and the model used to answer `Wilson` by reading it off the project
-  title. Telling it not to fill in years from elsewhere seems to have made it
-  more careful about the header fields generally.
-- **Inherited dates: not fixed.** In `02_easy_roof` the photo and receipt lines
-  still take the date of the dated line above them. `05_mixed_job_stream` does
-  it for the photo but not for the invoice on the very next line, so it is not
-  even consistent with itself. The model is treating a dated line as a heading
-  for the block underneath, and telling it not to has not been enough.
+**The first code fix made things worse, which is the useful part.** `src/dates.py`
+drops any date that is not written in the item it belongs to. Checking that
+against the item's `source_excerpt` cost three fields, because the model quotes
+`Crew completed cabinet removal` and leaves the `2026-07-21 - ` in front of it
+out. The check could not see dates that were really there and deleted four
+correct ones.
+
+**Checking the source line instead fixed it.** The excerpt is located back in
+the sample text and the date is read off that line, which still has the prefix.
+Inherited dates are dropped with a warning; real ones survive. All 22 date
+fields are now correct, and the two easy samples went to a perfect score.
 
 ### What is still wrong
 
-Ten misses. Three are the inherited dates above. Four are category
-disagreements, and some of those are genuinely arguable, such as whether
-"demo done ... there is moisture behind it" is a contractor update or an issue.
-Those judgements live in `data/expected/` and can be challenged. The rest are
-missed action flags.
+Seven misses, none of them dates. Five are category disagreements, and some are
+genuinely arguable — whether "demo done ... there is moisture behind it" is a
+contractor update or an issue is a judgement call. Those judgements live in
+`data/expected/` and can be challenged. The other two are missed action flags,
+where the item clearly asks for something and `action_required` came back false.
 
-Inheritance is the Week 4 target, and it will need something other than another
-sentence in the prompt.
+Categories are the Week 4 target now that dates are done.
