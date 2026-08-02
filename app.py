@@ -93,24 +93,15 @@ if "result" in st.session_state:
     # cannot disagree about which items are questionable.
     needs_review = {item["item_id"] for item in result["items"] if item["flags"]}
 
-    provider = result.get("provider")
-    if provider == "local":
+    # A run on the no-model fallback changes how much everything below is worth,
+    # so that one stays on top. Everything else goes under the timeline: the
+    # point of the app is the timeline, and notices should not push it off the
+    # screen before it has been read.
+    if result.get("provider") == "local":
         st.error(
             "Organized without an AI model. Every field below was matched by "
             "keyword and needs checking."
         )
-    elif provider:
-        st.caption(f"Organized by {PROVIDER_LABELS.get(provider, provider)}.")
-
-    if needs_review:
-        flagged_ids = ", ".join(sorted(needs_review))
-        st.info(
-            f"{len(needs_review)} of {len(result['items'])} items need a human "
-            f"check ({flagged_ids})."
-        )
-
-    for warning in result["warnings"]:
-        st.warning(warning)
 
     left, right = st.columns([2, 1])
 
@@ -170,6 +161,32 @@ if "result" in st.session_state:
                 st.checkbox(action, key=f"action_{index}")
         else:
             st.success("No open actions detected.")
+
+    # Notices live below the timeline, grouped rather than stacked. A column of
+    # yellow banners above the result made a clean run look like a failure.
+    warnings = result["warnings"]
+    provider = result.get("provider")
+
+    if needs_review or warnings:
+        with st.expander(
+            f"Review notes ({len(needs_review)} flagged, {len(warnings)} warnings)",
+            expanded=False,
+        ):
+            if needs_review:
+                st.write(
+                    f"**{len(needs_review)} of {len(result['items'])} items flagged:** "
+                    + ", ".join(sorted(needs_review))
+                )
+            else:
+                st.write("**No items were flagged by the guardrails.**")
+
+            for warning in warnings:
+                st.caption(f"• {warning}")
+    else:
+        st.success("Nothing flagged and no warnings on this run.")
+
+    if provider:
+        st.caption(f"Organized by {PROVIDER_LABELS.get(provider, provider)}.")
 
     st.download_button(
         "Download JSON",
