@@ -85,8 +85,18 @@ Three, tried in order. The first one that answers wins.
 
 The local engine is not a stub. It returns the same validated JSON contract, so
 nothing downstream knows the difference — but it matches keywords instead of
-reading, and it is visibly worse. The app says so in red when a run falls
-through to it, and every result records which provider answered.
+reading, and it is much worse. Scored the same way as everything else:
+
+| Engine | Field accuracy |
+| --- | --- |
+| Groq | 118/125 (94%) |
+| Local rule-based | 86/150 (57%) |
+
+The denominator differs because the local engine also splits the stream badly,
+inventing items that then lose every field. That is the honest size of the gap,
+and it is the argument for the fallback being a safety net rather than a mode
+anyone should demo in. The app says so in red when a run falls through to it,
+and every result records which provider answered.
 
 Set `AI_PROVIDER=anthropic|groq|local` to pin one and skip the chain. The scorer
 uses this to measure a single engine rather than whichever one happened to

@@ -91,17 +91,33 @@ Seven steps, one slide, no code on screen:
 
 1. Take raw text
 2. Build the prompt — instructions, schema, worked example, missing-data rule
-3. Call the model (Groq, `llama-3.3-70b-versatile`, temperature 0)
+3. Call the provider chain — **Anthropic, then Groq, then no model at all**
 4. Slice the JSON out of the reply
 5. Validate with Pydantic — categories, types, no negative amounts
 6. **Drop any date not written on the item's own source line**
-7. Return, or fail with the reason
+7. Enforce safety / missing-amount / PII rules in code
+8. Aggregate the timeline and totals — no second API call
 
-Two design points worth saying out loud:
+Three design points worth saying out loud:
 
-- **Temperature 0.** The same input gives the same output twice. Without that,
-  the accuracy number moves between runs and means nothing.
-- **Step 6 is the interesting one** — that is your next slide.
+- **The chain degrades instead of dying.** If Anthropic is down it uses Groq. If
+  both are unreachable it falls to a rule-based engine that needs no key and
+  returns the same JSON contract. Say the honest part too: that engine is much
+  worse, the app says so in red, and every result records which one answered.
+- **Temperature 0** for reproducibility — with the caveat in section 5.
+- **Steps 6 and 7 are the interesting ones** — that is your next slide.
+
+### If you are asked about the merge
+
+There were two prototypes in this repo — yours and a teammate's port of a PHP
+web app. They were merged rather than chosen between. Kept from yours: the
+scorer, the answer key, the source-line date check. Taken from theirs: the
+provider fallback, code-enforced guardrails, the aggregation layer.
+
+The part that shows judgement: **you declined their 13-category schema**, even
+though it is richer, because adopting it would have invalidated the answer key
+and made the new number incomparable with every earlier one. Expanding the test
+set is Week 4 work, done properly by adding samples and answers together.
 
 ## 5. How I know it works (2:00)
 
@@ -127,6 +143,12 @@ by hand first, then scored against them.
 completely clean, because errors spread thin instead of piling up in one bad
 sample. A per-document number would have been 40% and would also have been true.
 Be the person who noticed that.
+
+**Then say the harder thing.** Temperature 0 is not the same as deterministic.
+Three consecutive runs scored 117, 118, 118 — so it is 118 ± 1, and a
+one-field improvement is not evidence of anything. Volunteering this before
+anyone asks is the single most credible thing you can do in the whole talk. It
+also protects you: if someone re-runs it and gets 117, you already said so.
 
 ## 6. The date experiment (1:30)
 
@@ -208,10 +230,17 @@ explain any line in `src/dates.py` including why the first version was wrong.
 The failed attempt in section 6 is the proof — nobody generates a change that
 lowers their own score and then keeps it in the write-up.
 
-**"Why Groq and llama rather than GPT or Claude?"**
-Free tier, fast, and it does structured JSON output natively. The provider is
-one function (`call_groq` in `src/organizer.py`) — swapping it is a small change,
-and the prompt and validation would not move.
+**"Which model does it use?"**
+Anthropic Claude first, Groq as the backup, and a rule-based engine below both
+that needs no key. `src/providers.py` is the whole abstraction. The measured
+118/125 was run on Groq, and every output file records the provider that
+produced it — so no number in this project is quoted without saying which engine
+produced it.
+
+**"What if the API is down during a demo?"**
+It falls to the next provider. If everything is unreachable it still returns a
+valid, correctly-shaped result from the local engine, marked in red as
+keyword-matched rather than organized. That is a tested path, not a hope.
 
 **"What would you do with more time?"**
 In order: more test samples, then the action flags, then a tie-break rule for
@@ -237,8 +266,8 @@ the arguable categories written into the prompt and the answer key together.
 
 Run through this the morning of, not five minutes before.
 
-- [ ] `python -m pytest` → 42 passed
-- [ ] `python -m src.score` → 118/125
+- [ ] `python -m pytest` → 76 passed
+- [ ] `python -m src.score` → 118/125 (117 is fine — say so if asked)
 - [ ] `streamlit run app.py` opens and organizes a sample end to end
 - [ ] `.env` has a **working, unexpired** key — test an actual run, not just that
       the file exists
