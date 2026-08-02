@@ -36,6 +36,10 @@ class JobItem(BaseModel):
     priority: Priority = "medium"
     confidence: Confidence = "medium"
     source_excerpt: str
+    # Set by src/guardrails.py after validation, not by the model. These are the
+    # reasons a human should look at an item, and why.
+    flags: list[str] = Field(default_factory=list)
+    compliance_notes: Optional[str] = None
 
     @field_validator("currency")
     @classmethod
