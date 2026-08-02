@@ -49,13 +49,26 @@ the number can be rerun after every prompt change instead of recounted.
 Test set: still 5 samples, expand to 8-10. The answers live in data/expected
 now, so a new sample means writing its expected file at the same time.
 
-Weakest field: dates, and now specifically inheritance. Inventing a year is
-fixed. Copying the date off the line above is not, and adding another sentence
-to the prompt did not move it at all, so the next attempt should not be another
-sentence. Two options worth trying:
+Dates: done. 22/22 correct. The code check in src/dates.py drops any date that
+is not written on the item's own source line. Worth remembering that the first
+version compared against source_excerpt and lowered the score to 112/125,
+because the model's quote leaves the date prefix out. The excerpt is what the
+model chose to write; the source line is what the input actually said, and only
+the second one can settle whether a date was really there.
 
-- Feed the model one line at a time so there is no line above to copy from.
-- Check it in code after the fact: if the date does not appear inside that
-  item's own source_excerpt, clear it and add a warning.
+The wider lesson: two prompt rewrites did not move inheritance at all, and
+twenty lines of code fixed it completely. Rules the model has to remember are
+weaker than rules the pipeline enforces.
 
-The second is cheaper and testable without an API call, so try it first.
+Weakest field now: category, five of the seven remaining misses. Different in
+kind from dates, because some of them are arguable rather than wrong — calling
+"demo done, there is moisture behind it" an issue instead of a contractor
+update is a defensible reading. Before tuning anything:
+
+- Separate the genuinely wrong ones from the arguable ones by hand.
+- Only the wrong ones are worth chasing. For the arguable ones the fix is to
+  write the tie-break rule into the prompt and into data/expected together, so
+  the answer key states which reading the project intends.
+
+Also outstanding: action_required missed twice on items that plainly ask for
+something. That is a smaller and clearer target than category.
