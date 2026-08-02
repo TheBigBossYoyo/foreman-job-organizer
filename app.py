@@ -5,7 +5,16 @@ from pathlib import Path
 
 import streamlit as st
 
+from src.aggregate import summarize
 from src.organizer import JobOrganizerError, organize_job_stream
+from src.providers import resolve_chain
+from src.schema import JobOrganizationResult
+
+PROVIDER_LABELS = {
+    "anthropic": "Anthropic Claude",
+    "groq": "Groq",
+    "local": "Local rule-based engine (no AI)",
+}
 
 SAMPLE_DIR = Path("data/samples")
 
@@ -20,10 +29,21 @@ st.caption("Paste the running record of a job and get back a timeline you can re
 
 with st.sidebar:
     st.header("Settings")
-    if os.getenv("GROQ_API_KEY"):
-        st.success("Groq API connected")
-    else:
-        st.error("No GROQ_API_KEY found. Copy .env.example to .env and add your key.")
+    # Show the whole chain, not just the winner. Knowing that Anthropic is
+    # missing and Groq is carrying the run is the difference between a result
+    # you trust and one you check.
+    chain = resolve_chain()
+    st.write("**Providers, in order:**")
+    for position, provider in enumerate(chain, 1):
+        label = PROVIDER_LABELS.get(provider, provider)
+        if provider == "local":
+            st.caption(f"{position}. {label} — always available")
+        else:
+            st.caption(f"{position}. {label}")
+    if "anthropic" not in chain:
+        st.info("No ANTHROPIC_API_KEY set, so Anthropic is skipped.")
+    if chain == ["local"]:
+        st.warning("No API keys at all. Output will be keyword-matched, not organized by a model.")
 
     st.markdown(
         """
@@ -68,19 +88,25 @@ if st.button("Organize job", type="primary", use_container_width=True):
 if "result" in st.session_state:
     result = st.session_state["result"]
 
-    # Dates were the weakest field in the Week 3 scoring, and a missing date or a
-    # low confidence label is exactly where the model tends to have guessed. Put
-    # those items in front of the reviewer instead of leaving them to be found.
-    needs_review = {
-        item["item_id"] for item in result["items"]
-        if item["date"] is None or item["confidence"] == "low"
-    }
+    # The guardrails already decided what needs a human. Reading their flags
+    # rather than re-deriving the rule here means the app and the pipeline
+    # cannot disagree about which items are questionable.
+    needs_review = {item["item_id"] for item in result["items"] if item["flags"]}
+
+    provider = result.get("provider")
+    if provider == "local":
+        st.error(
+            "Organized without an AI model. Every field below was matched by "
+            "keyword and needs checking."
+        )
+    elif provider:
+        st.caption(f"Organized by {PROVIDER_LABELS.get(provider, provider)}.")
+
     if needs_review:
         flagged_ids = ", ".join(sorted(needs_review))
         st.info(
             f"{len(needs_review)} of {len(result['items'])} items need a human "
-            f"check ({flagged_ids}). They are missing a date or came back at low "
-            f"confidence."
+            f"check ({flagged_ids})."
         )
 
     for warning in result["warnings"]:
@@ -106,6 +132,10 @@ if "result" in st.session_state:
                     st.write(f"**Amount:** {item['amount']:.2f} {item['currency'] or ''}".strip())
                 if item["action_required"]:
                     st.warning(f"Action: {item['action']}")
+                if item["flags"]:
+                    st.caption("Flagged: " + ", ".join(f.replace("_", " ") for f in item["flags"]))
+                if item["compliance_notes"]:
+                    st.caption(f"⚠ {item['compliance_notes']}")
                 st.caption(f"Source: \"{item['source_excerpt']}\"")
 
     with right:
@@ -115,11 +145,28 @@ if "result" in st.session_state:
         st.write(f"**Address:** {result['property_address'] or 'Not found'}")
         st.write(result["overall_summary"])
 
+        summary = summarize(JobOrganizationResult.model_validate(result))
+
+        st.subheader("Totals")
+        c1, c2 = st.columns(2)
+        c1.metric("Items", summary["item_count"])
+        c2.metric("Need review", summary["needs_review"])
+        if summary["spend"]:
+            # One line per currency. A single combined total would be a number
+            # that appears nowhere in the input.
+            for currency, total in summary["spend"].items():
+                st.write(f"**Spend ({currency}):** {total:,.2f}")
+        if summary["date_range"]["start"]:
+            st.caption(
+                f"Dated {summary['date_range']['start']} to "
+                f"{summary['date_range']['end']} · {summary['undated']} undated"
+            )
+
         st.subheader("Open actions")
-        if result["open_actions"]:
+        if summary["open_actions"]:
             # Keyed by position, because two open actions can read the same and
             # Streamlit raises on duplicate widget ids built from the label.
-            for index, action in enumerate(result["open_actions"]):
+            for index, action in enumerate(summary["open_actions"]):
                 st.checkbox(action, key=f"action_{index}")
         else:
             st.success("No open actions detected.")
