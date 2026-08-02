@@ -230,7 +230,14 @@ def render_numbers(summary):
         cells.append((f"{total:,.2f}", currency.lower(), False))
 
     if summary["undated"]:
-        cells.append((f"{summary['undated']}", "no date given", False))
+        # Reads as a count of items, not as a statement about the job. "No date
+        # given" was ambiguous enough that the first person to see it asked what
+        # it meant.
+        cells.append((
+            f"{summary['undated']} of {summary['item_count']}",
+            "items undated in the source",
+            False,
+        ))
     if summary["needs_review"]:
         cells.append((str(summary["needs_review"]), "need review", True))
 
