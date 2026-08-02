@@ -16,6 +16,21 @@ PROVIDER_LABELS = {
     "local": "Local rule-based engine (no AI)",
 }
 
+# Short, readable names. "Contractor Update" title-cased from the enum reads as
+# a database field; these read as something a foreman would say.
+CATEGORY_LABELS = {
+    "photo": "📷 Photo",
+    "receipt": "🧾 Receipt",
+    "client_update": "💬 Client",
+    "contractor_update": "🏗️ Site work",
+    "inspection": "✅ Inspection",
+    "delivery": "🚚 Delivery",
+    "schedule": "📅 Schedule",
+    "issue": "⚠️ Issue",
+    "payment": "💵 Payment",
+    "other": "📦 Other",
+}
+
 SAMPLE_DIR = Path("data/samples")
 
 st.set_page_config(page_title="Foreman AI Job Organizer", page_icon="🏗️", layout="wide")
@@ -107,26 +122,47 @@ if "result" in st.session_state:
 
     with left:
         st.subheader("Organized timeline")
-        for item in result["items"]:
+
+        # Chronological, with undated items last in the order they arrived. It
+        # is a timeline, so it should read as one rather than follow whatever
+        # order the model happened to emit.
+        ordered = sorted(
+            result["items"],
+            key=lambda item: (item["date"] is None, item["date"] or ""),
+        )
+
+        for item in ordered:
+            marker = "⚠ " if item["item_id"] in needs_review else ""
+            date_label = item["date"] or "no date"
             header = (
-                f"{'⚠ ' if item['item_id'] in needs_review else ''}"
-                f"{item['item_id']} · {item['category'].replace('_', ' ').title()} · "
+                f"{marker}{date_label} · "
+                f"{CATEGORY_LABELS.get(item['category'], item['category'])} · "
                 f"{item['title']}"
             )
+
             with st.expander(header, expanded=True):
                 st.write(item["summary"])
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Date", item["date"] or "Not found")
-                c2.metric("Priority", item["priority"].title())
-                c3.metric("Confidence", item["confidence"].title())
+
+                # One line of facts instead of three metric tiles. Fifteen large
+                # numbers on screen at once buried the text they described.
+                facts = [f"Confidence: {item['confidence']}"]
                 if item["amount"] is not None:
-                    st.write(f"**Amount:** {item['amount']:.2f} {item['currency'] or ''}".strip())
-                if item["action_required"]:
-                    st.warning(f"Action: {item['action']}")
+                    facts.insert(0, f"**{item['amount']:,.2f} {item['currency'] or ''}**".strip())
+                if item["priority"] in ("high", "urgent"):
+                    facts.append(f"Priority: {item['priority']}")
+                if item["people"]:
+                    facts.append(", ".join(item["people"]))
+                st.caption(" · ".join(facts))
+
+                if item["action_required"] and item["action"]:
+                    st.warning(f"**Action:** {item['action']}")
                 if item["flags"]:
-                    st.caption("Flagged: " + ", ".join(f.replace("_", " ") for f in item["flags"]))
+                    st.caption(
+                        "⚠ Flagged: "
+                        + ", ".join(flag.replace("_", " ") for flag in item["flags"])
+                    )
                 if item["compliance_notes"]:
-                    st.caption(f"⚠ {item['compliance_notes']}")
+                    st.caption(item["compliance_notes"])
                 st.caption(f"Source: \"{item['source_excerpt']}\"")
 
     with right:
