@@ -4,6 +4,14 @@ A VTSP technical-track prototype. It takes the running record of a construction
 job, the notes and texts and receipts that pile up while the work happens, and
 turns it into a timeline you can actually read.
 
+> **Two prototypes in this repo.** The root is the original Python/Streamlit
+> prototype (measurement-focused: scorer, Pydantic schema, `pytest`). A second,
+> web-app-derived Python port lives in [`webapp-python/`](webapp-python/) — it
+> brings over a richer 13-category schema, code-enforced guardrails (safety,
+> never-invent-money, PII, date-grounding), a no-API-key local fallback, and a
+> Streamlit UI with a timeline, next-actions and JSON export. See
+> [`webapp-python/README.md`](webapp-python/README.md).
+
 ## What it produces
 
 - Project, client, and address metadata
