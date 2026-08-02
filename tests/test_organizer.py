@@ -69,10 +69,40 @@ def test_the_pipeline_drops_a_date_the_item_does_not_state(monkeypatch):
         "overall_summary": "A roof job.",
         "warnings": [],
     })
-    monkeypatch.setattr(organizer, "call_groq", lambda raw_text, model=None: reply)
+    monkeypatch.setattr(
+        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "anthropic")
+    )
 
     result = organize_job_stream(stream)
 
     assert result.items[0].date == "2026-07-23"
     assert result.items[1].date is None
     assert any("item_002" in warning for warning in result.warnings)
+
+
+def test_the_result_records_which_provider_answered(monkeypatch):
+    reply = json.dumps({
+        "items": [{
+            "item_id": "item_001",
+            "category": "other",
+            "title": "A thing",
+            "summary": "Something happened.",
+            "source_excerpt": "a thing happened",
+        }],
+        "overall_summary": "A job.",
+    })
+    monkeypatch.setattr(
+        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "groq")
+    )
+
+    assert organize_job_stream("a thing happened").provider == "groq"
+
+
+def test_a_dead_chain_surfaces_as_a_job_organizer_error(monkeypatch):
+    def boom(*args, **kwargs):
+        raise organizer.providers.ProviderError("everything is down")
+
+    monkeypatch.setattr(organizer.providers, "complete", boom)
+
+    with pytest.raises(JobOrganizerError):
+        organize_job_stream("some text")

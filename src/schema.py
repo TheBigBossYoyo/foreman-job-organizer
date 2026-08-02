@@ -52,3 +52,6 @@ class JobOrganizationResult(BaseModel):
     open_actions: list[str] = Field(default_factory=list)
     overall_summary: str
     warnings: list[str] = Field(default_factory=list)
+    # Filled in after the call, not by the model. Which engine answered changes
+    # how much you should trust the rest of this, so it travels with the result.
+    provider: Optional[str] = None
