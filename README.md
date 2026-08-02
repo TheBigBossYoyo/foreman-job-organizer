@@ -1,231 +1,286 @@
-# Foreman AI Job Organizer — Option C
+# 🏗️ Foreman AI Job Organizer
 
-A VTSP technical-track prototype. It takes the running record of a construction
-job, the notes and texts and receipts that pile up while the work happens, and
-turns it into a timeline you can actually read.
+**VTSP · Technical track · Option C — The Job Organizer**
 
-Built by merging two prototypes: this one, which was measurement-first, and a
-web-app-derived port that had the better runtime engineering. What survived from
-each is set out in [One app, from two](#one-app-from-two). The port itself is
-still on the `webapp-python` branch if you want to read the original.
+![Tests](https://img.shields.io/badge/tests-84%20passing-2ea44f)
+![Accuracy](https://img.shields.io/badge/field%20accuracy-118%2F125%20(94%25)-2ea44f)
+![Dates](https://img.shields.io/badge/dates%20correct-22%2F22-2ea44f)
+![Python](https://img.shields.io/badge/python-3.14-3776AB)
+![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
 
-## What it produces
+A contractor's job record is not a document. It is a pile — texts at 9pm,
+receipts with no date on them, photo captions, a supplier who called and would
+not commit to anything.
 
-- Project, client, and address metadata
-- Categorized timeline items
-- Dates, people, locations, and monetary amounts
-- Concise summaries and source excerpts
-- Open actions, priorities, confidence labels, and warnings
-- Downloadable JSON output
+**This turns the pile into a timeline. And it tells you how often it gets each
+field right, which is the part I care most about.**
 
-## Privacy
+---
 
-Use only made-up sample data. Never use real Foreman customer, employee, or
-company data.
+## 👀 What it actually does
 
-## Setup
+Paste this:
 
-Install the packages:
+```text
+Project: Alvarez kitchen renovation
+Client: Sofia Alvarez
+Address: 18 Cedar Lane
+
+2026-07-21 - Crew completed cabinet removal and disposed of debris.
+Receipt: BuildRight, drywall and screws, $142.75.
+2026-07-22 - New cabinets delivered in good condition.
+Client update: Sofia approved the quartz countertop sample.
+```
+
+Get this:
+
+| When | What | | |
+|---|---|---|---|
+| **21 Jul** | 🏗️ Site work | Cabinet removal | |
+| **no date** | 🧾 Receipt | Drywall and screws receipt | **142.75 USD** |
+| **22 Jul** | 🚚 Delivery | New cabinet delivery | |
+| **no date** | 💬 Client | Quartz countertop sample approval | |
+
+Look at the receipt. It sits directly under a dated line, and it comes back
+with **no date** — because its own line never gave one. Getting that right took
+four attempts and is the most interesting thing in this repo. The story is in
+[How the date problem was solved](#-how-the-date-problem-was-actually-solved).
+
+---
+
+## 🚀 Quick start
 
 ```bash
 python -m pip install -r requirements.txt
-```
-
-Then add a key. Copy `.env.example` to `.env` and fill it in:
-
-```text
-ANTHROPIC_API_KEY=your_key_here
-GROQ_API_KEY=your_key_here
-```
-
-`.env` is gitignored. Never commit a key.
-
-**You do not need either one.** With no keys at all the app still runs on the
-local rule-based engine — see [Providers](#providers).
-
-Run the app:
-
-```bash
 streamlit run app.py
 ```
 
-## Run the batch processor
+That's it. **No API key needed to try it** — with no keys at all it falls back
+to a local rule-based engine that returns the same JSON shape. It is much worse,
+and the app says so in red rather than pretending otherwise.
 
-Processes every `.txt` in `data/samples`, writes one JSON per sample plus a CSV
-results log:
+For real output, copy `.env.example` to `.env` and add a key:
 
-```bash
-python -m src.batch
+```text
+ANTHROPIC_API_KEY=your_key_here     # tried first
+GROQ_API_KEY=your_key_here          # the backup
 ```
 
-## Score the outputs
+> ⚠️ `.env` is gitignored. Never commit a key.
 
-Compares everything in `outputs/` against the hand-written answers in
-`data/expected/` and prints the misses:
-
-```bash
-python -m src.score
-```
-
-## Run tests
+**Other things you can run:**
 
 ```bash
-pytest
+python -m src.batch     # organize every sample, write JSON + a CSV log
+python -m src.score     # score those outputs against the hand-written answers
+pytest                  # 84 tests
 ```
 
-## Providers
+---
 
-Three, tried in order. The first one that answers wins.
+## 🔌 Providers
 
-| Order | Provider | Needs | Used when |
-| --- | --- | --- | --- |
-| 1 | Anthropic Claude | `ANTHROPIC_API_KEY` | Always, when the key is set |
-| 2 | Groq | `GROQ_API_KEY` | Anthropic has no key, or its call failed |
-| 3 | Local rule-based | nothing | Neither model is reachable |
+Three, tried in order. First one that answers wins.
 
-The local engine is not a stub. It returns the same validated JSON contract, so
-nothing downstream knows the difference — but it matches keywords instead of
-reading, and it is much worse. Scored the same way as everything else:
+| | Provider | Needs | Used when |
+|---|---|---|---|
+| 1️⃣ | **Anthropic Claude** | `ANTHROPIC_API_KEY` | Always, when the key is set |
+| 2️⃣ | **Groq** | `GROQ_API_KEY` | Anthropic has no key, or its call failed |
+| 3️⃣ | **Local rule-based** | nothing | Neither model is reachable |
+
+The local engine is not a stub — it returns the same validated contract, so
+nothing downstream knows the difference. But it matches keywords instead of
+reading, and the gap is big enough to be worth measuring:
 
 | Engine | Field accuracy |
-| --- | --- |
-| Groq | 118/125 (94%) |
-| Local rule-based | 86/150 (57%) |
+|---|---|
+| Groq | **118/125 (94%)** |
+| Local rule-based | **86/150 (57%)** |
 
-The denominator differs because the local engine also splits the stream badly,
-inventing items that then lose every field. That is the honest size of the gap,
-and it is the argument for the fallback being a safety net rather than a mode
-anyone should demo in. The app says so in red when a run falls through to it,
-and every result records which provider answered.
+The denominator differs because the local engine also splits the stream badly
+and invents items that then lose every field. That is the honest size of the
+gap, and the reason the fallback is a safety net rather than a mode to demo in.
+Every result records which provider produced it.
 
-Set `AI_PROVIDER=anthropic|groq|local` to pin one and skip the chain. The scorer
-uses this to measure a single engine rather than whichever one happened to
-answer.
+Set `AI_PROVIDER=anthropic|groq|local` to pin one and skip the chain.
 
-## Repository structure
+---
+
+## ⚙️ How it works
+
+```
+raw text
+   │
+   ├─ 1. build the prompt      instructions · schema · worked example · missing-data rule
+   ├─ 2. call the chain        src/providers.py — Claude → Groq → local
+   ├─ 3. slice out the JSON    the reply is not always only JSON
+   ├─ 4. validate              src/schema.py — Pydantic, no invented categories
+   ├─ 5. ground the dates      src/dates.py — a date must be on the item's own line
+   ├─ 6. enforce guardrails    src/guardrails.py — safety · money · PII
+   └─ 7. aggregate             src/aggregate.py — timeline, totals, actions (no API call)
+```
+
+Steps 5 and 6 are the interesting ones. Everything before them asks the model to
+behave; those two check that it did.
+
+---
+
+## 🛡️ The rules it enforces in code
+
+The date work taught this project one thing above all:
+
+> **A rule in the prompt is a request. A rule in the code is a guarantee.**
+
+Two prompt rewrites failed to stop dates being copied between lines. Twenty
+lines of code stopped it completely. So the rules that actually matter live in
+`src/guardrails.py`, not in the wording:
+
+- 🚨 **Injury language** forces an urgent review flag, whatever the model called it
+- 💵 **A receipt or payment with no amount** is flagged, not left looking complete
+- 🔒 **Phone numbers and SSNs** are redacted from the summary — and the note says
+  plainly that the source excerpt still contains them, because pretending
+  otherwise would be worse than not redacting
+- 📅 **A date not written on the item's own line** is dropped with a warning
+
+### The missing-data rule
+
+When something is absent or genuinely ambiguous: return `null`, add a warning,
+**do not guess**. If even a human would be unsure, flag it rather than commit to
+an answer.
+
+---
+
+## 📊 Accuracy
+
+`python -m src.score` compares `outputs/` against `data/expected/` — **125
+fields** across 5 samples: three header fields each, plus category, date,
+`action_required`, amount and `source_excerpt` for all 22 items.
+
+| Measure | Result |
+|---|---|
+| Field accuracy | **118/125 (94%)** |
+| Samples with no errors | 2/5 |
+| Date fields correct | **22/22** ✅ |
+
+Two things worth saying out loud rather than burying:
+
+**The two numbers disagree on purpose.** 94% of fields are right, but only 2 of
+5 documents are completely clean, because errors spread thin instead of piling
+into one bad sample. A per-document score would be 40% and would also be true.
+
+**Temperature 0 is not the same as deterministic.** Three consecutive runs of
+the same five samples scored 117, 118, 118. Treat this as **118 ± 1** — not
+precise enough to justify chasing a single-field change.
+
+Measured on Groq, since no Anthropic key was set on the last run. The provider
+is recorded in every file in `outputs/`, so any number can be traced to the
+engine that produced it.
+
+---
+
+## 🔬 How the date problem was actually solved
+
+Dates were the weakest field, failing two ways: **invented years** (`7/27`
+became `2026-07-27`) and **inherited dates** (an undated line taking the date of
+the line above). Every number below comes from the same scorer, so they compare
+directly.
+
+| Attempt | Result | |
+|---|---|---|
+| Week 3 baseline | 112/125 (90%) | |
+| Rewrote the prompt rule | 115/125 (92%) | ⬆️ |
+| Checked the date against the item's **excerpt** | 112/125 (90%) | ⬇️ **worse** |
+| Checked the date against the item's **source line** | **118/125 (94%)** | ✅ |
+
+**The prompt fixed half of it.** Spelling out both failure shapes stopped the
+invented years. Inheritance did not move at all, and a second rewrite did not
+move it either — the model reads a dated line as a heading for the block below.
+
+**My first code fix made it worse, which is the useful part.** I dropped any
+date not found in the item's `source_excerpt`. It cost three fields, because the
+model quotes `Crew completed cabinet removal` and leaves the `2026-07-21 - ` off
+the front. The check could not see dates that were really there and deleted four
+correct ones.
+
+**Checking the source line fixed it.** Find the line the quote came from and
+read the date off that — the prefix is still there. Inherited dates get dropped
+with a warning, real ones survive, and all 22 date fields are now correct.
+
+I kept the failed attempt in this table on purpose. It is what makes the final
+design look reasoned rather than lucky.
+
+---
+
+## 🚧 What is still wrong
+
+Seven misses, **none of them dates**.
+
+- **5 are category disagreements**, and some are genuinely arguable — whether
+  *"demo done … there is moisture behind it"* is a contractor update or an issue
+  is a judgement call. Those judgements are mine, sitting in `data/expected/`.
+  If you disagree, the fix is to change the answer key, not the code.
+- **2 are missed action flags**, where an item plainly asks for something and
+  `action_required` came back `false`. Those are simply wrong.
+
+Categories are the Week 4 target now that dates are done.
+
+---
+
+## 🤝 One app, from two
+
+This repo briefly held two prototypes — this one and a teammate's port of a PHP
+web app. They were merged rather than picked between.
+
+| | |
+|---|---|
+| **Kept from here** | the scorer and answer key, the source-line date check, the Pydantic contract, the batch runner |
+| **Taken from the port** | the provider chain with its no-key fallback, guardrails enforced in code, the aggregation layer |
+| **Deliberately not taken** | its 13-category schema and its own samples |
+
+That last row is the one I'd defend hardest. Both are reasonable, and adopting
+either would have invalidated `data/expected/` and made the new number
+incomparable with every earlier measurement. A richer schema is worth having; it
+is not worth losing the only measurement chain the project has. Widening the
+test set is Week 4 work, done properly by adding samples and their answers
+together.
+
+The port is still on the `webapp-python` branch if you want to read the original.
+
+---
+
+## 📁 Repository
 
 ```text
 Foreman Job Organizer/
-├── app.py
+├── app.py                  Streamlit interface
 ├── data/
-│   ├── expected/
-│   └── samples/
-├── outputs/
+│   ├── samples/            five made-up job streams
+│   └── expected/           hand-written answers — the scorer's ground truth
+├── outputs/                generated JSON + results log
 ├── src/
-│   ├── aggregate.py
-│   ├── batch.py
-│   ├── dates.py
-│   ├── guardrails.py
-│   ├── organizer.py
-│   ├── prompts.py
-│   ├── providers.py
-│   ├── schema.py
-│   ├── score.py
-│   └── text.py
-├── tests/
-├── .env.example
-├── .gitignore
-├── README.md
-└── requirements.txt
+│   ├── providers.py        Claude → Groq → local, with a no-key engine
+│   ├── organizer.py        the core pipeline
+│   ├── prompts.py          system prompt, schema, worked example
+│   ├── schema.py           Pydantic contract
+│   ├── dates.py            the date grounding check
+│   ├── guardrails.py       safety · money · PII, enforced in code
+│   ├── aggregate.py        timeline, totals, derived actions
+│   ├── score.py            field-by-field accuracy
+│   ├── batch.py            run the whole folder
+│   └── text.py             shared normalisation
+├── tests/                  84 tests
+└── PRESENTATION.md         slide plan, demo script, Q&A prep
 ```
 
-## Core pipeline
+---
 
-1. Take raw text.
-2. Build the prompt: instructions, the schema, a worked example, the missing-data rule.
-3. Call the provider chain (`src/providers.py`), falling back on failure.
-4. Slice out the JSON object and parse it.
-5. Validate required fields and allowed values with Pydantic.
-6. Drop any date that is not written on the item's own source line (`src/dates.py`).
-7. Enforce the safety, missing-amount and PII rules (`src/guardrails.py`).
-8. Return the result, or raise with the reason it failed.
-9. `src/aggregate.py` derives the timeline and totals, with no further API call.
-10. `src/batch.py` runs the whole folder and logs a row per sample.
+## 🔐 Privacy
 
-## One app, from two
+> **Made-up sample data only.** Never use real Foreman customer, employee, or
+> company data. Everything in `data/samples/` is invented, and the rule is
+> repeated in the app sidebar so it is visible while the tool is in use.
 
-This repo briefly held two prototypes. They were merged rather than picked
-between, because each had something the other did not.
+---
 
-**Kept from this one:** the scorer and the hand-written answer key, the
-source-line date check, the Pydantic contract, the batch runner.
-
-**Taken from the port:** the provider chain with its no-key fallback, guardrails
-enforced in code rather than asked for in the prompt, and the aggregation layer.
-
-**Deliberately not taken:** its 13-category schema and its own samples. Both are
-reasonable, but adopting either would have invalidated `data/expected/` and made
-the accuracy number incomparable with every earlier measurement. Widening the
-test set is Week 4 work, done by adding samples and their answers together.
-
-The port also split a stream on blank lines only, which fused five events into
-one item on a dense sample. That bug is not in this pipeline.
-
-## Missing-data rule
-
-When something is absent or genuinely ambiguous, return `null` and add a
-warning. Do not guess. If even a human would be unsure, flag it for review
-rather than committing to an answer.
-
-## Accuracy so far
-
-`python -m src.score` compares `outputs/` against `data/expected/`. 125 fields
-across the 5 samples: three header fields each, then category, date,
-action_required, amount and source_excerpt for every one of the 22 items.
-
-| Measure | Result |
-| --- | --- |
-| Field accuracy | 118/125 (94%) |
-| Samples with no errors | 2/5 |
-| Date fields correct | 22/22 |
-
-Measured on Groq, since no Anthropic key was set when this was last run. The
-provider is recorded in every file in `outputs/`, so a number can always be
-traced to the engine that produced it.
-
-**On reproducibility.** Temperature is 0, but that is not the same as
-deterministic. Three consecutive runs of the same five samples scored 117, 118
-and 118, so treat this as 118 ± 1 field. It is not precise enough to justify
-chasing a single-field change, which is worth knowing before reading too much
-into the table below.
-
-### How the date problem was actually solved
-
-Dates were the weakest field, in two shapes: invented years (`7/27` became
-`2026-07-27`) and inherited dates (an undated line took the date of the line
-above it). Every number below comes from the same scorer, so they compare
-directly.
-
-| Attempt | Result |
-| --- | --- |
-| Week 3 baseline | 112/125 (90%) |
-| Rewrote the prompt rule | 115/125 (92%) |
-| Checked the date against the item's excerpt | 112/125 (90%) |
-| Checked the date against the item's source line | **118/125 (94%)** |
-
-**The prompt fixed half of it.** Spelling both failure shapes out in rule 3
-stopped the invented years. Inheritance did not move at all, and a second
-rewrite did not move it either — the model reads a dated line as a heading for
-the block underneath it.
-
-**The first code fix made things worse, which is the useful part.** `src/dates.py`
-drops any date that is not written in the item it belongs to. Checking that
-against the item's `source_excerpt` cost three fields, because the model quotes
-`Crew completed cabinet removal` and leaves the `2026-07-21 - ` in front of it
-out. The check could not see dates that were really there and deleted four
-correct ones.
-
-**Checking the source line instead fixed it.** The excerpt is located back in
-the sample text and the date is read off that line, which still has the prefix.
-Inherited dates are dropped with a warning; real ones survive. All 22 date
-fields are now correct, and the two easy samples went to a perfect score.
-
-### What is still wrong
-
-Seven misses, none of them dates. Five are category disagreements, and some are
-genuinely arguable — whether "demo done ... there is moisture behind it" is a
-contractor update or an issue is a judgement call. Those judgements live in
-`data/expected/` and can be challenged. The other two are missed action flags,
-where the item clearly asks for something and `action_required` came back false.
-
-Categories are the Week 4 target now that dates are done.
+<sub>Built for the 2026 Venture &amp; Tech Summer Program. This is a measured
+prototype, not a production system.</sub>
