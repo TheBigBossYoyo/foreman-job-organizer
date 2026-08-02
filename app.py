@@ -83,7 +83,16 @@ company data.
 if "raw_text" not in st.session_state:
     st.session_state["raw_text"] = load_sample(sample_names[0]) if sample_names else ""
 
-raw_text = st.text_area("Paste a messy job stream", height=300, key="raw_text")
+# Once there is a result, the input is no longer the thing you came to look at.
+# Collapse it so a 300px box does not push the timeline off the screen, but
+# leave it one click away for the next run.
+with st.expander("Job stream", expanded="result" not in st.session_state):
+    raw_text = st.text_area(
+        "Paste a messy job stream",
+        height=300,
+        key="raw_text",
+        label_visibility="collapsed",
+    )
 
 if st.button("Organize job", type="primary", use_container_width=True):
     # Clear the last run before starting. Otherwise a failed call leaves the
@@ -167,9 +176,19 @@ if "result" in st.session_state:
 
     with right:
         st.subheader("Job overview")
-        st.write(f"**Project:** {result['project_name'] or 'Not found'}")
-        st.write(f"**Client:** {result['client_name'] or 'Not found'}")
-        st.write(f"**Address:** {result['property_address'] or 'Not found'}")
+        # "Not stated" rather than "Not found". The field is blank because the
+        # source never said, which is the missing-data rule working, not the
+        # app failing to locate something that was there.
+        for label, key in [
+            ("Project", "project_name"),
+            ("Client", "client_name"),
+            ("Address", "property_address"),
+        ]:
+            value = result[key]
+            if value:
+                st.write(f"**{label}:** {value}")
+            else:
+                st.write(f"**{label}:** :grey[not stated in the source]")
         st.write(result["overall_summary"])
 
         summary = summarize(JobOrganizationResult.model_validate(result))
