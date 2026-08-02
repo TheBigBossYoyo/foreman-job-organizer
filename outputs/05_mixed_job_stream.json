@@ -17,12 +17,12 @@
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "2026-07-25 09:10 - lumber delivery showed up"
+      "source_excerpt": "lumber delivery showed up"
     },
     {
       "item_id": "item_002",
       "category": "issue",
-      "date": "2026-07-25",
+      "date": null,
       "people": [],
       "location": null,
       "amount": null,
@@ -30,7 +30,7 @@
       "title": "Warped lumber",
       "summary": "Three boards from the lumber delivery are warped.",
       "action_required": true,
-      "action": "Document the warped lumber and arrange replacements.",
+      "action": "Document the warped boards and arrange replacements.",
       "priority": "high",
       "confidence": "high",
       "source_excerpt": "3 boards look warped, see pic"
@@ -62,7 +62,7 @@
       "title": "City inspection",
       "summary": "The city inspection failed due to two missing bolts on the stair handrail.",
       "action_required": true,
-      "action": "Install replacement bolts and schedule a re-inspection.",
+      "action": "Install the replacement bolts and schedule a re-inspection.",
       "priority": "high",
       "confidence": "high",
       "source_excerpt": "city inspection FAILED. two bolts missing on the stair handrail."
@@ -88,12 +88,13 @@
   ],
   "open_actions": [
     "Document the warped lumber and arrange replacements.",
-    "Install replacement bolts and schedule a re-inspection.",
+    "Install the replacement bolts and schedule a re-inspection.",
     "Provide the client with the revised completion date once confirmed."
   ],
-  "overall_summary": "Lumber was delivered with warped boards, the city inspection failed, and the client requested the revised completion date.",
+  "overall_summary": "Lumber delivery arrived with warped boards, a payment was made, the city inspection failed, and the client requested the revised completion date.",
   "warnings": [
     "The payment date was not provided.",
-    "The exact revised completion date was not provided."
+    "The exact revised completion date was not provided.",
+    "item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one."
   ]
 }

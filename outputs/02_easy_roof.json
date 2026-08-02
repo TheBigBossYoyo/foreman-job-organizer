@@ -11,7 +11,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Shingle repair update",
+      "title": "Shingle replacement",
       "summary": "Replaced damaged shingles on the north slope.",
       "action_required": false,
       "action": null,
@@ -22,7 +22,7 @@
     {
       "item_id": "item_002",
       "category": "photo",
-      "date": "2026-07-23",
+      "date": null,
       "people": [],
       "location": null,
       "amount": null,
@@ -38,7 +38,7 @@
     {
       "item_id": "item_003",
       "category": "receipt",
-      "date": "2026-07-23",
+      "date": null,
       "people": [],
       "location": "Roofing Depot",
       "amount": 486.2,
@@ -69,8 +69,10 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "The north slope shingle repair was completed, a receipt for shingles and nails was recorded, and the final cleanup is done.",
+  "overall_summary": "Damaged shingles were replaced, a receipt for materials was recorded, and final cleanup is complete.",
   "warnings": [
-    "No explicit mention of the client's involvement or approval for the work done."
+    "No explicit mention of inspection or payment schedules.",
+    "item_002: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one.",
+    "item_003: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one."
   ]
 }

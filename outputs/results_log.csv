@@ -1,6 +1,6 @@
 sample,status,items,actions,notes
 01_easy_kitchen.txt,pass,4,0,The receipt date was not provided.; The date of the client update was not provided.
-02_easy_roof.txt,pass,4,0,No explicit mention of the client's involvement or approval for the work done.
-03_tricky_bathroom.txt,pass,5,3,The date of the demo completion was not provided in the standard format.; The exact calendar dates for Friday and Thursday were not provided.
-04_tricky_painting.txt,pass,4,2,"The dates for the living room painting update, bedroom color issue, receipt, and work pause were not provided."
-05_mixed_job_stream.txt,pass,5,3,The payment date was not provided.; The exact revised completion date was not provided.
+02_easy_roof.txt,pass,4,0,"No explicit mention of inspection or payment schedules.; item_002: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one.; item_003: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one."
+03_tricky_bathroom.txt,pass,5,3,The date of the demo completion was provided in an ambiguous format (7/27).; The exact dates for Friday and Thursday were not provided.; Lopez's site visit is tentative and not confirmed.; The vanity supplier did not provide a firm delivery date.
+04_tricky_painting.txt,pass,4,2,"The dates for the living room painting update, bedroom color issue, painting supplies receipt, and work pause were not provided."
+05_mixed_job_stream.txt,pass,5,3,"The payment date was not provided.; The exact revised completion date was not provided.; item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one."
