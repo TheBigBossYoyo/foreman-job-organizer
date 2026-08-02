@@ -1,0 +1,119 @@
+import json
+
+import pytest
+
+from src import providers
+from src.providers import ProviderError, classify, find_amount, find_date, resolve_chain
+from src.schema import JobOrganizationResult
+
+SAMPLE = """Project: Alvarez kitchen renovation
+Client: Sofia Alvarez
+
+2026-07-21 - Crew completed cabinet removal.
+Receipt: BuildRight, drywall and screws, $142.75.
+"""
+
+
+@pytest.fixture(autouse=True)
+def clear_provider_env(monkeypatch):
+    for name in ["AI_PROVIDER", "ANTHROPIC_API_KEY", "GROQ_API_KEY"]:
+        monkeypatch.delenv(name, raising=False)
+
+
+def test_anthropic_leads_when_both_keys_are_set(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    assert resolve_chain() == ["anthropic", "groq", "local"]
+
+
+def test_groq_leads_when_anthropic_has_no_key(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    assert resolve_chain() == ["groq", "local"]
+
+
+def test_local_is_all_that_is_left_without_keys():
+    assert resolve_chain() == ["local"]
+
+
+def test_a_pinned_provider_skips_the_chain(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("AI_PROVIDER", "local")
+
+    assert resolve_chain() == ["local"]
+
+
+def test_groq_takes_over_when_anthropic_raises(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    def boom(system_prompt, user_prompt, model=None):
+        raise RuntimeError("anthropic is down")
+
+    monkeypatch.setattr(providers, "call_anthropic", boom)
+    monkeypatch.setattr(providers, "call_groq", lambda s, u, model=None: '{"ok": true}')
+
+    text, used = providers.complete("sys", "user", SAMPLE)
+
+    assert used == "groq"
+    assert text == '{"ok": true}'
+
+
+def test_the_local_engine_catches_a_total_outage(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("no network")
+
+    monkeypatch.setattr(providers, "call_anthropic", boom)
+    monkeypatch.setattr(providers, "call_groq", boom)
+
+    text, used = providers.complete("sys", "user", SAMPLE)
+
+    assert used == "local"
+    assert json.loads(text)["items"]
+
+
+def test_every_provider_failing_is_an_error(monkeypatch):
+    monkeypatch.setenv("AI_PROVIDER", "groq")
+    monkeypatch.setattr(providers, "call_groq", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("x")))
+
+    with pytest.raises(ProviderError):
+        providers.complete("sys", "user", SAMPLE)
+
+
+def test_the_local_engine_output_passes_the_real_schema():
+    # The whole point of the fallback is that nothing downstream has to know.
+    result = JobOrganizationResult.model_validate(json.loads(providers.local_result(SAMPLE)))
+
+    assert result.project_name == "Alvarez kitchen renovation"
+    assert result.client_name == "Sofia Alvarez"
+    assert [item.category for item in result.items] == ["contractor_update", "receipt"]
+
+
+def test_the_local_engine_will_not_invent_a_year():
+    result = json.loads(providers.local_result("7/27 demo done, moisture behind the wall"))
+
+    assert result["items"][0]["date"] is None
+
+
+def test_classify_picks_the_specific_rule_over_the_broad_one():
+    assert classify("Receipt: BuildRight, screws, $142.75") == "receipt"
+    assert classify("photo_0431.jpg - dark staining on the framing") == "photo"
+    assert classify("something entirely unremarkable") == "other"
+
+
+def test_find_amount_reads_the_currency_with_the_number():
+    assert find_amount("Receipt: screws, $142.75") == (142.75, "USD")
+    assert find_amount("paid 118.90 TND for the primer") == (118.90, "TND")
+
+
+def test_find_amount_ignores_a_date():
+    assert find_amount("7/27 demo done") == (None, None)
+
+
+def test_find_date_needs_a_year():
+    assert find_date("2026-07-21 - crew on site") == "2026-07-21"
+    assert find_date("7/27 demo done") is None
