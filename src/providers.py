@@ -24,6 +24,11 @@ load_dotenv()
 ANTHROPIC_DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 GROQ_DEFAULT_MODEL = "llama-3.3-70b-versatile"
 
+# Preference order. Anthropic leads; Groq covers for it; the local engine is
+# the floor. resolve_chain drops whatever has no key, provider_status keeps
+# them all so the reason can be shown.
+PROVIDER_ORDER = ["anthropic", "groq", "local"]
+
 HEADER_PATTERNS = [
     ("project_name", re.compile(r"^project\s*[:\-]\s*(.+)$", re.I)),
     ("client_name", re.compile(r"^client\s*(?:is|[:\-])\s*(.+)$", re.I)),
@@ -67,6 +72,29 @@ def resolve_chain():
         chain.append("groq")
     chain.append("local")
     return chain
+
+
+def provider_status():
+    """Every provider and its state, including the ones not in play.
+
+    resolve_chain drops a provider that has no key, which is right for calling
+    but wrong for showing: a missing row makes "Anthropic leads but has no key"
+    look identical to "Anthropic is not part of this app". Returns
+    [(name, state)] where state is active, standby, no key, or off.
+    """
+    chain = resolve_chain()
+    pinned = os.getenv("AI_PROVIDER", "").strip().lower() in PROVIDER_ORDER
+
+    rows = []
+    for name in PROVIDER_ORDER:
+        if name == chain[0]:
+            state = "active"
+        elif name in chain:
+            state = "standby"
+        else:
+            state = "off" if pinned else "no key"
+        rows.append((name, state))
+    return rows
 
 
 def complete(system_prompt, user_prompt, raw_text, model=None):

@@ -3,7 +3,14 @@ import json
 import pytest
 
 from src import providers
-from src.providers import ProviderError, classify, find_amount, find_date, resolve_chain
+from src.providers import (
+    ProviderError,
+    classify,
+    find_amount,
+    find_date,
+    provider_status,
+    resolve_chain,
+)
 from src.schema import JobOrganizationResult
 
 SAMPLE = """Project: Alvarez kitchen renovation
@@ -42,6 +49,49 @@ def test_a_pinned_provider_skips_the_chain(monkeypatch):
     monkeypatch.setenv("AI_PROVIDER", "local")
 
     assert resolve_chain() == ["local"]
+
+
+def test_status_lists_anthropic_even_with_no_key(monkeypatch):
+    # The whole point: a missing row would make "leads but unconfigured" look
+    # the same as "not part of this app".
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    assert provider_status() == [
+        ("anthropic", "no key"),
+        ("groq", "active"),
+        ("local", "standby"),
+    ]
+
+
+def test_status_marks_anthropic_active_when_it_has_a_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    assert provider_status() == [
+        ("anthropic", "active"),
+        ("groq", "standby"),
+        ("local", "standby"),
+    ]
+
+
+def test_status_says_off_rather_than_no_key_when_a_provider_is_pinned(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+    monkeypatch.setenv("AI_PROVIDER", "groq")
+
+    assert provider_status() == [
+        ("anthropic", "off"),
+        ("groq", "active"),
+        ("local", "off"),
+    ]
+
+
+def test_status_with_no_keys_at_all():
+    assert provider_status() == [
+        ("anthropic", "no key"),
+        ("groq", "no key"),
+        ("local", "active"),
+    ]
 
 
 def test_groq_takes_over_when_anthropic_raises(monkeypatch):
