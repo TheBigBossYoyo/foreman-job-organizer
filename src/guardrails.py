@@ -82,8 +82,11 @@ def enforce(item):
         flags.add("possible_pii")
     if item.confidence == "low":
         flags.add("low_confidence")
-    if item.date is None:
-        flags.add("no_date")
+
+    # A missing date is deliberately not a flag. Most lines in a real job
+    # stream never carry one, so flagging them marked every item for review and
+    # made the flag mean nothing. The date is already visible on the item, and a
+    # date that was dropped by grounding already writes its own warning.
 
     item.flags = sorted(flags)
     return item

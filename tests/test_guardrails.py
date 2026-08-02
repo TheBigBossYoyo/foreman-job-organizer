@@ -78,11 +78,17 @@ def test_the_source_excerpt_is_left_intact_when_pii_is_redacted():
     assert "still contains it" in item.compliance_notes
 
 
-def test_low_confidence_and_a_missing_date_are_both_flagged():
-    item = enforce(make_item(confidence="low", date=None))
+def test_low_confidence_is_flagged():
+    assert "low_confidence" in enforce(make_item(confidence="low")).flags
 
-    assert "low_confidence" in item.flags
-    assert "no_date" in item.flags
+
+def test_a_missing_date_is_not_a_review_flag():
+    # Most lines in a real stream carry no date. Flagging them all marked every
+    # item for review and made the flag useless.
+    item = enforce(make_item(category="photo", date=None, confidence="high"))
+
+    assert item.flags == []
+    assert not needs_review(item)
 
 
 def test_a_clean_item_gets_no_flags():
