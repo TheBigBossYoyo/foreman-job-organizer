@@ -4,13 +4,10 @@ A VTSP technical-track prototype. It takes the running record of a construction
 job, the notes and texts and receipts that pile up while the work happens, and
 turns it into a timeline you can actually read.
 
-> **Two prototypes in this repo.** The root is the original Python/Streamlit
-> prototype (measurement-focused: scorer, Pydantic schema, `pytest`). A second,
-> web-app-derived Python port lives in [`webapp-python/`](webapp-python/) — it
-> brings over a richer 13-category schema, code-enforced guardrails (safety,
-> never-invent-money, PII, date-grounding), a no-API-key local fallback, and a
-> Streamlit UI with a timeline, next-actions and JSON export. See
-> [`webapp-python/README.md`](webapp-python/README.md).
+Built by merging two prototypes: this one, which was measurement-first, and a
+web-app-derived port that had the better runtime engineering. What survived from
+each is set out in [One app, from two](#one-app-from-two). The port itself is
+still on the `webapp-python` branch if you want to read the original.
 
 ## What it produces
 
@@ -34,14 +31,17 @@ Install the packages:
 python -m pip install -r requirements.txt
 ```
 
-Then add a Groq API key. Copy `.env.example` to `.env` and fill it in:
+Then add a key. Copy `.env.example` to `.env` and fill it in:
 
 ```text
+ANTHROPIC_API_KEY=your_key_here
 GROQ_API_KEY=your_key_here
-GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
-`.env` is gitignored. Never commit the key.
+`.env` is gitignored. Never commit a key.
+
+**You do not need either one.** With no keys at all the app still runs on the
+local rule-based engine — see [Providers](#providers).
 
 Run the app:
 
@@ -73,6 +73,25 @@ python -m src.score
 pytest
 ```
 
+## Providers
+
+Three, tried in order. The first one that answers wins.
+
+| Order | Provider | Needs | Used when |
+| --- | --- | --- | --- |
+| 1 | Anthropic Claude | `ANTHROPIC_API_KEY` | Always, when the key is set |
+| 2 | Groq | `GROQ_API_KEY` | Anthropic has no key, or its call failed |
+| 3 | Local rule-based | nothing | Neither model is reachable |
+
+The local engine is not a stub. It returns the same validated JSON contract, so
+nothing downstream knows the difference — but it matches keywords instead of
+reading, and it is visibly worse. The app says so in red when a run falls
+through to it, and every result records which provider answered.
+
+Set `AI_PROVIDER=anthropic|groq|local` to pin one and skip the chain. The scorer
+uses this to measure a single engine rather than whichever one happened to
+answer.
+
 ## Repository structure
 
 ```text
@@ -83,10 +102,13 @@ Foreman Job Organizer/
 │   └── samples/
 ├── outputs/
 ├── src/
+│   ├── aggregate.py
 │   ├── batch.py
 │   ├── dates.py
+│   ├── guardrails.py
 │   ├── organizer.py
 │   ├── prompts.py
+│   ├── providers.py
 │   ├── schema.py
 │   ├── score.py
 │   └── text.py
@@ -101,12 +123,33 @@ Foreman Job Organizer/
 
 1. Take raw text.
 2. Build the prompt: instructions, the schema, a worked example, the missing-data rule.
-3. Call Groq.
+3. Call the provider chain (`src/providers.py`), falling back on failure.
 4. Slice out the JSON object and parse it.
 5. Validate required fields and allowed values with Pydantic.
 6. Drop any date that is not written on the item's own source line (`src/dates.py`).
-7. Return the result, or raise with the reason it failed.
-8. `src/batch.py` runs the whole folder and logs a row per sample.
+7. Enforce the safety, missing-amount and PII rules (`src/guardrails.py`).
+8. Return the result, or raise with the reason it failed.
+9. `src/aggregate.py` derives the timeline and totals, with no further API call.
+10. `src/batch.py` runs the whole folder and logs a row per sample.
+
+## One app, from two
+
+This repo briefly held two prototypes. They were merged rather than picked
+between, because each had something the other did not.
+
+**Kept from this one:** the scorer and the hand-written answer key, the
+source-line date check, the Pydantic contract, the batch runner.
+
+**Taken from the port:** the provider chain with its no-key fallback, guardrails
+enforced in code rather than asked for in the prompt, and the aggregation layer.
+
+**Deliberately not taken:** its 13-category schema and its own samples. Both are
+reasonable, but adopting either would have invalidated `data/expected/` and made
+the accuracy number incomparable with every earlier measurement. Widening the
+test set is Week 4 work, done by adding samples and their answers together.
+
+The port also split a stream on blank lines only, which fused five events into
+one item on a dense sample. That bug is not in this pipeline.
 
 ## Missing-data rule
 
@@ -125,6 +168,16 @@ action_required, amount and source_excerpt for every one of the 22 items.
 | Field accuracy | 118/125 (94%) |
 | Samples with no errors | 2/5 |
 | Date fields correct | 22/22 |
+
+Measured on Groq, since no Anthropic key was set when this was last run. The
+provider is recorded in every file in `outputs/`, so a number can always be
+traced to the engine that produced it.
+
+**On reproducibility.** Temperature is 0, but that is not the same as
+deterministic. Three consecutive runs of the same five samples scored 117, 118
+and 118, so treat this as 118 ± 1 field. It is not precise enough to justify
+chasing a single-field change, which is worth knowing before reading too much
+into the table below.
 
 ### How the date problem was actually solved
 
