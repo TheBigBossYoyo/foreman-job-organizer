@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from html import escape
 from pathlib import Path
 
 import streamlit as st
@@ -19,17 +20,150 @@ PROVIDER_LABELS = {
 # Short, readable names. "Contractor Update" title-cased from the enum reads as
 # a database field; these read as something a foreman would say.
 CATEGORY_LABELS = {
-    "photo": "📷 Photo",
-    "receipt": "🧾 Receipt",
-    "client_update": "💬 Client",
-    "contractor_update": "🏗️ Site work",
-    "inspection": "✅ Inspection",
-    "delivery": "🚚 Delivery",
-    "schedule": "📅 Schedule",
-    "issue": "⚠️ Issue",
-    "payment": "💵 Payment",
-    "other": "📦 Other",
+    "photo": "Photo",
+    "receipt": "Receipt",
+    "client_update": "Client",
+    "contractor_update": "Site work",
+    "inspection": "Inspection",
+    "delivery": "Delivery",
+    "schedule": "Schedule",
+    "issue": "Issue",
+    "payment": "Payment",
+    "other": "Other",
 }
+
+# One colour per category, carried by the card's left edge. Chosen to stay
+# legible on both the light and dark Streamlit themes.
+CATEGORY_COLORS = {
+    "photo": "#9333EA",
+    "receipt": "#EA580C",
+    "client_update": "#2563EB",
+    "contractor_update": "#F97316",
+    "inspection": "#16A34A",
+    "delivery": "#D97706",
+    "schedule": "#0EA5E9",
+    "issue": "#DC2626",
+    "payment": "#059669",
+    "other": "#64748B",
+}
+
+# Neutral greys at low alpha rather than fixed colours, so the cards sit
+# correctly on a light or a dark background without a second stylesheet.
+CARD_CSS = """
+<style>
+.jo-card {
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-left: 4px solid var(--jo-accent, #64748B);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.6rem;
+  background: rgba(128, 128, 128, 0.06);
+}
+.jo-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+.jo-date {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+  min-width: 4.2rem;
+}
+.jo-cat {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.jo-amount {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.jo-badge {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.15);
+  color: #DC2626;
+}
+.jo-title { font-weight: 600; line-height: 1.35; }
+.jo-summary { opacity: 0.85; line-height: 1.5; margin-top: 0.15rem; }
+.jo-action {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(234, 88, 12, 0.12);
+  font-size: 0.85rem;
+}
+.jo-source {
+  margin-top: 0.5rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid rgba(128, 128, 128, 0.3);
+  font-size: 0.8rem;
+  font-style: italic;
+  opacity: 0.6;
+  line-height: 1.4;
+}
+.jo-note { margin-top: 0.4rem; font-size: 0.78rem; opacity: 0.7; }
+</style>
+"""
+
+
+def format_date(iso_date):
+    """2026-07-21 becomes 21 Jul. Reads faster down a column than the ISO form."""
+    if not iso_date:
+        return "no date"
+    try:
+        return datetime.strptime(iso_date, "%Y-%m-%d").strftime("%d %b")
+    except ValueError:
+        return iso_date
+
+
+def render_card(item):
+    """One item as a self-contained card. Everything is escaped: the text here
+    comes from a model reading arbitrary input, so it is never trusted as HTML.
+    """
+    colour = CATEGORY_COLORS.get(item["category"], CATEGORY_COLORS["other"])
+    label = CATEGORY_LABELS.get(item["category"], item["category"])
+
+    parts = [
+        f'<div class="jo-card" style="--jo-accent: {colour}">',
+        '<div class="jo-head">',
+        f'<span class="jo-date">{escape(format_date(item["date"]))}</span>',
+        f'<span class="jo-cat" style="color: {colour}">{escape(label)}</span>',
+    ]
+
+    if item["flags"]:
+        flags = ", ".join(flag.replace("_", " ") for flag in item["flags"])
+        parts.append(f'<span class="jo-badge">{escape(flags)}</span>')
+
+    if item["amount"] is not None:
+        amount = f'{item["amount"]:,.2f} {item["currency"] or ""}'.strip()
+        parts.append(f'<span class="jo-amount">{escape(amount)}</span>')
+
+    parts.append("</div>")
+    parts.append(f'<div class="jo-title">{escape(item["title"])}</div>')
+    parts.append(f'<div class="jo-summary">{escape(item["summary"])}</div>')
+
+    if item["action_required"] and item["action"]:
+        parts.append(f'<div class="jo-action"><b>Action</b> · {escape(item["action"])}</div>')
+
+    if item["compliance_notes"]:
+        parts.append(f'<div class="jo-note">{escape(item["compliance_notes"])}</div>')
+
+    parts.append(f'<div class="jo-source">{escape(item["source_excerpt"])}</div>')
+    parts.append("</div>")
+    return "".join(parts)
 
 SAMPLE_DIR = Path("data/samples")
 
@@ -38,6 +172,8 @@ st.set_page_config(page_title="Foreman AI Job Organizer", page_icon="🏗️", l
 
 def load_sample(name):
     return (SAMPLE_DIR / name).read_text(encoding="utf-8")
+
+st.markdown(CARD_CSS, unsafe_allow_html=True)
 
 st.title("🏗️ Foreman AI Job Organizer")
 st.caption("Paste the running record of a job and get back a timeline you can read.")
@@ -140,39 +276,13 @@ if "result" in st.session_state:
             key=lambda item: (item["date"] is None, item["date"] or ""),
         )
 
-        for item in ordered:
-            marker = "⚠ " if item["item_id"] in needs_review else ""
-            date_label = item["date"] or "no date"
-            header = (
-                f"{marker}{date_label} · "
-                f"{CATEGORY_LABELS.get(item['category'], item['category'])} · "
-                f"{item['title']}"
-            )
-
-            with st.expander(header, expanded=True):
-                st.write(item["summary"])
-
-                # One line of facts instead of three metric tiles. Fifteen large
-                # numbers on screen at once buried the text they described.
-                facts = [f"Confidence: {item['confidence']}"]
-                if item["amount"] is not None:
-                    facts.insert(0, f"**{item['amount']:,.2f} {item['currency'] or ''}**".strip())
-                if item["priority"] in ("high", "urgent"):
-                    facts.append(f"Priority: {item['priority']}")
-                if item["people"]:
-                    facts.append(", ".join(item["people"]))
-                st.caption(" · ".join(facts))
-
-                if item["action_required"] and item["action"]:
-                    st.warning(f"**Action:** {item['action']}")
-                if item["flags"]:
-                    st.caption(
-                        "⚠ Flagged: "
-                        + ", ".join(flag.replace("_", " ") for flag in item["flags"])
-                    )
-                if item["compliance_notes"]:
-                    st.caption(item["compliance_notes"])
-                st.caption(f"Source: \"{item['source_excerpt']}\"")
+        # Rendered as one HTML block rather than per item. Streamlit wraps every
+        # separate markdown call in its own padded container, which reintroduces
+        # the gaps the cards exist to remove.
+        st.markdown(
+            "".join(render_card(item) for item in ordered),
+            unsafe_allow_html=True,
+        )
 
     with right:
         st.subheader("Job overview")
