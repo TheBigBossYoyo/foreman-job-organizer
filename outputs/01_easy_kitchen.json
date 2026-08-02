@@ -36,9 +36,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "BuildRight, drywall and screws, $142.75.",
-      "flags": [
-        "no_date"
-      ],
+      "flags": [],
       "compliance_notes": null
     },
     {
@@ -76,9 +74,7 @@
       "priority": "low",
       "confidence": "medium",
       "source_excerpt": "Sofia approved the quartz countertop sample.",
-      "flags": [
-        "no_date"
-      ],
+      "flags": [],
       "compliance_notes": null
     }
   ],
@@ -86,8 +82,7 @@
   "overall_summary": "The crew completed cabinet removal, a receipt for drywall and screws was recorded, new cabinets were delivered, and the client approved the quartz countertop sample.",
   "warnings": [
     "The receipt date was not provided.",
-    "The date of the client update was not provided.",
-    "2 of 4 items were flagged for review by the guardrails."
+    "The date of the client update was not provided."
   ],
   "provider": "groq"
 }
