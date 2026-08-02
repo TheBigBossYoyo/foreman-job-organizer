@@ -70,7 +70,7 @@ CSS = """
   padding-bottom: .9rem; margin-bottom: 1.6rem;
   border-bottom: 1px solid #ECEEF1;
 }
-.jo-name { font-size: 1rem; font-weight: 700; color: #0F172A; letter-spacing: -.01em; }
+.jo-name { font-size: 1.08rem; font-weight: 700; color: #0F172A; letter-spacing: -.015em; }
 .jo-engine { margin-left: auto; font-size: .74rem; color: #94A3B8; font-weight: 500; }
 
 /* ---- job identity ---- */
@@ -100,22 +100,29 @@ CSS = """
 
 /* ---- timeline ---- */
 .jo-row {
-  display: grid; grid-template-columns: 3.9rem .9rem 1fr;
-  column-gap: .85rem; padding-bottom: 1.15rem;
+  display: grid; grid-template-columns: 4.3rem .9rem 1fr;
+  column-gap: .85rem; padding: .35rem .5rem 1.15rem .5rem;
+  margin-left: -.5rem; border-radius: 8px;
+  transition: background .12s ease;
 }
+.jo-row:hover { background: #FAFBFC; }
 .jo-when {
-  text-align: right; font-size: .76rem; font-weight: 600; color: #64748B;
-  font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .12rem;
+  text-align: right; font-size: .78rem; font-weight: 700; color: #334155;
+  font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .1rem;
 }
-.jo-when.none { color: #CBD5E1; font-weight: 500; }
+/* Undated is a real state, not a rendering gap, so it says so in words. */
+.jo-when.none {
+  color: #CBD5E1; font-weight: 600; font-size: .66rem;
+  letter-spacing: .04em; text-transform: uppercase;
+}
 .jo-rail { position: relative; }
 .jo-dot {
-  position: absolute; top: .3rem; left: .12rem;
+  position: absolute; top: .35rem; left: .12rem;
   width: .58rem; height: .58rem; border-radius: 50%;
   box-shadow: 0 0 0 3px #fff; z-index: 1;
 }
 .jo-rail::after {
-  content: ""; position: absolute; left: .385rem; top: .55rem; bottom: -1.15rem;
+  content: ""; position: absolute; left: .385rem; top: .6rem; bottom: -1.5rem;
   width: 1.5px; background: #E2E8F0;
 }
 .jo-row:last-child .jo-rail::after { display: none; }
@@ -263,7 +270,8 @@ def render_row(item):
 
     parts = [
         '<div class="jo-row">',
-        f'<div class="jo-when{"" if when else " none"}">{escape(when) if when else "—"}</div>',
+        f'<div class="jo-when{"" if when else " none"}">'
+        f'{escape(when) if when else "no date"}</div>',
         f'<div class="jo-rail"><span class="jo-dot" style="background:{colour}"></span></div>',
         '<div>',
         '<div class="jo-head">',
