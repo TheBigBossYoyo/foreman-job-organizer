@@ -11,19 +11,12 @@ excerpt that is not in the input is a quote it made up.
 
 import argparse
 import json
-import re
 from pathlib import Path
+
+from .text import normalize
 
 HEADER_FIELDS = ["project_name", "client_name", "property_address"]
 ITEM_FIELDS = ["category", "date", "action_required", "amount", "source_excerpt"]
-
-
-def normalize(text):
-    """Lower-case, straighten curly quotes, and collapse runs of whitespace."""
-    text = text.lower()
-    for curly, straight in [("‘", "'"), ("’", "'"), ("“", '"'), ("”", '"')]:
-        text = text.replace(curly, straight)
-    return re.sub(r"\s+", " ", text).strip()
 
 
 def excerpt_is_grounded(excerpt, source):
