@@ -239,7 +239,10 @@ def render_numbers(summary):
     """
     cells = [(str(summary["item_count"]), "items", False)]
 
-    for currency, total in list(summary["spend"].items())[:2]:
+    # Every currency, not the first two. Cutting the list dropped a real total
+    # off the screen with nothing to say it was missing, which is the one thing
+    # a spend figure must never do.
+    for currency, total in summary["spend"].items():
         cells.append((f"{total:,.2f}", currency.lower(), False))
 
     if summary["undated"]:
@@ -403,7 +406,8 @@ if st.button("Organize", type="primary"):
 
 if "result" in st.session_state:
     result = st.session_state["result"]
-    summary = summarize(JobOrganizationResult.model_validate(result))
+    validated = JobOrganizationResult.model_validate(result)
+    summary = summarize(validated)
 
     if result.get("provider") == "local":
         st.error("No model was reached. Every field below was matched by keyword.")
@@ -413,7 +417,7 @@ if "result" in st.session_state:
 
     # Ordered by src.aggregate, so the screen and the exported JSON agree about
     # what order this job happened in.
-    ordered = ordered_items(JobOrganizationResult.model_validate(result).items)
+    ordered = ordered_items(validated.items)
     # One markdown call for the whole list: Streamlit pads every separate call
     # with its own container, which breaks the rail into disconnected pieces.
     st.markdown(
@@ -423,8 +427,9 @@ if "result" in st.session_state:
 
     if summary["open_actions"]:
         st.markdown('<div class="jo-h">Open actions</div>', unsafe_allow_html=True)
-        # Keyed by position: two actions can read the same, and Streamlit raises
-        # on duplicate widget ids built from the label.
+        # Keyed by position rather than by label. summarize() has already
+        # collapsed repeats, but a key built from model-written text would be
+        # one duplicate away from Streamlit raising on the whole page.
         for index, action in enumerate(summary["open_actions"]):
             st.checkbox(action, key=f"action_{index}")
 
