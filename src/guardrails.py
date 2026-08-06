@@ -22,9 +22,16 @@ SAFETY_WORDS = [
     "urgent care", "bleeding", "fell off", "fell from", "electric shock",
 ]
 
-# A phone number, a US social security number, or a long card-shaped digit run.
+# Phone numbers, US social security numbers, and card-shaped digit runs.
+# People write these the way they write them, not the way a regex would like:
+# (555) 123-4567 and 4111 1111 1111 1111 are the common forms, and an earlier
+# version of this pattern matched neither.
 PII_PATTERN = re.compile(
-    r"\b(\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{3}-\d{2}-\d{4}|\d{13,16})\b"
+    r"\(\d{3}\)\s*\d{3}[-.\s]\d{4}"        # (555) 123-4567
+    r"|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b"    # 555-123-4567, 555.123.4567
+    r"|\b\d{3}-\d{2}-\d{4}\b"              # social security number
+    r"|\b\d{4}(?:[-\s]\d{4}){3}\b"         # 4111 1111 1111 1111
+    r"|\b\d{13,16}\b"                      # the same card with nothing between
 )
 
 # Categories where an amount is the point of the item. One of these arriving
@@ -58,14 +65,24 @@ def flag_missing_amount(item):
 
 
 def flag_pii(item):
-    """Redact personal data out of the summary, and say that we did."""
-    if not PII_PATTERN.search(f"{item.source_excerpt} {item.summary}"):
+    """Redact personal data out of what we wrote, and say that we did.
+
+    The title gets the same treatment as the summary. It is the largest line on
+    an item and is always on screen, so redacting only the summary left the
+    number sitting in bold above the note promising it had been removed.
+
+    The source excerpt is deliberately left alone. It is the evidence for the
+    item and altering it would make the record less checkable, so the note says
+    plainly that the original still has the number in it.
+    """
+    if not PII_PATTERN.search(f"{item.source_excerpt} {item.summary} {item.title}"):
         return False
 
     item.summary = PII_PATTERN.sub("[redacted]", item.summary)
+    item.title = PII_PATTERN.sub("[redacted]", item.title)
     item.compliance_notes = item.compliance_notes or (
         "Possible personal data in the source. It has been redacted from the "
-        "summary, but the original text still contains it."
+        "title and summary, but the original text still contains it."
     )
     return True
 

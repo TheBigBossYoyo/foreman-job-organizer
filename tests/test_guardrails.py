@@ -67,6 +67,55 @@ def test_a_phone_number_is_redacted_from_the_summary():
     assert "[redacted]" in item.summary
 
 
+def test_a_phone_number_is_redacted_from_the_title():
+    # The title is the biggest text on the item. Redacting only the summary
+    # left the number on screen under a note saying it had been removed.
+    item = enforce(make_item(
+        title="Call Maya on 555-123-4567",
+        summary="Client wants a callback about the tile.",
+        source_excerpt="maya said call her on 555-123-4567",
+    ))
+
+    assert "555-123-4567" not in item.title
+    assert "[redacted]" in item.title
+
+
+def test_pii_only_in_the_title_still_triggers_the_rule():
+    item = enforce(make_item(
+        title="Callback for 555-123-4567",
+        summary="Nothing sensitive here.",
+        source_excerpt="a note about the tile order",
+    ))
+
+    assert "possible_pii" in item.flags
+
+
+def test_the_common_ways_people_write_a_number_are_caught():
+    # The first version of the pattern required separators in fixed places and
+    # matched none of these.
+    for written in ["(555) 123-4567", "4111 1111 1111 1111", "4111-1111-1111-1111"]:
+        item = enforce(make_item(
+            item_id="item_001",
+            summary=f"On file: {written}.",
+            source_excerpt=f"on file: {written}",
+        ))
+
+        assert "possible_pii" in item.flags, written
+        assert written not in item.summary, written
+
+
+def test_an_ordinary_number_is_not_mistaken_for_personal_data():
+    item = enforce(make_item(
+        category="receipt",
+        amount=142.75,
+        currency="USD",
+        summary="Drywall and screws, 142.75 on 2026-07-21.",
+        source_excerpt="receipt: buildright, drywall and screws, $142.75",
+    ))
+
+    assert "possible_pii" not in item.flags
+
+
 def test_the_source_excerpt_is_left_intact_when_pii_is_redacted():
     # We redact what we present, not the evidence. Say so rather than pretend.
     item = enforce(make_item(
