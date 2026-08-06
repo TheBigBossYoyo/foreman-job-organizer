@@ -98,22 +98,44 @@ def provider_status():
 
 
 def complete(system_prompt, user_prompt, raw_text, model=None):
-    """Return (raw_json_text, provider_used), falling down the chain on failure."""
+    """Return (raw_json_text, provider_used, failures).
+
+    Falls down the chain on failure. The third value is why each earlier
+    provider did not answer, and it is empty on the normal path.
+
+    Returning it rather than swallowing it matters: a bad key, a rate limit or
+    an uninstalled SDK all end with Groq quietly answering in Anthropic's place.
+    The result says "groq", which is true, but without the reason there is no
+    way to tell a deliberate configuration from a broken one.
+    """
     failures = []
 
     for provider in resolve_chain():
         try:
             if provider == "anthropic":
-                return call_anthropic(system_prompt, user_prompt, model), provider
+                return call_anthropic(system_prompt, user_prompt, model), provider, failures
             if provider == "groq":
-                return call_groq(system_prompt, user_prompt, model), provider
-            return local_result(raw_text), "local"
+                return call_groq(system_prompt, user_prompt, model), provider, failures
+            return local_result(raw_text), "local", failures
         except Exception as exc:
             # Record it and try the next one. The last provider is always local,
             # which cannot fail on a network problem, so the chain terminates.
-            failures.append(f"{provider}: {exc}")
+            failures.append(f"{provider}: {describe_failure(exc)}")
 
     raise ProviderError("Every provider failed.\n" + "\n".join(failures))
+
+
+def describe_failure(exc):
+    """A reason a reader can act on, rather than the repr of an exception.
+
+    A missing SDK is the one worth naming: it looks like an outage in the logs
+    but it is a setup problem, and the fix is a pip install, not a retry.
+    """
+    if isinstance(exc, ImportError):
+        return f"the SDK is not installed ({exc})"
+    if isinstance(exc, KeyError):
+        return f"{exc.args[0]} is not set"
+    return f"{type(exc).__name__}: {exc}"
 
 
 def call_anthropic(system_prompt, user_prompt, model=None):

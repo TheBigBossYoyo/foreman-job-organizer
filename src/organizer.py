@@ -40,14 +40,14 @@ def organize_job_stream(raw_text, model=None):
     """Turn one messy job stream into a validated result. This is the core function.
 
     The provider chain decides who answers, and records which one did on the
-    result. Temperature is 0 wherever it is supported, so the same sample gives
-    the same answer twice and the accuracy number does not drift between runs.
+    result. Temperature is 0, which lowers the variation between runs but does
+    not remove it — three consecutive scoring runs came out at 117, 118 and 118.
     """
     if not raw_text or not raw_text.strip():
         raise ValueError("Input text cannot be empty.")
 
     try:
-        reply, provider = providers.complete(
+        reply, provider, failures = providers.complete(
             SYSTEM_PROMPT, build_user_prompt(raw_text), raw_text, model
         )
     except providers.ProviderError as exc:
@@ -64,13 +64,19 @@ def organize_job_stream(raw_text, model=None):
 
     result.provider = provider
 
+    # Say which providers were tried and skipped. Without this the only sign
+    # that the first choice failed is the provider name on the result, and that
+    # looks exactly the same as having chosen the second one on purpose.
+    for failure in failures:
+        result.warnings.append(f"Fell back after {failure}")
+
     # Validation only proves the shape is right. A date can pass every check
     # here and still have been copied off a neighbouring line, so compare each
     # one against the line it came from and drop the ones that are not there.
     ground_dates(result, raw_text)
 
-    # Guardrails run last, so the no_date flag reflects the dates that actually
-    # survived rather than the ones the model claimed.
+    # Guardrails run last, so they see the dates that actually survived
+    # grounding rather than the ones the model claimed.
     return enforce_all(result)
 
 

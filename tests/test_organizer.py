@@ -70,7 +70,7 @@ def test_the_pipeline_drops_a_date_the_item_does_not_state(monkeypatch):
         "warnings": [],
     })
     monkeypatch.setattr(
-        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "anthropic")
+        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "anthropic", [])
     )
 
     result = organize_job_stream(stream)
@@ -92,10 +92,34 @@ def test_the_result_records_which_provider_answered(monkeypatch):
         "overall_summary": "A job.",
     })
     monkeypatch.setattr(
-        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "groq")
+        organizer.providers, "complete", lambda s, u, raw, model=None: (reply, "groq", [])
     )
 
     assert organize_job_stream("a thing happened").provider == "groq"
+
+
+def test_a_skipped_provider_is_reported_in_the_warnings(monkeypatch):
+    # The provider field says groq answered. It does not say anthropic was
+    # asked first and failed, and that is the part a reader needs.
+    reply = json.dumps({
+        "items": [{
+            "item_id": "item_001",
+            "category": "other",
+            "title": "A thing",
+            "summary": "Something happened.",
+            "source_excerpt": "a thing happened",
+        }],
+        "overall_summary": "A job.",
+    })
+    monkeypatch.setattr(
+        organizer.providers,
+        "complete",
+        lambda s, u, raw, model=None: (reply, "groq", ["anthropic: 401 invalid api key"]),
+    )
+
+    result = organize_job_stream("a thing happened")
+
+    assert "Fell back after anthropic: 401 invalid api key" in result.warnings
 
 
 def test_a_dead_chain_surfaces_as_a_job_organizer_error(monkeypatch):

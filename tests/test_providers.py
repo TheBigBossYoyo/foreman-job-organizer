@@ -104,10 +104,48 @@ def test_groq_takes_over_when_anthropic_raises(monkeypatch):
     monkeypatch.setattr(providers, "call_anthropic", boom)
     monkeypatch.setattr(providers, "call_groq", lambda s, u, model=None: '{"ok": true}')
 
-    text, used = providers.complete("sys", "user", SAMPLE)
+    text, used, failures = providers.complete("sys", "user", SAMPLE)
 
     assert used == "groq"
     assert text == '{"ok": true}'
+    # The reason has to survive the fallback. Groq answering is not by itself a
+    # sign that anything went wrong, so the result cannot be the only record.
+    assert failures == ["anthropic: RuntimeError: anthropic is down"]
+
+
+def test_nothing_is_reported_when_the_first_provider_answers(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setattr(providers, "call_anthropic", lambda s, u, model=None: '{"ok": true}')
+
+    _, used, failures = providers.complete("sys", "user", SAMPLE)
+
+    assert used == "anthropic"
+    assert failures == []
+
+
+def test_a_missing_sdk_is_named_as_a_setup_problem(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+
+    def not_installed(*args, **kwargs):
+        raise ImportError("No module named 'anthropic'")
+
+    monkeypatch.setattr(providers, "call_anthropic", not_installed)
+    monkeypatch.setattr(providers, "call_groq", lambda s, u, model=None: "{}")
+
+    _, _, failures = providers.complete("sys", "user", SAMPLE)
+
+    assert failures == ["anthropic: the SDK is not installed (No module named 'anthropic')"]
+
+
+def test_a_missing_key_says_which_key(monkeypatch):
+    monkeypatch.setenv("AI_PROVIDER", "anthropic")
+
+    # No key, so the real call_anthropic raises KeyError on os.environ.
+    with pytest.raises(ProviderError) as caught:
+        providers.complete("sys", "user", SAMPLE)
+
+    assert "ANTHROPIC_API_KEY is not set" in str(caught.value)
 
 
 def test_the_local_engine_catches_a_total_outage(monkeypatch):
@@ -120,10 +158,11 @@ def test_the_local_engine_catches_a_total_outage(monkeypatch):
     monkeypatch.setattr(providers, "call_anthropic", boom)
     monkeypatch.setattr(providers, "call_groq", boom)
 
-    text, used = providers.complete("sys", "user", SAMPLE)
+    text, used, failures = providers.complete("sys", "user", SAMPLE)
 
     assert used == "local"
     assert json.loads(text)["items"]
+    assert len(failures) == 2
 
 
 def test_every_provider_failing_is_an_error(monkeypatch):
