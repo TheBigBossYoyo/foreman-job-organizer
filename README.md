@@ -1,8 +1,8 @@
-# 🏗️ Foreman AI Job Organizer
+﻿# 🏗️ Foreman AI Job Organizer
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-84%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)
 ![Accuracy](https://img.shields.io/badge/field%20accuracy-118%2F125%20(94%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
@@ -68,7 +68,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 84 tests
+pytest                  # 107 tests
 ```
 
 ---
@@ -113,8 +113,10 @@ Enforced in `src/guardrails.py`, not asked for in the prompt:
 
 - 🚨 Injury language forces an urgent review flag, whatever the model called it
 - 💵 A receipt or payment with no amount is flagged rather than left looking complete
-- 🔒 Phone numbers and SSNs are redacted from summaries — the note says the
-  source excerpt still contains them
+- 🔒 Phone numbers, SSNs and card numbers are redacted from titles and
+  summaries — the note says the source excerpt still contains them
+- 🔁 A provider that fails is named in the warnings, so a fallback can't pass
+  for a choice
 - 📅 A date not written on the item's own line is dropped with a warning
 
 **Missing-data rule:** when something is absent or ambiguous, return `null`, add
@@ -174,7 +176,7 @@ Categories are next.
 │   ├── score.py            field-by-field accuracy
 │   ├── batch.py            run the whole folder
 │   └── text.py             shared normalisation
-├── tests/                  84 tests
+├── tests/                  107 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
 
