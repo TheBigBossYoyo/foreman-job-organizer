@@ -2,8 +2,8 @@
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-107%20passing-2ea44f)
-![Accuracy](https://img.shields.io/badge/field%20accuracy-118%2F125%20(94%25)-2ea44f)
+![Tests](https://img.shields.io/badge/tests-127%20passing-2ea44f)
+![Accuracy](https://img.shields.io/badge/field%20accuracy-192%2F214%20(90%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
 
@@ -68,7 +68,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 107 tests
+pytest                  # 127 tests
 ```
 
 ---
@@ -84,8 +84,9 @@ Three, tried in order. First one that answers wins.
 | 3️⃣ | **Local rule-based** | nothing | Neither model is reachable |
 
 The local engine returns the same validated JSON, so nothing downstream knows
-the difference. It matches keywords instead of reading, and it scores 86/150
-against the model's 118/125. It's a safety net, not something to demo.
+the difference. It matches keywords instead of reading, and on the original five
+samples it scored 86/150 against the model's 118/125. It's a safety net, not
+something to demo.
 
 Pin one with `AI_PROVIDER=anthropic|groq|local`.
 
@@ -127,33 +128,43 @@ a warning, don't guess.
 ## 📊 Accuracy
 
 `python -m src.score` compares `outputs/` against the hand-written answers in
-`data/expected/` — 125 fields across 5 samples.
+`data/expected/` — 214 fields across 8 samples.
 
 | Measure | Result |
 |---|---|
-| Field accuracy | **118/125 (94%)** |
-| Samples with no errors | 2/5 |
-| Date fields correct | **22/22** ✅ |
+| Field accuracy | **192/214 (90%)** |
+| Samples with no errors | 4/8 |
+| Date fields correct | **36/38** |
 
-94% of fields are right but only 2 of 5 documents are completely clean, because
-the errors spread thin instead of piling into one bad sample.
+It was 118/125 (94%) at five samples. Three harder ones took it to 90%, which is
+what a test set is for. The original five scored 118/125 again in the same run,
+so nothing regressed — and two of the three new samples came back perfect first
+time.
 
-Temperature is 0, which isn't the same as deterministic — three consecutive runs
-scored 117, 118, 118. Call it 118 ± 1.
+Temperature is 0, which isn't the same as deterministic. Three consecutive runs
+scored 117, 118, 118, so ±1 on fields. Occasionally something larger happens:
+the model splits a line into two items instead of one, every later item lines up
+against the wrong answer, and the denominator moves too. `python -m src.stability
+--runs N` measures both.
 
 Measured on Groq. Every file in `outputs/` records which provider produced it.
 
 ### Known errors
 
-Seven misses, none of them dates.
+22 misses. **15 of them are one mistake.**
 
+- **1 merged event** on `06_safety_incident`: the model folded a progress line
+  and an injury line into a single item. Items are matched by position, so
+  everything after the merge scored against the wrong entry — including both
+  date misses, which are alignment, not date logic.
 - **5 category disagreements.** Some are arguable — whether *"demo done … there
   is moisture behind it"* is a contractor update or an issue is a judgement
   call, and that judgement lives in `data/expected/`.
 - **2 missed action flags**, where an item plainly asks for something and
   `action_required` came back `false`.
 
-Categories are next.
+Splitting events is next, along with a scorer that can tell one merge from
+fifteen mistakes.
 
 ---
 
@@ -162,7 +173,7 @@ Categories are next.
 ```text
 ├── app.py                  Streamlit interface
 ├── data/
-│   ├── samples/            five made-up job streams
+│   ├── samples/            eight made-up job streams
 │   └── expected/           hand-written answers, the scorer's ground truth
 ├── outputs/                generated JSON + results log
 ├── src/
@@ -174,9 +185,10 @@ Categories are next.
 │   ├── guardrails.py       safety · money · PII
 │   ├── aggregate.py        timeline, totals, derived actions
 │   ├── score.py            field-by-field accuracy
+│   ├── stability.py        how much the same input moves between runs
 │   ├── batch.py            run the whole folder
 │   └── text.py             shared normalisation
-├── tests/                  107 tests
+├── tests/                  127 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
 
