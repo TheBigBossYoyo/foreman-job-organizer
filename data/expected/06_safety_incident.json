@@ -1,0 +1,12 @@
+{
+  "project_name": "Okonkwo garage conversion",
+  "client_name": "Ada Okonkwo",
+  "property_address": "92 Birch Street",
+  "items": [
+    {"category": "contractor_update", "date": "2026-08-03", "action_required": false, "amount": null, "currency": null},
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "photo", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "contractor_update", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "inspection", "date": "2026-08-04", "action_required": false, "amount": null, "currency": null}
+  ]
+}

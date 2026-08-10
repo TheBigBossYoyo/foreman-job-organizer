@@ -1,0 +1,12 @@
+{
+  "project_name": "Ben Salah patio",
+  "client_name": "Nadia Ben Salah",
+  "property_address": "12 Rue des Oliviers",
+  "items": [
+    {"category": "contractor_update", "date": "2026-08-01", "action_required": false, "amount": null, "currency": null},
+    {"category": "receipt", "date": null, "action_required": false, "amount": 640.00, "currency": "TND"},
+    {"category": "receipt", "date": null, "action_required": false, "amount": 48.20, "currency": "USD"},
+    {"category": "payment", "date": null, "action_required": false, "amount": 1150.00, "currency": "TND"},
+    {"category": "client_update", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "project_name": "Whitfield loft insulation",
+  "client_name": "Tom Whitfield",
+  "property_address": "5 Harbour Lane",
+  "items": [
+    {"category": "contractor_update", "date": "2026-08-05", "action_required": false, "amount": null, "currency": null},
+    {"category": "delivery", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "photo", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "schedule", "date": "2026-08-06", "action_required": false, "amount": null, "currency": null},
+    {"category": "client_update", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}
