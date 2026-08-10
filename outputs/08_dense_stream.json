@@ -1,0 +1,131 @@
+{
+  "project_name": "Whitfield loft insulation",
+  "client_name": "Tom Whitfield",
+  "property_address": "5 Harbour Lane",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": "2026-08-05",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Crew arrival and old batts removal",
+      "summary": "The crew arrived and removed the old batts.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "crew arrived 7am, stripped the old batts out",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_002",
+      "category": "delivery",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Skip delivery",
+      "summary": "A skip was delivered and was half full by lunch.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "skip delivered same morning, half full by lunch",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_003",
+      "category": "issue",
+      "date": null,
+      "people": [],
+      "location": "north bay",
+      "amount": null,
+      "currency": null,
+      "title": "Knob and tube wiring discovery",
+      "summary": "Knob and tube wiring was found in the north bay, and work was stopped in that section.",
+      "action_required": true,
+      "action": "Assess and address the knob and tube wiring issue.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "found knob and tube wiring in the north bay, stopped work in that section",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_004",
+      "category": "photo",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Old wiring photo",
+      "summary": "A photo of the old wiring was taken.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "the old wiring where it enters the joist",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_005",
+      "category": "schedule",
+      "date": "2026-08-06",
+      "people": [
+        "electrician"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Electrician visit",
+      "summary": "An electrician is booked to look at the wiring issue.",
+      "action_required": false,
+      "action": null,
+      "priority": "medium",
+      "confidence": "high",
+      "source_excerpt": "electrician booked for 2026-08-06 to look at it",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_006",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Tom Whitfield"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Price request",
+      "summary": "The client wants a price before proceeding further.",
+      "action_required": true,
+      "action": "Provide a price quote to the client.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "Tom wants a price before we go any further",
+      "flags": [],
+      "compliance_notes": null
+    }
+  ],
+  "open_actions": [
+    "Assess and address the knob and tube wiring issue.",
+    "Provide a price quote to the client."
+  ],
+  "overall_summary": "The crew removed old batts, a skip was delivered, knob and tube wiring was discovered, and an electrician is booked to assess the issue. The client wants a price quote before proceeding.",
+  "warnings": [
+    "The date for the client's price request was not provided.",
+    "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one.",
+    "item_003: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one.",
+    "item_004: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one."
+  ],
+  "provider": "groq"
+}

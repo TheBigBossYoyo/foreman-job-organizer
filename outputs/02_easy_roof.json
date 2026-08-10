@@ -11,7 +11,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Shingle repair update",
+      "title": "Shingle replacement",
       "summary": "Replaced damaged shingles on the north slope.",
       "action_required": false,
       "action": null,
@@ -77,9 +77,8 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "The north slope shingle repair was completed, a receipt for shingles and nails was recorded, and final cleanup is complete.",
+  "overall_summary": "Damaged shingles were replaced, a receipt for materials was recorded, and final cleanup was completed.",
   "warnings": [
-    "No explicit mention of the project completion or final inspection.",
     "item_002: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one."
   ],

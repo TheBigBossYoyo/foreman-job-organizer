@@ -12,7 +12,7 @@
       "amount": null,
       "currency": null,
       "title": "Living room painting update",
-      "summary": "The living room painting is done except for touch-ups.",
+      "summary": "The living room is done except for touch-ups.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -50,7 +50,7 @@
       "amount": 118.9,
       "currency": "TND",
       "title": "Painting supplies receipt",
-      "summary": "A receipt for painting supplies, including rollers, tape, and primer, was recorded.",
+      "summary": "A receipt for painting supplies, including rollers, tape, and primer.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -68,7 +68,7 @@
       "amount": null,
       "currency": null,
       "title": "Work continuation",
-      "summary": "The work needs to be paused until the bedroom color is confirmed.",
+      "summary": "Work needs to be paused until the bedroom color is confirmed.",
       "action_required": true,
       "action": "Confirm the bedroom color before continuing work.",
       "priority": "high",
@@ -82,7 +82,7 @@
     "Confirm the correct bedroom color with the homeowner.",
     "Confirm the bedroom color before continuing work."
   ],
-  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
+  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color and work needs to be paused until it is resolved.",
   "warnings": [
     "The dates for the living room painting update, bedroom color issue, receipt, and work continuation were not provided.",
     "The homeowner's name and property address were not provided."

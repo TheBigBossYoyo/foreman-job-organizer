@@ -11,7 +11,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Demo completion and moisture issue",
+      "title": "Demo completion",
       "summary": "Demo was completed and moisture was found behind the shower wall.",
       "action_required": true,
       "action": "Investigate the cause of the moisture and plan for remediation.",
@@ -50,7 +50,7 @@
       "amount": null,
       "currency": null,
       "title": "Schedule inquiry",
-      "summary": "The client inquired whether the moisture issue would delay the tile start on Friday.",
+      "summary": "The client inquired if the moisture issue would delay the tile start on Friday.",
       "action_required": true,
       "action": "Respond to the client regarding the potential delay.",
       "priority": "medium",
@@ -88,7 +88,7 @@
       "amount": null,
       "currency": null,
       "title": "Vanity delay",
-      "summary": "The vanity supplier reported a delay without providing a firm date.",
+      "summary": "The vanity supplier called and reported a delay without giving a firm date.",
       "action_required": true,
       "action": "Follow up with the supplier for a revised delivery date.",
       "priority": "medium",
@@ -103,11 +103,11 @@
     "Respond to the client regarding the potential delay.",
     "Follow up with the supplier for a revised delivery date."
   ],
-  "overall_summary": "The demo was completed, revealing a moisture issue, and the client inquired about potential delays. The vanity supplier reported a delay, and Lopez may visit on Thursday.",
+  "overall_summary": "The demo was completed, revealing moisture behind the shower wall. The client inquired about a potential delay, and there are issues with the vanity delivery.",
   "warnings": [
-    "The date of the demo was provided in an ambiguous format (7/27).",
+    "The date of the demo was not provided in a standard format.",
     "The exact calendar dates for Friday and Thursday were not provided.",
-    "The date of the photo, client text, Lopez visit, and vanity delay were not provided."
+    "The date of the photo and other events were not provided."
   ],
   "provider": "groq"
 }

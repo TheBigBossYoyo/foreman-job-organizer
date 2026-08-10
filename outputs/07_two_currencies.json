@@ -1,0 +1,109 @@
+{
+  "project_name": "Ben Salah patio",
+  "client_name": "Nadia Ben Salah",
+  "property_address": "12 Rue des Oliviers",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": "2026-08-01",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Slab pouring update",
+      "summary": "The slab was poured and needs five days to cure before laying tiles.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "slab poured, five days to cure before we lay anything",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_002",
+      "category": "receipt",
+      "date": null,
+      "people": [],
+      "location": "Carrelage Sud",
+      "amount": 640.0,
+      "currency": "TND",
+      "title": "Tile receipt",
+      "summary": "Receipt for tiles from Carrelage Sud.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "tiles from Carrelage Sud, 640.00 TND",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_003",
+      "category": "receipt",
+      "date": null,
+      "people": [],
+      "location": "US supplier",
+      "amount": 48.2,
+      "currency": "USD",
+      "title": "Sealant receipt",
+      "summary": "Receipt for sealant from the US supplier.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "sealant from the US supplier, $48.20",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_004",
+      "category": "payment",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": 1150.0,
+      "currency": "TND",
+      "title": "Invoice payment",
+      "summary": "Invoice 2210 was paid in full.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "invoice 2210 paid in full, 1,150.00 TND",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_005",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Nadia Ben Salah"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Receipt request",
+      "summary": "Nadia requested a copy of both receipts by email.",
+      "action_required": true,
+      "action": "Send the receipts to Nadia by email.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "Nadia asked for a copy of both receipts by email",
+      "flags": [],
+      "compliance_notes": null
+    }
+  ],
+  "open_actions": [
+    "Send the receipts to Nadia by email."
+  ],
+  "overall_summary": "The slab was poured, two receipts were recorded, an invoice was paid, and the client requested a copy of the receipts.",
+  "warnings": [
+    "The dates for the tile and sealant receipts were not provided.",
+    "The date for the invoice payment was not provided.",
+    "The date for the client's receipt request was not provided."
+  ],
+  "provider": "groq"
+}

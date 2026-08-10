@@ -29,7 +29,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Warped lumber",
+      "title": "Warped lumber boards",
       "summary": "Three boards from the lumber delivery are warped.",
       "action_required": true,
       "action": "Document the warped boards and arrange replacements.",
@@ -48,7 +48,7 @@
       "amount": 1250.0,
       "currency": "USD",
       "title": "Lumber payment",
-      "summary": "Payment of $1,250.00 for lumber invoice 1048.",
+      "summary": "Payment for lumber, invoice 1048, has been made.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -68,7 +68,7 @@
       "title": "City inspection",
       "summary": "The city inspection failed due to two missing bolts on the stair handrail.",
       "action_required": true,
-      "action": "Install replacement bolts and schedule a re-inspection.",
+      "action": "Obtain replacement bolts and reschedule the city inspection.",
       "priority": "high",
       "confidence": "high",
       "source_excerpt": "city inspection FAILED. two bolts missing on the stair handrail.",
@@ -97,16 +97,15 @@
     }
   ],
   "open_actions": [
-    "Document the warped lumber and arrange replacements.",
-    "Install replacement bolts and schedule a re-inspection.",
+    "Document the warped lumber boards and arrange replacements.",
+    "Obtain replacement bolts and reschedule the city inspection.",
     "Provide the client with an updated completion date once confirmed."
   ],
   "overall_summary": "Lumber delivery arrived with warped boards, a payment was made, the city inspection failed, and the client requested a revised completion date.",
   "warnings": [
-    "The date for the client's request for the revised completion date was not provided.",
-    "The exact completion date to be provided to the client is not confirmed yet.",
-    "item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one.",
-    "item_003: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one."
+    "The payment date was not provided.",
+    "The exact revised completion date was not provided.",
+    "item_002: dropped the date 2026-07-25. It is not written on this item's own line, so it was most likely copied from another one."
   ],
   "provider": "groq"
 }
