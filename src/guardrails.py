@@ -67,13 +67,12 @@ def flag_missing_amount(item):
 def flag_pii(item):
     """Redact personal data out of what we wrote, and say that we did.
 
-    The title gets the same treatment as the summary. It is the largest line on
-    an item and is always on screen, so redacting only the summary left the
-    number sitting in bold above the note promising it had been removed.
+    Title as well as summary: it is the largest line on an item and is always on
+    screen, so redacting only the summary left the number in bold above a note
+    saying it had been removed.
 
-    The source excerpt is deliberately left alone. It is the evidence for the
-    item and altering it would make the record less checkable, so the note says
-    plainly that the original still has the number in it.
+    The source excerpt is left alone. It is the evidence for the item, and the
+    note states that the original still contains the number.
     """
     if not PII_PATTERN.search(f"{item.source_excerpt} {item.summary} {item.title}"):
         return False

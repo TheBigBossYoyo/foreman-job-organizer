@@ -7,11 +7,9 @@
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
 
-A contractor's job record is not a document. It's a pile — texts at 9pm,
-receipts with no date on them, photo captions, a supplier who called and
-wouldn't commit to anything.
-
-This turns the pile into a timeline.
+Turns a messy contractor job stream — texts, receipts, photo captions, supplier
+calls — into a structured timeline with open actions and a source quote for
+every item.
 
 ---
 
@@ -40,7 +38,7 @@ Out:
 | **no date** | 💬 Client | Quartz countertop sample approval | |
 
 The receipt sits under a dated line and still comes back with no date, because
-its own line never gave one. Inheriting that date would be inventing a fact.
+its own line never gave one.
 
 ---
 
@@ -51,8 +49,8 @@ python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-No API key needed to try it — without one it falls back to a local rule-based
-engine. That engine is much worse and the app says so in red.
+No API key needed to try it. Without one it falls back to a local rule-based
+engine, which is much worse — the app says so in red.
 
 For real output, copy `.env.example` to `.env`:
 
@@ -83,10 +81,9 @@ Three, tried in order. First one that answers wins.
 | 2️⃣ | **Groq** | `GROQ_API_KEY` | Anthropic has no key, or its call failed |
 | 3️⃣ | **Local rule-based** | nothing | Neither model is reachable |
 
-The local engine returns the same validated JSON, so nothing downstream knows
-the difference. It matches keywords instead of reading, and on the original five
-samples it scored 86/150 against the model's 118/125. It's a safety net, not
-something to demo.
+The local engine returns the same validated JSON, so nothing downstream changes.
+It matches keywords instead of reading. On the original five samples it scored
+86/150 against the model's 118/125 — a safety net, not a demo.
 
 Pin one with `AI_PROVIDER=anthropic|groq|local`.
 
@@ -113,15 +110,14 @@ raw text
 Enforced in `src/guardrails.py`, not asked for in the prompt:
 
 - 🚨 Injury language forces an urgent review flag, whatever the model called it
-- 💵 A receipt or payment with no amount is flagged rather than left looking complete
-- 🔒 Phone numbers, SSNs and card numbers are redacted from titles and
-  summaries — the note says the source excerpt still contains them
-- 🔁 A provider that fails is named in the warnings, so a fallback can't pass
-  for a choice
+- 💵 A receipt or payment with no amount is flagged
+- 🔒 Phone numbers, SSNs and card numbers are redacted from titles and summaries;
+  the note states that the source excerpt still contains them
+- 🔁 A failed provider is named in the warnings
 - 📅 A date not written on the item's own line is dropped with a warning
 
-**Missing-data rule:** when something is absent or ambiguous, return `null`, add
-a warning, don't guess.
+**Missing-data rule:** if something is absent or ambiguous, return `null`, add a
+warning, don't guess.
 
 ---
 
@@ -136,35 +132,31 @@ a warning, don't guess.
 | Samples with no errors | 4/8 |
 | Date fields correct | **36/38** |
 
-It was 118/125 (94%) at five samples. Three harder ones took it to 90%, which is
-what a test set is for. The original five scored 118/125 again in the same run,
-so nothing regressed — and two of the three new samples came back perfect first
-time.
+It was 118/125 (94%) at five samples. Three harder samples took it to 90%. The
+original five scored 118/125 again in the same run, and two of the three new
+ones passed clean first time.
 
-Temperature is 0, which isn't the same as deterministic. Three consecutive runs
-scored 117, 118, 118, so ±1 on fields. Occasionally something larger happens:
-the model splits a line into two items instead of one, every later item lines up
-against the wrong answer, and the denominator moves too. `python -m src.stability
---runs N` measures both.
+Temperature is 0, which is not deterministic. Three consecutive runs scored 117,
+118, 118 — so ±1 on fields. Larger swings happen when the model splits a line
+into two items instead of one: every later item then matches the wrong answer
+and the denominator moves. `python -m src.stability --runs N` measures both.
 
 Measured on Groq. Every file in `outputs/` records which provider produced it.
 
 ### Known errors
 
-22 misses. **15 of them are one mistake.**
+22 misses, 15 of them from one mistake.
 
-- **1 merged event** on `06_safety_incident`: the model folded a progress line
-  and an injury line into a single item. Items are matched by position, so
-  everything after the merge scored against the wrong entry — including both
-  date misses, which are alignment, not date logic.
-- **5 category disagreements.** Some are arguable — whether *"demo done … there
-  is moisture behind it"* is a contractor update or an issue is a judgement
-  call, and that judgement lives in `data/expected/`.
-- **2 missed action flags**, where an item plainly asks for something and
-  `action_required` came back `false`.
+- **1 merged event** on `06_safety_incident` — the model folded a progress line
+  and an injury line into one item. Items match by position, so everything after
+  it scored against the wrong entry, including both date misses.
+- **5 category disagreements.** Some are arguable: *"demo done … there is
+  moisture behind it"* as contractor update vs issue. That call lives in
+  `data/expected/`.
+- **2 missed action flags** on items that plainly ask for something.
 
-Splitting events is next, along with a scorer that can tell one merge from
-fifteen mistakes.
+Next: event splitting, and a scorer that can tell one merge from fifteen
+mistakes.
 
 ---
 
@@ -196,9 +188,9 @@ fifteen mistakes.
 
 ## 🔐 Privacy
 
-> Made-up sample data only. Never use real Foreman customer, employee, or company
-> data. Everything in `data/samples/` is invented, and the rule is repeated in the
+> Made-up sample data only. Never use real Foreman customer, employee or company
+> data. Everything in `data/samples/` is invented. The rule is repeated in the
 > app sidebar.
 
-<sub>Built for the 2026 Venture &amp; Tech Summer Program. A measured prototype,
-not a production system.</sub>
+<sub>Built for the 2026 Venture &amp; Tech Summer Program. A prototype, not a
+production system.</sub>

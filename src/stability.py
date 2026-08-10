@@ -1,21 +1,13 @@
 """Measure how much the same input moves between identical runs.
 
-PROJECT_NOTES has said "118 ± 1" since Week 3, taken from three scoring runs
-that came out 117, 118, 118. That number only describes the runs where the
-model split the stream the same way each time.
-
-It does not always. On 03_tricky_bathroom the line
+"118 ± 1" came from three runs that scored 117, 118, 118. It only holds while
+the model splits the stream the same way each time, and it does not always. On
+03_tricky_bathroom this line is one item on some runs and two on others:
 
     7/27 demo done. opened up the shower wall and there is moisture behind it
 
-is one item on some runs and two on others. When that happens the item count
-changes, the scorer lines items up by position, and every field after the split
-shifts by one. A single segmentation difference therefore moves the score by
-far more than a single field would, and it moves the denominator too, so the
-percentage is not comparable between runs.
-
-This runs each sample several times and reports the spread, so the claim about
-reproducibility is measured rather than assumed.
+The scorer matches items by position, so an extra item shifts every later field
+and changes the denominator. The percentage is then not comparable between runs.
 
     python -m src.stability --runs 3
     python -m src.stability --runs 5 --sample 03_tricky_bathroom
@@ -95,9 +87,8 @@ def main():
 
     print()
     if unstable:
-        # This is the finding, not a footnote. A sample that splits differently
-        # between runs cannot have a stable percentage, however many times the
-        # scorer is re-run.
+        # A sample that splits differently between runs cannot have a stable
+        # percentage, however many times the scorer is re-run.
         print(f"* item count changed between runs: {', '.join(unstable)}")
     else:
         print("Item counts were identical across runs for every sample.")

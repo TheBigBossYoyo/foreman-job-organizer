@@ -100,13 +100,12 @@ def provider_status():
 def complete(system_prompt, user_prompt, raw_text, model=None):
     """Return (raw_json_text, provider_used, failures).
 
-    Falls down the chain on failure. The third value is why each earlier
-    provider did not answer, and it is empty on the normal path.
+    Falls down the chain on failure. `failures` says why each earlier provider
+    did not answer, and is empty on the normal path.
 
-    Returning it rather than swallowing it matters: a bad key, a rate limit or
-    an uninstalled SDK all end with Groq quietly answering in Anthropic's place.
-    The result says "groq", which is true, but without the reason there is no
-    way to tell a deliberate configuration from a broken one.
+    A bad key, a rate limit or an uninstalled SDK all end with Groq answering in
+    Anthropic's place. The result says "groq", which is true but looks identical
+    to having configured Groq on purpose, so the reason has to travel with it.
     """
     failures = []
 
