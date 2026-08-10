@@ -147,6 +147,42 @@ write the tie-break rule into the prompt and `data/expected` together.
 
 **4. action_required** — missed twice on items that plainly ask for something.
 
+## Tomorrow
+
+Ordered so each commit stands on its own and the risky one comes first.
+
+**1. Make the scorer report error shape.** Detect when the model's item count
+differs from the answer key and label it a segmentation error instead of
+scoring every later field against the wrong entry. Output becomes
+"1 segmentation error, 3 field errors" rather than 13/28.
+
+Do this first. Every number after it changes, and tuning a prompt against the
+current scorer would be tuning against a measurement that hides its own errors.
+
+**2. Re-score and record the new numbers.** 192/214 will move once the scorer
+stops cascading. Regenerate outputs, update README and this file together.
+
+**3. Check item count in code.** Compare items produced against non-header
+lines in the input and warn when they disagree by more than one. Not a fix for
+segmentation — a detector, so the merge on 06 shows up as a warning rather than
+as a low score. Same approach as date grounding.
+
+**4. Samples 09 and 10.** A stream with no dates at all, and one where the same
+event appears twice in different words. Answer key first, before running.
+
+**5. action_required.** Two misses on items that plainly ask for something.
+Look at both, decide whether it is a prompt problem or an answer key problem,
+then measure. Do not tune and re-run until the number looks better.
+
+**6. Category triage.** Split the five misses into wrong and arguable. For the
+arguable ones write the tie-break rule into the prompt and `data/expected`
+in the same commit.
+
+**7. Stability at 10 runs.** Current evidence is thin. Update the numbers here
+if segmentation moves more often than three-runs-of-eight suggested.
+
+Build freezes Wednesday. Items 1-4 are the ones worth having; 5-7 are optional.
+
 ## For the reviewer
 
 - **Re-read the 06 answer key before tuning against it.** The key says the photo
