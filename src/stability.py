@@ -98,6 +98,13 @@ def main():
         print(f"Field spread across all runs: {min(all_scores)}-{max(all_scores)} "
               f"per sample, stdev {statistics.stdev(all_scores):.1f}")
 
+    # Make the denominator explicit. Ten runs of one sample is ten data points;
+    # ten runs of eight samples is eighty. State which one the numbers came from.
+    total_orgs = sum(len(row["scores"]) for row in rows)
+    print(f"\nEvidence base: {args.runs} run(s) x {len(rows)} sample(s) = {total_orgs} organizations.")
+    if len(rows) <= 1:
+        print("  One sample is thin — drop --sample to measure the whole set.")
+
 
 if __name__ == "__main__":
     main()

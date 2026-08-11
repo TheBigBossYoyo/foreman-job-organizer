@@ -51,7 +51,16 @@ def flag_safety(item):
     if item.category in VAGUE_CATEGORIES:
         item.category = "issue"
     item.priority = "urgent"
-    item.action_required = True
+    # A photo is documentation of a hazard, not itself an open task — the action
+    # lives on the item that describes it. In sample 06 the injury line and the
+    # "cap the strap ends" follow-up carry action_required; the photo of the strap
+    # does not, and the answer key agrees. The rule was flipping the photo to
+    # action_required anyway, because it reads the model's summary (which
+    # paraphrases the injury) rather than the input. Forcing action onto the photo
+    # as well just double-counts the same action and dilutes the flag, so a photo
+    # keeps whatever action_required the model gave it.
+    if item.category != "photo":
+        item.action_required = True
     item.compliance_notes = item.compliance_notes or (
         "Injury or safety language detected. Needs a human review before any "
         "action, and may carry a reporting obligation."
