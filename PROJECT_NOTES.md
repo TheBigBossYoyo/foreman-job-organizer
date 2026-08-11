@@ -248,10 +248,8 @@ Three things worked in the same sample:
 
 ## Next
 
-**3. Check item count in code.** Compare items produced against non-header lines
-and warn when they disagree by more than one. A detector, not a fix — the merge
-on 06 should announce itself in the app, not only in the scorer. Same approach
-as date grounding. This is the one still worth doing before the freeze.
+**3. Check item count in code.** Superseded — see "This evening". Counting
+lines was measured and rejected; coverage replaced it.
 
 **5. action_required.** Two misses, both on the model saying false where the key
 says true: "might be able to swing by thursday pm" and "living room done except
@@ -264,6 +262,87 @@ someone has API budget spare.
 **The de-duplication decision.** See above. Needs a person, not a commit.
 
 Build freezes Wednesday.
+
+## This evening
+
+Last working session before the freeze. Ordered so that stopping early still
+leaves the repo in a presentable state.
+
+**1. Line coverage detector.** This replaces "check the item count", which was
+tried this afternoon and does not work. Measured on all ten samples: a threshold
+of "lines minus items greater than one" catches 10, misses 06 entirely, and
+false-fires on 03 and 05. Lines are not events — the answer keys themselves fold
+7 lines into 5 items on 03.
+
+What does work is coverage rather than counting: every non-header input line
+should be quoted by some item's `source_excerpt`. A merged or dropped event
+leaves its own line unquoted. Measured on the same ten, it names the exact
+merged line on 06 and both dropped duplicates on 10.
+
+The false positives it currently has are a header bug, not a flaw in the idea:
+"client is Maya Chen", "wilson interior painting" and "7 Meadow Court" are
+headers that a throwaway regex missed. `providers.HEADER_PATTERNS` already
+handles "client is X" — reuse it instead of writing a second one.
+
+That leaves 05 as the only judgement call. "crew going back once the replacement
+bolts get here" and the parenthetical note after it are folded by the answer key
+too, so folding a continuation line has to count as covered. Write that rule
+down rather than tuning a number until 05 goes quiet.
+
+The warning names the lines, not a count. "2 lines are not quoted by any item"
+followed by the lines is actionable; a number is not. Advisory only — it does
+not change the score, and it is the same shape as date grounding: judge the
+input line, not the model's rewrite of it.
+
+Tests: 06 and 10 fire, 01/02/07/08/09 stay quiet. No API calls needed.
+
+**2. Re-run the batch once and confirm the score did not move.** The detector
+only adds warnings. If 241/265 moves, something else changed and it needs
+finding before the freeze, not after.
+
+**3. action_required — read the two, expect to leave them alone.** "might be
+able to swing by thursday pm" and "living room done except touch ups". Both
+describe work that is not finished. Today's measurement says a prompt rule fixes
+the items it names and shuffles others, so the likely right answer is to change
+nothing and record why. Do not spend the evening here.
+
+**4. Update PRESENTATION.md and the deck. Not optional.** If time runs short,
+drop 3 and 5, not this. Presenting last week's numbers is the one mistake that
+actually costs something. Stale, all confirmed:
+
+| Location | Says | Should say |
+|---|---|---|
+| Field accuracy | 192/214 (90%) | 241/265 (91%) |
+| Clean samples | 4/8 | 4/10 |
+| Sample count | 8 | 10 |
+| Date fields | 36/38 | 44/47 |
+| Test count | 127 | 144 |
+| Known errors | 22 misses, 15 from one | 3 segmentation, 9 field |
+
+The talk gets better, not worse. "The number went down and that is the point"
+now has a second act: the number went down, then we found the ruler was wrong,
+and 06 was being charged fifteen times for one mistake. Fixing the measurement
+was worth more than any prompt change tried all week.
+
+**5. Optional: `python -m src.stability --runs 10`.** Only if there is API
+budget left after 1 and 2.
+
+### Freeze checklist for tomorrow
+
+- [ ] `python -m pytest` green
+- [ ] `python -m src.score` matches the number in the README and the deck
+- [ ] `git status` clean, `main` pushed
+- [ ] the app starts and organizes one sample end to end
+
+### Off the repo
+
+- **Rotate the Groq key.** Still outstanding. It is in `.env` and gitignored, so
+  the repo is fine, but it has been pasted in chat.
+- **Confirm the teacher's invite.** A pending invite to `salaidh814perez-alt`
+  exists with write access. Neeti has read. Worth checking the account is the
+  right one and that write is intended.
+- **The de-duplication decision** needs @vjvidhaan, not a commit. Sample 10 is
+  the whole argument.
 
 ## For the reviewer
 
