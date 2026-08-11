@@ -2,7 +2,7 @@
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-138%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-144%20passing-2ea44f)
 ![Accuracy](https://img.shields.io/badge/field%20accuracy-241%2F265%20(91%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
@@ -66,7 +66,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 138 tests
+pytest                  # 144 tests
 ```
 
 ---
@@ -109,7 +109,8 @@ raw text
 
 Enforced in `src/guardrails.py`, not asked for in the prompt:
 
-- 🚨 Injury language forces an urgent review flag, whatever the model called it
+- 🚨 Injury language forces an urgent review flag, whatever the model called it,
+  and the timeline shows that item as urgent
 - 💵 A receipt or payment with no amount is flagged
 - 🔒 Phone numbers, SSNs and card numbers are redacted from titles and summaries;
   the note states that the source excerpt still contains them
@@ -191,7 +192,7 @@ arguable.
 │   ├── stability.py        how much the same input moves between runs
 │   ├── batch.py            run the whole folder
 │   └── text.py             shared normalisation
-├── tests/                  138 tests
+├── tests/                  144 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
 
