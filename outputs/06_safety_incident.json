@@ -15,7 +15,7 @@
       "amount": null,
       "currency": null,
       "title": "Framing progress and injury",
-      "summary": "Framing crew was on site, north wall studs were completed, and a crew member was injured by a strap end.",
+      "summary": "The framing crew was on site, the north wall studs were completed, and a crew member was injured by a strap end.",
       "action_required": true,
       "action": "Follow up on Dave's injury and ensure proper medical attention if needed.",
       "priority": "urgent",
@@ -34,17 +34,15 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Photo of strap that caused injury",
-      "summary": "A photo was taken of the strap that caused the injury.",
+      "title": "Photo of the strap that caused injury",
+      "summary": "A photo of the strap that caught Dave's forearm.",
       "action_required": false,
       "action": null,
-      "priority": "urgent",
+      "priority": "low",
       "confidence": "high",
       "source_excerpt": "photo_1188.jpg - the strap that caught him, still sticking out of the plate",
-      "flags": [
-        "safety_review"
-      ],
-      "compliance_notes": "Injury or safety language detected. Needs a human review before any action, and may carry a reporting obligation."
+      "flags": [],
+      "compliance_notes": null
     },
     {
       "item_id": "item_003",
@@ -55,11 +53,11 @@
       "amount": null,
       "currency": null,
       "title": "Strap end capping",
-      "summary": "The supply house has not responded about capping the strap ends.",
+      "summary": "The supply house has not yet responded about capping the strap ends.",
       "action_required": true,
       "action": "Follow up with the supply house about capping the strap ends.",
       "priority": "medium",
-      "confidence": "high",
+      "confidence": "medium",
       "source_excerpt": "still need to hear back from the supply house about capping the strap ends",
       "flags": [],
       "compliance_notes": null
@@ -89,11 +87,11 @@
   ],
   "overall_summary": "The framing crew made progress, a crew member was injured, and the framing inspection passed.",
   "warnings": [
-    "The date of the follow-up with the supply house is not specified.",
+    "No date was provided for the follow-up with the supply house.",
     "item_001: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_002: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
-    "2 of 4 items were flagged for review by the guardrails."
+    "1 of 4 items were flagged for review by the guardrails."
   ],
   "provider": "groq"
 }

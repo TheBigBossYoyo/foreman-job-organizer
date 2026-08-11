@@ -120,8 +120,8 @@ kinds of error separately.
 | | Before | After |
 |---|---|---|
 | Samples | 8 | 10 |
-| Field accuracy | 192/214 (90%) | **240/265 (91%)** |
-| Same eight samples | 192/214 | **201/214** |
+| Field accuracy | 192/214 (90%) | **241/265 (91%)** |
+| Same eight samples, scorer change alone | 192/214 | **201/214** |
 | Clean samples | 4/8 | 4/10 |
 
 The nine recovered fields are all on 06, which went 13/28 → 22/28. The other
@@ -129,12 +129,71 @@ seven samples came out identical field for field, and the original five scored
 118/125 for the third run running. The model did not improve. The ruler was
 wrong.
 
-Error shape across the ten: **3 segmentation errors, 10 field errors.** That
-sentence is the reason for the change — 25 misses reads like 25 problems, and it
-is 13.
+Error shape across the ten: **3 segmentation errors, 9 field errors.** That
+sentence is the reason for the change — 24 misses reads like 24 problems, and it
+is 12.
 
 Every date on an item the model produced is correct (44/47 date fields; the
 three losses are items that were never produced).
+
+## Category misses — wrong vs arguable
+
+The split @vjvidhaan could not run. Every miss read against the input line, not
+against the model's own excerpt.
+
+**Model wrong, key right — 3.** All three checked against every other item in
+the keys that shares the category, and the keys are consistent.
+
+- `03` "lopez said he might be able to swing by thursday pm" — key schedule,
+  model contractor_update. Soft timing, no date.
+- `09` "tile guy confirmed he can start once the vanity is out" — same, timing
+  relative to another event.
+- `05` "photo: 3 boards look warped, see pic" — key photo, model issue. The line
+  opens with `photo:`. The model dropped that prefix from its own
+  `source_excerpt` and then classified what was left. Judging its own rewrite
+  instead of the input, which is the date bug wearing a different hat.
+
+**Arguable — 3.** No action. Recorded so nobody re-opens them as bugs.
+
+- `03` "7/27 demo done. opened up the shower wall and there is moisture behind
+  it" — one line, two events. Key says issue, model says contractor_update.
+- `03` "vanity - supplier called, delayed, wouldnt give me a firm date" — key
+  delivery, model issue. A delayed delivery is both.
+- `06` "still need to hear back from the supply house about capping the strap
+  ends" — key contractor_update, model issue. An open safety follow-up.
+
+**Keys changed: none.** Two looked wrong until the source line was read. The
+photo key was checked against all five photo items in the set; every one opens
+with a marker.
+
+## What the tie-break rules did
+
+Two rules went into the prompt: a photo marker at the start of a line wins over
+whatever the caption says, and a line about when something happens is schedule
+even with no date.
+
+| Run | Prompt | Score | Clean |
+|---|---|---|---|
+| A | before | 240/265 | 4/10 |
+| B | + the two rules | 242/265 | 5/10 |
+| C | + client_update takes precedence | **241/265** | 4/10 |
+
+All three named misses were fixed, in both runs after the change. Nothing else
+held still. Run B lost a source_excerpt on 06; run C lost a payment on 05 and a
+category on 07, and did not fix the thing the qualifier was written for — a
+client asking for a completion date is still filed as schedule.
+
+So: the total moved 240 → 242 → 241, which is inside the ±1 already measured for
+this set. The rules moved the items they named and shuffled others. Nothing here
+justifies claiming the score went up.
+
+This is the date lesson for the third time. Date grounding was moved into code
+and has not regressed since. Category rules live in the prompt and hold only on
+the examples they quote. The fix, when someone has time, is the same shape:
+decide categories in code where the input gives a marker to decide on.
+
+Stopped at run C rather than trying a fourth prompt. Re-rolling until the number
+looks better is how a measurement stops meaning anything.
 
 ## The de-duplication question — open
 
@@ -180,10 +239,12 @@ Three things worked in the same sample:
 ## Done from the plan
 
 1. **Scorer reports error shape.** Aligned instead of positional. Done.
-2. **Re-scored and recorded.** 240/265. Done.
+2. **Re-scored and recorded.** 241/265. Done.
 4. **Samples 09 and 10.** Added by @vjvidhaan, answer keys written first. Done —
    and 10 produced the de-duplication question above, which is the most
    interesting thing to come out of the week.
+6. **Category triage.** Sorted into wrong and arguable, tie-break rules written
+   into the prompt, measured. Done, and the result argues against the method.
 
 ## Next
 
@@ -192,8 +253,10 @@ and warn when they disagree by more than one. A detector, not a fix — the merg
 on 06 should announce itself in the app, not only in the scorer. Same approach
 as date grounding. This is the one still worth doing before the freeze.
 
-**5. action_required.** Three misses. Prompt problem or key problem — decide by
-reading, then measure once. Do not re-run until the number looks better.
+**5. action_required.** Two misses, both on the model saying false where the key
+says true: "might be able to swing by thursday pm" and "living room done except
+touch ups". Both are work that is not finished. Prompt problem or key problem —
+decide by reading, then measure once.
 
 **7. Stability at 10 runs.** Three runs of eight is thin. Worth doing only if
 someone has API budget spare.

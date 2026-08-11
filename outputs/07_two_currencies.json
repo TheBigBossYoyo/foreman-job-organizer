@@ -5,13 +5,13 @@
   "items": [
     {
       "item_id": "item_001",
-      "category": "contractor_update",
+      "category": "schedule",
       "date": "2026-08-01",
       "people": [],
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Slab pouring update",
+      "title": "Slab pouring and curing schedule",
       "summary": "The slab was poured and needs five days to cure before laying tiles.",
       "action_required": false,
       "action": null,
@@ -86,9 +86,9 @@
       "amount": null,
       "currency": null,
       "title": "Receipt request",
-      "summary": "Nadia requested a copy of both receipts by email.",
+      "summary": "The client requested a copy of both receipts by email.",
       "action_required": true,
-      "action": "Send the receipts to Nadia by email.",
+      "action": "Send the receipts to the client by email.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "Nadia asked for a copy of both receipts by email",
@@ -97,7 +97,7 @@
     }
   ],
   "open_actions": [
-    "Send the receipts to Nadia by email."
+    "Send the receipts to the client by email."
   ],
   "overall_summary": "The slab was poured, receipts for tiles and sealant were recorded, an invoice was paid, and the client requested a copy of the receipts.",
   "warnings": [

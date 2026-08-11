@@ -86,7 +86,7 @@
       "amount": null,
       "currency": null,
       "title": "Electrician visit",
-      "summary": "An electrician is booked to look at the wiring issue.",
+      "summary": "An electrician is booked to look at the wiring issue on 2026-08-06.",
       "action_required": false,
       "action": null,
       "priority": "medium",
@@ -109,8 +109,8 @@
       "summary": "The client wants a price before proceeding further.",
       "action_required": true,
       "action": "Provide the client with a price for the work.",
-      "priority": "medium",
-      "confidence": "medium",
+      "priority": "high",
+      "confidence": "high",
       "source_excerpt": "Tom wants a price before we go any further",
       "flags": [],
       "compliance_notes": null
@@ -120,7 +120,7 @@
     "Assess and address the knob and tube wiring issue.",
     "Provide the client with a price for the work."
   ],
-  "overall_summary": "The crew removed old batts, a skip was delivered, knob and tube wiring was discovered, and an electrician is booked to assess the issue. The client has requested a price before proceeding.",
+  "overall_summary": "The crew arrived and removed the old batts, a skip was delivered, knob and tube wiring was discovered, and the client requested a price before proceeding.",
   "warnings": [
     "The date for the client's price request was not provided.",
     "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one.",

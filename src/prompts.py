@@ -22,7 +22,19 @@ Rules:
 7. If an issue, deadline, missing item, approval, repair, payment, inspection,
    or follow-up requires attention, set action_required to true and write a
    concise action.
-8. Return ONLY one valid JSON object. Do not use markdown fences or commentary.
+8. Two tie-breaks for "category", both decided on the input line, not on your
+   own summary of it:
+   - If the line opens with a photo marker, such as "photo:" or a .jpg
+     filename, the category is "photo" whatever the caption goes on to
+     describe. A caption that reports a defect is still a caption.
+   - If the point of the line is when something will happen, the category is
+     "schedule", even when no date is given and even when it names a person.
+     "might swing by thursday pm" and "can start once the vanity is out" are
+     both schedule. This breaks a tie against "contractor_update" only. A line
+     that quotes the client is "client_update" whatever it asks about, so a
+     client asking for a revised completion date is client_update, not
+     schedule.
+9. Return ONLY one valid JSON object. Do not use markdown fences or commentary.
 
 The output must follow this exact shape:
 {

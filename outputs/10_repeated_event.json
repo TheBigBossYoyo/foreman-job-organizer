@@ -30,7 +30,7 @@
       "amount": null,
       "currency": null,
       "title": "Gutter stock and downspouts delivery",
-      "summary": "84 Lumber delivered gutter stock and downspouts.",
+      "summary": "84 Lumber delivered the gutter stock and downspouts.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -41,7 +41,7 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "The final roof inspection was passed and gutter stock and downspouts were delivered from 84 Lumber.",
+  "overall_summary": "The final roof inspection was passed and the gutter stock and downspouts were delivered.",
   "warnings": [
     "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one."
   ],

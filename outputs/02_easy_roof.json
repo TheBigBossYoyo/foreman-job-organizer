@@ -12,7 +12,7 @@
       "amount": null,
       "currency": null,
       "title": "Shingle replacement",
-      "summary": "Replaced damaged shingles on the north slope.",
+      "summary": "Damaged shingles on the north slope were replaced.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -30,7 +30,7 @@
       "amount": null,
       "currency": null,
       "title": "Shingle repair photo",
-      "summary": "Photo of completed shingle repair on the north slope.",
+      "summary": "A photo of the completed shingle repair on the north slope.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -66,7 +66,7 @@
       "amount": null,
       "currency": null,
       "title": "Final cleanup",
-      "summary": "Final cleanup is complete.",
+      "summary": "The final cleanup is complete.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -77,7 +77,7 @@
     }
   ],
   "open_actions": [],
-  "overall_summary": "Damaged shingles were replaced, a receipt for materials was recorded, and final cleanup is complete.",
+  "overall_summary": "The damaged shingles on the north slope were replaced, a receipt for shingles and nails was recorded, and the final cleanup is complete.",
   "warnings": [
     "item_002: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one."

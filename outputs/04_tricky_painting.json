@@ -11,8 +11,8 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Living room painting update",
-      "summary": "The living room painting is done except for touch-ups.",
+      "title": "Living room painting status",
+      "summary": "The living room painting is complete except for touch-ups.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -36,8 +36,8 @@
       "action_required": true,
       "action": "Confirm the correct bedroom color with the homeowner.",
       "priority": "high",
-      "confidence": "high",
-      "source_excerpt": "homeowner says the bedroom color looks wrong",
+      "confidence": "medium",
+      "source_excerpt": "homeowner says the bedroom color looks wrong - didnt say which code",
       "flags": [],
       "compliance_notes": null
     },
@@ -50,7 +50,7 @@
       "amount": 118.9,
       "currency": "TND",
       "title": "Painting supplies receipt",
-      "summary": "A receipt for painting supplies, including rollers, tape, and primer.",
+      "summary": "A receipt for painting supplies, including rollers, tape, and primer, was recorded.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -67,7 +67,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Work pause",
+      "title": "Work continuation",
       "summary": "Work needs to be paused until the bedroom color is confirmed.",
       "action_required": true,
       "action": "Confirm the bedroom color before proceeding with the work.",
@@ -84,8 +84,9 @@
   ],
   "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
   "warnings": [
-    "The dates for the living room painting update, bedroom color issue, receipt, and work pause were not provided.",
-    "The homeowner's name and the property address were not provided."
+    "The date for the living room painting completion was not provided.",
+    "The date for the receipt was not provided.",
+    "The exact bedroom color code was not provided."
   ],
   "provider": "groq"
 }

@@ -3,7 +3,7 @@
 **VTSP · Technical track · Option C**
 
 ![Tests](https://img.shields.io/badge/tests-138%20passing-2ea44f)
-![Accuracy](https://img.shields.io/badge/field%20accuracy-240%2F265%20(91%25)-2ea44f)
+![Accuracy](https://img.shields.io/badge/field%20accuracy-241%2F265%20(91%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
 
@@ -128,11 +128,11 @@ warning, don't guess.
 
 | Measure | Result |
 |---|---|
-| Field accuracy | **240/265 (91%)** |
+| Field accuracy | **241/265 (91%)** |
 | Samples with no errors | 4/10 |
 | Date fields correct | **44/47** |
 
-The score also reports the shape of what went wrong: **3 segmentation errors, 10
+The score also reports the shape of what went wrong: **3 segmentation errors, 9
 field errors**. Those are different problems. A segmentation error is one event
 merged or dropped and costs five fields at once, so one of them is worth more
 than five field errors.
@@ -141,7 +141,7 @@ Every date the model put on an item it produced is right. All three date losses
 are items it never produced at all.
 
 It was 192/214 before the scorer stopped matching items by position. On the same
-eight samples the new scorer reads 201/214 — the nine recovered fields are all on
+eight samples the new scorer read 201/214 — the nine recovered fields were all on
 `06_safety_incident`, which was being charged fifteen times for one merged line.
 The model did not change. The measurement did.
 
@@ -155,16 +155,16 @@ Measured on Groq. Every file in `outputs/` records which provider produced it.
 
 ### Known errors
 
-25 misses in two kinds.
+24 misses in two kinds.
 
 - **3 segmentation errors.** One merge on `06_safety_incident`, and two on
   `10_repeated_event`, where the model collapsed each event that was stated
   twice into a single item. The answer key expects both mentions. Whether
   de-duplicating is right is an open decision, not a bug — see PROJECT_NOTES.
-- **7 category disagreements.** Some are arguable: *"demo done … there is
+- **7 category disagreements**, three of them arguable rather than wrong. Some are arguable: *"demo done … there is
   moisture behind it"* as contractor update vs issue. That call lives in
   `data/expected/`.
-- **3 missed action flags** on items that plainly ask for something.
+- **2 missed action flags** on items that plainly ask for something.
 
 Next: a check on item count in code, and the category split into wrong vs
 arguable.
