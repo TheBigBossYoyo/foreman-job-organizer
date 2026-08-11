@@ -27,7 +27,7 @@ def run_once(sample_path, expected_path):
     source = sample_path.read_text(encoding="utf-8")
     result = organize_job_stream(source).model_dump()
     expected = json.loads(expected_path.read_text(encoding="utf-8"))
-    correct, total, _ = score_sample(expected, result, source)
+    correct, total, _, _ = score_sample(expected, result, source)
     return len(result["items"]), correct, total
 
 
