@@ -1,0 +1,12 @@
+{
+  "project_name": "Delgado bathroom refresh",
+  "client_name": "Marta Delgado",
+  "property_address": "14 Poplar Lane",
+  "items": [
+    {"category": "schedule", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "contractor_update", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "client_update", "date": null, "action_required": true, "amount": null, "currency": null},
+    {"category": "receipt", "date": null, "action_required": false, "amount": null, "currency": null},
+    {"category": "issue", "date": null, "action_required": true, "amount": null, "currency": null}
+  ]
+}
