@@ -193,3 +193,26 @@ Build freezes Wednesday. Items 1-4 are the ones worth having; 5-7 are optional.
 - **Samples 09 and 10.** Untested: a stream with no dates at all, and one where
   the same event appears twice in different words. Answer key first.
 - **`python -m src.stability --runs 10`.** Ten runs of 03 is thin evidence.
+
+## Reviewer follow-ups — resolved
+
+- **06 strap / safety guardrail → fixed the guardrail, kept the key.** The key is
+  right: the photo of the strap is documentation, and the action already lives on
+  the injury line and the "cap the strap ends" follow-up. The guardrail was
+  flipping the photo to `action_required` because `flag_safety` reads the model's
+  *summary* (which paraphrases the injury), not the input. `src/guardrails.py` now
+  leaves a `photo` item's `action_required` alone. This is the date lesson again —
+  judge what the input said, not what the model rewrote. (Verify with a real
+  `src.score` run: item 2 should stay `true`, item 3 should now be `false`.)
+- **Samples 09 and 10 added, answer key first.** `09_no_dates` (no dated lines —
+  nothing should get a date) and `10_repeated_event` (an inspection and a delivery
+  each stated twice, plus a dated line above an undated duplicate so date-grounding
+  is exercised). Expected files written before any run; the repeated event is
+  expected to appear twice and categorize consistently (de-dup is still a
+  non-goal).
+- **Stability prints its denominator.** `src/stability.py` now states
+  "N runs x M samples = K organizations" and warns when only one sample was used —
+  so "ten runs of 03" reads as 10 data points, not a stable number.
+- **Category misses (wrong vs arguable): NOT sorted yet.** That needs the live
+  `python -m src.score` miss list, which requires a Python env + an API call; it
+  was not run in this pass, so the split is left open rather than guessed.
