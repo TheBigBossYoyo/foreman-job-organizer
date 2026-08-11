@@ -43,6 +43,15 @@ CATEGORY_LABELS = {
     "other": "Other",
 }
 
+# Flags that mean "look at this now" against flags that are only context. They
+# were all printed in alarm red, which put a low-confidence guess and a possible
+# injury in the same typeface. A warning that fires on everything is furniture.
+ALARM_FLAGS = {"safety_review", "possible_pii"}
+
+# Priority is worth screen space only when it is above the default. Labelling
+# every ordinary item "medium" is ten words that never change.
+LOUD_PRIORITIES = {"urgent", "high"}
+
 # One colour per category, carried only by the timeline dot. Colour is the
 # cheapest way to let someone find the receipts in a long list, and the dot is
 # enough of it — tinting whole rows turns a record into a highlighter drawing.
@@ -143,6 +152,24 @@ CSS = """
   color: #B91C1C; background: #FEF2F2; border: 1px solid #FECACA;
   padding: .05rem .38rem; border-radius: 4px;
 }
+/* Context, not an alarm. Same shape so the row still scans, no red. */
+.jo-flag.quiet { color: #64748B; background: #F6F7F9; border-color: #E7EAEE; }
+
+/* ---- priority ---- */
+/* Urgent gets the loudest thing on the row and nothing else does. The bar is
+   read before any text, which is the point: on a long job the injury should be
+   findable without reading. */
+.jo-row.urgent {
+  border-left: 2px solid #DC2626; background: #FFFCFC;
+  margin-left: -.6rem; padding-left: .6rem;
+}
+.jo-row.urgent:hover { background: #FFF7F7; }
+.jo-dot.ring { box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px currentColor; }
+.jo-prio {
+  font-size: .62rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.jo-prio.urgent { color: #DC2626; }
+.jo-prio.high { color: #B45309; }
 .jo-title { font-weight: 600; color: #0F172A; line-height: 1.4; font-size: .97rem; }
 .jo-sum { color: #475569; font-size: .9rem; line-height: 1.55; margin-top: .15rem; }
 .jo-act {
@@ -290,21 +317,33 @@ def render_row(item):
     """
     colour = CATEGORY_COLORS.get(item["category"], CATEGORY_COLORS["other"])
     when = format_date(item["date"])
+    priority = item.get("priority")
+    urgent = priority == "urgent"
 
     parts = [
-        '<div class="jo-row">',
+        f'<div class="jo-row{" urgent" if urgent else ""}">',
         f'<div class="jo-when{"" if when else " none"}">'
         f'{escape(when) if when else "no date"}</div>',
-        f'<div class="jo-rail"><span class="jo-dot" style="background:{colour}"></span></div>',
+        f'<div class="jo-rail"><span class="jo-dot{" ring" if urgent else ""}" '
+        f'style="background:{colour};color:{colour}"></span></div>',
         '<div>',
         '<div class="jo-head">',
         f'<span class="jo-cat" style="color:{colour}">'
         f'{escape(CATEGORY_LABELS.get(item["category"], item["category"]))}</span>',
     ]
 
-    if item["flags"]:
-        flags = ", ".join(flag.replace("_", " ") for flag in item["flags"])
-        parts.append(f'<span class="jo-flag">{escape(flags)}</span>')
+    if priority in LOUD_PRIORITIES:
+        parts.append(f'<span class="jo-prio {priority}">{escape(priority)}</span>')
+
+    # Split so the alarms keep the red and the rest stop borrowing it.
+    for style, flags in (
+        ("jo-flag", [flag for flag in item["flags"] if flag in ALARM_FLAGS]),
+        ("jo-flag quiet", [flag for flag in item["flags"] if flag not in ALARM_FLAGS]),
+    ):
+        if flags:
+            label = ", ".join(flag.replace("_", " ") for flag in flags)
+            parts.append(f'<span class="{style}">{escape(label)}</span>')
+
     if item["amount"] is not None:
         amount = f'{item["amount"]:,.2f} {item["currency"] or ""}'.strip()
         parts.append(f'<span class="jo-amt">{escape(amount)}</span>')

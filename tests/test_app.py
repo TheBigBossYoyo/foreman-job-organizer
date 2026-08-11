@@ -167,3 +167,59 @@ def test_the_download_payload_is_the_result_that_is_on_screen():
     app = run_with_result()
 
     assert json.loads(json.dumps(app.session_state["result"])) == RESULT
+
+
+# --- priority and flags ------------------------------------------------------
+
+def with_first_item(**overrides):
+    """RESULT with the first item changed, everything else untouched."""
+    items = [{**RESULT["items"][0], **overrides}, *RESULT["items"][1:]]
+    return {**RESULT, "items": items}
+
+
+def test_an_urgent_item_is_marked_as_urgent():
+    # The safety guardrail raises injuries to urgent. If the page does not show
+    # it, the guardrail may as well not have run.
+    # Checked on the row's own class, not on the word: the stylesheet is part of
+    # this page too, so "urgent" appears in it either way.
+    html = page_html(run_with_result(with_first_item(priority="urgent")))
+
+    assert 'class="jo-row urgent"' in html
+    assert '<span class="jo-prio urgent">urgent</span>' in html
+
+
+def test_an_ordinary_item_gets_no_urgent_styling():
+    html = page_html(run_with_result(with_first_item(priority="low")))
+
+    assert 'class="jo-row urgent"' not in html
+
+
+def test_an_ordinary_priority_is_not_announced():
+    # Every item is medium by default. Printing it on all of them is a column
+    # of identical words.
+    html = page_html(run_with_result(with_first_item(priority="medium")))
+
+    assert "medium" not in html.lower()
+
+
+def test_a_safety_flag_is_styled_as_an_alarm():
+    html = page_html(run_with_result(with_first_item(flags=["safety_review"])))
+
+    assert 'class="jo-flag"' in html
+
+
+def test_low_confidence_is_shown_but_not_as_an_alarm():
+    # It is context. Sharing a style with a possible injury overstates it.
+    html = page_html(run_with_result(with_first_item(flags=["low_confidence"])))
+
+    assert "low confidence" in html
+    assert 'class="jo-flag quiet"' in html
+
+
+def test_an_alarm_and_a_quiet_flag_on_one_item_keep_their_own_styles():
+    html = page_html(run_with_result(
+        with_first_item(flags=["low_confidence", "safety_review"])
+    ))
+
+    assert 'class="jo-flag"' in html
+    assert 'class="jo-flag quiet"' in html
