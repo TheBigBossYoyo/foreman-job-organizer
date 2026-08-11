@@ -215,7 +215,8 @@ def main():
     report = score_all(args.expected, args.output, args.samples)
 
     for row in report:
-        print(f"\n{row['sample']}: {row['correct']}/{row['total']} — {describe_shape(row['shape'])}")
+        # Plain hyphen, not an em dash: the Windows console prints it as "?".
+        print(f"\n{row['sample']}: {row['correct']}/{row['total']} - {describe_shape(row['shape'])}")
         for miss in row["misses"]:
             print(f"  - {miss}")
 

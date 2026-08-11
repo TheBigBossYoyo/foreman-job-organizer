@@ -11,7 +11,7 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Demo completion",
+      "title": "Demo completion and moisture issue",
       "summary": "Demo was completed and moisture was found behind the shower wall.",
       "action_required": true,
       "action": "Investigate the cause of the moisture and plan for remediation.",
@@ -35,7 +35,7 @@
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "photo_0431.jpg - dark staining, lower left of the shower framing",
+      "source_excerpt": "dark staining, lower left of the shower framing",
       "flags": [],
       "compliance_notes": null
     },
@@ -49,10 +49,10 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Schedule inquiry",
-      "summary": "The client inquired if the moisture issue would delay the tile start on Friday.",
+      "title": "Client inquiry about schedule impact",
+      "summary": "The client asked if the moisture issue would delay the tile start on Friday.",
       "action_required": true,
-      "action": "Respond to the client regarding the potential delay.",
+      "action": "Assess the impact of the moisture issue on the project schedule and respond to the client.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "does the moisture thing push the tile start on friday??",
@@ -69,8 +69,8 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Lopez visit",
-      "summary": "Lopez may visit on Thursday to take a look.",
+      "title": "Lopez site visit",
+      "summary": "Lopez may visit the site on Thursday to take a look.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -87,10 +87,10 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Vanity delay",
+      "title": "Vanity delivery delay",
       "summary": "The vanity supplier called and reported a delay without giving a firm date.",
       "action_required": true,
-      "action": "Follow up with the supplier for a revised delivery date.",
+      "action": "Follow up with the supplier to get a revised delivery date for the vanity.",
       "priority": "medium",
       "confidence": "high",
       "source_excerpt": "vanity - supplier called, delayed, wouldnt give me a firm date",
@@ -100,14 +100,14 @@
   ],
   "open_actions": [
     "Investigate the cause of the moisture and plan for remediation.",
-    "Respond to the client regarding the potential delay.",
-    "Follow up with the supplier for a revised delivery date."
+    "Assess the impact of the moisture issue on the project schedule and respond to the client.",
+    "Follow up with the supplier to get a revised delivery date for the vanity."
   ],
-  "overall_summary": "The demo was completed, revealing moisture behind the shower wall. The client inquired about a potential delay, and there are issues with the vanity delivery.",
+  "overall_summary": "The demo was completed, but a moisture issue was found behind the shower wall. The client inquired about the impact on the schedule, and there are issues with the vanity delivery.",
   "warnings": [
-    "The date of the demo was not provided in a standard format.",
-    "The exact calendar dates for Friday and Thursday were not provided.",
-    "The date of the photo and other events were not provided."
+    "The date of the demo completion was not provided in a standard format.",
+    "The exact dates for Friday and Thursday were not provided.",
+    "The date of the photo and the supplier's call were not provided."
   ],
   "provider": "groq"
 }

@@ -12,7 +12,7 @@
       "amount": null,
       "currency": null,
       "title": "Crew arrival and old batts removal",
-      "summary": "The crew arrived and removed the old batts.",
+      "summary": "The crew arrived at 7am and removed the old batts.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -30,7 +30,7 @@
       "amount": null,
       "currency": null,
       "title": "Skip delivery",
-      "summary": "A skip was delivered and was half full by lunch.",
+      "summary": "A skip was delivered in the morning and was half full by lunch.",
       "action_required": false,
       "action": null,
       "priority": "low",
@@ -66,12 +66,12 @@
       "amount": null,
       "currency": null,
       "title": "Old wiring photo",
-      "summary": "A photo of the old wiring was taken.",
+      "summary": "A photo of the old wiring where it enters the joist was taken.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "the old wiring where it enters the joist",
+      "source_excerpt": "photo_2201.jpg - the old wiring where it enters the joist",
       "flags": [],
       "compliance_notes": null
     },
@@ -108,7 +108,7 @@
       "title": "Price request",
       "summary": "The client wants a price before proceeding further.",
       "action_required": true,
-      "action": "Provide a price quote to the client.",
+      "action": "Provide the client with a price for the work.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "Tom wants a price before we go any further",
@@ -118,9 +118,9 @@
   ],
   "open_actions": [
     "Assess and address the knob and tube wiring issue.",
-    "Provide a price quote to the client."
+    "Provide the client with a price for the work."
   ],
-  "overall_summary": "The crew removed old batts, a skip was delivered, knob and tube wiring was discovered, and an electrician is booked to assess the issue. The client wants a price quote before proceeding.",
+  "overall_summary": "The crew removed old batts, a skip was delivered, knob and tube wiring was discovered, and an electrician is booked to assess the issue. The client has requested a price before proceeding.",
   "warnings": [
     "The date for the client's price request was not provided.",
     "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one.",

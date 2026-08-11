@@ -1,0 +1,115 @@
+{
+  "project_name": "Delgado bathroom refresh",
+  "client_name": "Marta Delgado",
+  "property_address": "14 Poplar Lane",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "contractor_update",
+      "date": null,
+      "people": [
+        "tile guy"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Tile installation confirmation",
+      "summary": "The tile installer confirmed he can start once the vanity is removed.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "tile guy confirmed he can start once the vanity is out",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_002",
+      "category": "contractor_update",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Vanity removal",
+      "summary": "The old vanity was removed and the water lines were capped.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "pulled the old vanity and capped the water lines",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_003",
+      "category": "client_update",
+      "date": null,
+      "people": [
+        "Marta Delgado"
+      ],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Baseboard matching request",
+      "summary": "The homeowner asked if the existing baseboard can be matched.",
+      "action_required": true,
+      "action": "Determine if matching the existing baseboard is feasible.",
+      "priority": "medium",
+      "confidence": "medium",
+      "source_excerpt": "homeowner asked if we can match the existing baseboard",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_004",
+      "category": "receipt",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Thinset and spacers purchase",
+      "summary": "Thinset and a box of spacers were purchased, but the receipt is not available.",
+      "action_required": true,
+      "action": "Retrieve the receipt for the thinset and spacers from the truck.",
+      "priority": "low",
+      "confidence": "medium",
+      "source_excerpt": "picked up thinset and a box of spacers, receipt is in the truck",
+      "flags": [
+        "missing_amount"
+      ],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_005",
+      "category": "issue",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Grout haze on the floor",
+      "summary": "The finished floor has grout haze and needs a second wipe-down.",
+      "action_required": true,
+      "action": "Perform a second wipe-down to remove the grout haze from the floor.",
+      "priority": "high",
+      "confidence": "high",
+      "source_excerpt": "grout haze on the finished floor, needs a second wipe-down",
+      "flags": [],
+      "compliance_notes": null
+    }
+  ],
+  "open_actions": [
+    "Determine if matching the existing baseboard is feasible.",
+    "Retrieve the receipt for the thinset and spacers from the truck.",
+    "Perform a second wipe-down to remove the grout haze from the floor."
+  ],
+  "overall_summary": "The vanity was removed, the tile installer is ready to start, the homeowner requested baseboard matching, thinset and spacers were purchased, and the finished floor has grout haze.",
+  "warnings": [
+    "The dates for all events were not provided.",
+    "The receipt for thinset and spacers is not available.",
+    "1 of 5 items were flagged for review by the guardrails."
+  ],
+  "provider": "groq"
+}

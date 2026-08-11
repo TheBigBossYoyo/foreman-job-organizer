@@ -82,7 +82,7 @@
   "overall_summary": "The crew completed cabinet removal, a receipt for drywall and screws was recorded, new cabinets were delivered, and the client approved the quartz countertop sample.",
   "warnings": [
     "The receipt date was not provided.",
-    "The date of the client update was not provided."
+    "The date for the client update was not provided."
   ],
   "provider": "groq"
 }

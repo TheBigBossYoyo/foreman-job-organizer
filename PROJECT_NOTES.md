@@ -111,88 +111,105 @@ Two kinds of variation, different sizes:
 `python -m src.stability --runs N` measures both. Item counts held identical
 across three runs of all eight samples and six more of 03.
 
+## Week 5 — the scorer, and what it changed
+
+The scorer no longer matches items by position. It aligns them first
+(Needleman-Wunsch, scored on field agreement, order preserved) and reports two
+kinds of error separately.
+
+| | Before | After |
+|---|---|---|
+| Samples | 8 | 10 |
+| Field accuracy | 192/214 (90%) | **240/265 (91%)** |
+| Same eight samples | 192/214 | **201/214** |
+| Clean samples | 4/8 | 4/10 |
+
+The nine recovered fields are all on 06, which went 13/28 → 22/28. The other
+seven samples came out identical field for field, and the original five scored
+118/125 for the third run running. The model did not improve. The ruler was
+wrong.
+
+Error shape across the ten: **3 segmentation errors, 10 field errors.** That
+sentence is the reason for the change — 25 misses reads like 25 problems, and it
+is 13.
+
+Every date on an item the model produced is correct (44/47 date fields; the
+three losses are items that were never produced).
+
+## The de-duplication question — open
+
+`10_repeated_event` states an inspection twice and a delivery twice, in
+different words. The answer key expects four items. The model returned two: it
+recognised each restatement and folded it in. That is both segmentation errors
+on that sample and most of the gap between 91% and higher.
+
+The key is not obviously right. A foreman reading a timeline probably wants one
+inspection, not the same one twice. But nothing asked for de-duplication, it is
+not in the prompt, and the model is doing it silently — which means it is also
+free to merge two events that only *sound* alike. That is exactly the 06 failure
+wearing a friendlier face.
+
+Not decided here. Deciding it means either rewriting the key and documenting
+de-duplication as intended, or keeping the key and making the model stop. Both
+need a second opinion, and a run of `10` where the two events are genuinely
+different to see whether it over-merges.
+
 ## The 06 result
 
-13/28, from one mistake. The model merged these two lines into a single item
-titled "Framing progress and injury":
+The model merged these two lines into a single item titled "Framing progress and
+injury":
 
     2026-08-03 - framing crew on site, north wall studs up
     Dave cut his forearm on a strap end, first aid kit used, he finished the day
 
-Five expected items then line up against four actual ones. One error, fifteen
-wrong fields.
+Five expected items line up against four actual ones. Under position matching
+that read as fifteen wrong fields and 13/28. Aligned, it reads as what it is:
+one segmentation error and one category disagreement, 22/28. The merge is still
+there and still the thing to fix.
 
-Two things worked in the same sample:
+Three things worked in the same sample:
 
 - the safety guardrail fired on the injury and on the photo of the strap, and
   raised both to urgent — not asked for in the prompt
 - the model put 2026-08-03 on three items that do not state it; date grounding
   dropped all three with warnings
+- the photo of the strap now keeps `action_required: false` while still carrying
+  the safety flag, confirmed on a real run. Documentation of a hazard is not
+  itself a task; the action lives on the injury line and the capping follow-up
+
+## Done from the plan
+
+1. **Scorer reports error shape.** Aligned instead of positional. Done.
+2. **Re-scored and recorded.** 240/265. Done.
+4. **Samples 09 and 10.** Added by @vjvidhaan, answer keys written first. Done —
+   and 10 produced the de-duplication question above, which is the most
+   interesting thing to come out of the week.
 
 ## Next
 
-**1. Event segmentation.** Biggest single source of lost fields. One merge on
-06 cost fifteen. Nothing in the pipeline checks the item count against the
-input. Same class of problem as date inheritance, which was fixed in code.
+**3. Check item count in code.** Compare items produced against non-header lines
+and warn when they disagree by more than one. A detector, not a fix — the merge
+on 06 should announce itself in the app, not only in the scorer. Same approach
+as date grounding. This is the one still worth doing before the freeze.
 
-**2. The scorer cannot tell a merge from fifteen mistakes.** Position matching
-was fine at five samples and now hides the shape of the errors. "1 segmentation
-error, 3 field errors" is more useful than 13/28. Fix this before tuning any
-prompt against these numbers.
+**5. action_required.** Three misses. Prompt problem or key problem — decide by
+reading, then measure once. Do not re-run until the number looks better.
 
-**3. Category** — five of the seven misses on the original five. Some are
-arguable, not wrong: "demo done, there is moisture behind it" as issue vs
-contractor update. Separate wrong from arguable, chase only the wrong ones, and
-write the tie-break rule into the prompt and `data/expected` together.
+**7. Stability at 10 runs.** Three runs of eight is thin. Worth doing only if
+someone has API budget spare.
 
-**4. action_required** — missed twice on items that plainly ask for something.
+**The de-duplication decision.** See above. Needs a person, not a commit.
 
-## Tomorrow
-
-Ordered so each commit stands on its own and the risky one comes first.
-
-**1. Make the scorer report error shape.** Detect when the model's item count
-differs from the answer key and label it a segmentation error instead of
-scoring every later field against the wrong entry. Output becomes
-"1 segmentation error, 3 field errors" rather than 13/28.
-
-Do this first. Every number after it changes, and tuning a prompt against the
-current scorer would be tuning against a measurement that hides its own errors.
-
-**2. Re-score and record the new numbers.** 192/214 will move once the scorer
-stops cascading. Regenerate outputs, update README and this file together.
-
-**3. Check item count in code.** Compare items produced against non-header
-lines in the input and warn when they disagree by more than one. Not a fix for
-segmentation — a detector, so the merge on 06 shows up as a warning rather than
-as a low score. Same approach as date grounding.
-
-**4. Samples 09 and 10.** A stream with no dates at all, and one where the same
-event appears twice in different words. Answer key first, before running.
-
-**5. action_required.** Two misses on items that plainly ask for something.
-Look at both, decide whether it is a prompt problem or an answer key problem,
-then measure. Do not tune and re-run until the number looks better.
-
-**6. Category triage.** Split the five misses into wrong and arguable. For the
-arguable ones write the tie-break rule into the prompt and `data/expected`
-in the same commit.
-
-**7. Stability at 10 runs.** Current evidence is thin. Update the numbers here
-if segmentation moves more often than three-runs-of-eight suggested.
-
-Build freezes Wednesday. Items 1-4 are the ones worth having; 5-7 are optional.
+Build freezes Wednesday.
 
 ## For the reviewer
 
-- **Re-read the 06 answer key before tuning against it.** The key says the photo
-  of the strap is `action_required: false`; the safety guardrail overrides it to
-  true. Change the key or the guardrail, and record which and why.
-- **Sort the category misses into wrong and arguable.** List is in
-  `python -m src.score`.
-- **Samples 09 and 10.** Untested: a stream with no dates at all, and one where
-  the same event appears twice in different words. Answer key first.
+- **Sample 10 and de-duplication.** The open question above. Read the key, read
+  the output, and say which one should change.
 - **`python -m src.stability --runs 10`.** Ten runs of 03 is thin evidence.
+- **The aligner is optimistic by construction.** It finds the best monotonic
+  pairing, so the score is the kindest reading of a given output. That is the
+  right default for measuring the model, but worth knowing before quoting 91%.
 
 ## Reviewer follow-ups — resolved
 
@@ -202,8 +219,9 @@ Build freezes Wednesday. Items 1-4 are the ones worth having; 5-7 are optional.
   flipping the photo to `action_required` because `flag_safety` reads the model's
   *summary* (which paraphrases the injury), not the input. `src/guardrails.py` now
   leaves a `photo` item's `action_required` alone. This is the date lesson again —
-  judge what the input said, not what the model rewrote. (Verify with a real
-  `src.score` run: item 2 should stay `true`, item 3 should now be `false`.)
+  judge what the input said, not what the model rewrote. **Verified on a real
+  run:** the injury item is `action_required: true`, the photo is `false`, and
+  the photo still carries `safety_review` at urgent priority.
 - **Samples 09 and 10 added, answer key first.** `09_no_dates` (no dated lines —
   nothing should get a date) and `10_repeated_event` (an inspection and a delivery
   each stated twice, plus a dated line above an undated duplicate so date-grounding

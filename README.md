@@ -2,8 +2,8 @@
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-127%20passing-2ea44f)
-![Accuracy](https://img.shields.io/badge/field%20accuracy-192%2F214%20(90%25)-2ea44f)
+![Tests](https://img.shields.io/badge/tests-138%20passing-2ea44f)
+![Accuracy](https://img.shields.io/badge/field%20accuracy-240%2F265%20(91%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
 
@@ -66,7 +66,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 127 tests
+pytest                  # 138 tests
 ```
 
 ---
@@ -124,39 +124,50 @@ warning, don't guess.
 ## 📊 Accuracy
 
 `python -m src.score` compares `outputs/` against the hand-written answers in
-`data/expected/` — 214 fields across 8 samples.
+`data/expected/` — 265 fields across 10 samples.
 
 | Measure | Result |
 |---|---|
-| Field accuracy | **192/214 (90%)** |
-| Samples with no errors | 4/8 |
-| Date fields correct | **36/38** |
+| Field accuracy | **240/265 (91%)** |
+| Samples with no errors | 4/10 |
+| Date fields correct | **44/47** |
 
-It was 118/125 (94%) at five samples. Three harder samples took it to 90%. The
-original five scored 118/125 again in the same run, and two of the three new
-ones passed clean first time.
+The score also reports the shape of what went wrong: **3 segmentation errors, 10
+field errors**. Those are different problems. A segmentation error is one event
+merged or dropped and costs five fields at once, so one of them is worth more
+than five field errors.
+
+Every date the model put on an item it produced is right. All three date losses
+are items it never produced at all.
+
+It was 192/214 before the scorer stopped matching items by position. On the same
+eight samples the new scorer reads 201/214 — the nine recovered fields are all on
+`06_safety_incident`, which was being charged fifteen times for one merged line.
+The model did not change. The measurement did.
+
+The original five samples scored 118/125 for the third run in a row.
 
 Temperature is 0, which is not deterministic. Three consecutive runs scored 117,
-118, 118 — so ±1 on fields. Larger swings happen when the model splits a line
-into two items instead of one: every later item then matches the wrong answer
-and the denominator moves. `python -m src.stability --runs N` measures both.
+118, 118 — so ±1 on fields. `python -m src.stability --runs N` measures that,
+and the item count alongside it.
 
 Measured on Groq. Every file in `outputs/` records which provider produced it.
 
 ### Known errors
 
-22 misses, 15 of them from one mistake.
+25 misses in two kinds.
 
-- **1 merged event** on `06_safety_incident` — the model folded a progress line
-  and an injury line into one item. Items match by position, so everything after
-  it scored against the wrong entry, including both date misses.
-- **5 category disagreements.** Some are arguable: *"demo done … there is
+- **3 segmentation errors.** One merge on `06_safety_incident`, and two on
+  `10_repeated_event`, where the model collapsed each event that was stated
+  twice into a single item. The answer key expects both mentions. Whether
+  de-duplicating is right is an open decision, not a bug — see PROJECT_NOTES.
+- **7 category disagreements.** Some are arguable: *"demo done … there is
   moisture behind it"* as contractor update vs issue. That call lives in
   `data/expected/`.
-- **2 missed action flags** on items that plainly ask for something.
+- **3 missed action flags** on items that plainly ask for something.
 
-Next: event splitting, and a scorer that can tell one merge from fifteen
-mistakes.
+Next: a check on item count in code, and the category split into wrong vs
+arguable.
 
 ---
 
@@ -165,7 +176,7 @@ mistakes.
 ```text
 ├── app.py                  Streamlit interface
 ├── data/
-│   ├── samples/            eight made-up job streams
+│   ├── samples/            ten made-up job streams
 │   └── expected/           hand-written answers, the scorer's ground truth
 ├── outputs/                generated JSON + results log
 ├── src/
@@ -180,7 +191,7 @@ mistakes.
 │   ├── stability.py        how much the same input moves between runs
 │   ├── batch.py            run the whole folder
 │   └── text.py             shared normalisation
-├── tests/                  127 tests
+├── tests/                  138 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
 

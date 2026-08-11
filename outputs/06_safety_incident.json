@@ -34,15 +34,17 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Photo of the strap that caused injury",
-      "summary": "A photo was taken of the strap that caught Dave.",
+      "title": "Photo of strap that caused injury",
+      "summary": "A photo was taken of the strap that caused the injury.",
       "action_required": false,
       "action": null,
-      "priority": "low",
+      "priority": "urgent",
       "confidence": "high",
       "source_excerpt": "photo_1188.jpg - the strap that caught him, still sticking out of the plate",
-      "flags": [],
-      "compliance_notes": null
+      "flags": [
+        "safety_review"
+      ],
+      "compliance_notes": "Injury or safety language detected. Needs a human review before any action, and may carry a reporting obligation."
     },
     {
       "item_id": "item_003",
@@ -87,11 +89,11 @@
   ],
   "overall_summary": "The framing crew made progress, a crew member was injured, and the framing inspection passed.",
   "warnings": [
-    "No date was provided for the photo, but it is assumed to be the same as the surrounding events.",
+    "The date of the follow-up with the supply house is not specified.",
     "item_001: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_002: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
-    "1 of 4 items were flagged for review by the guardrails."
+    "2 of 4 items were flagged for review by the guardrails."
   ],
   "provider": "groq"
 }

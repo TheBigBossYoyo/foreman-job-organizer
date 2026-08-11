@@ -1,0 +1,49 @@
+{
+  "project_name": "Hollis roof and gutters",
+  "client_name": "Ben Hollis",
+  "property_address": "7 Cedar Court",
+  "items": [
+    {
+      "item_id": "item_001",
+      "category": "inspection",
+      "date": "2026-08-05",
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Final roof inspection",
+      "summary": "The final roof inspection was passed and the inspector signed off.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "passed the final roof inspection, the inspector signed off",
+      "flags": [],
+      "compliance_notes": null
+    },
+    {
+      "item_id": "item_002",
+      "category": "delivery",
+      "date": null,
+      "people": [],
+      "location": null,
+      "amount": null,
+      "currency": null,
+      "title": "Gutter stock and downspouts delivery",
+      "summary": "84 Lumber delivered gutter stock and downspouts.",
+      "action_required": false,
+      "action": null,
+      "priority": "low",
+      "confidence": "high",
+      "source_excerpt": "84 Lumber dropped the gutter stock and downspouts this morning",
+      "flags": [],
+      "compliance_notes": null
+    }
+  ],
+  "open_actions": [],
+  "overall_summary": "The final roof inspection was passed and gutter stock and downspouts were delivered from 84 Lumber.",
+  "warnings": [
+    "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one."
+  ],
+  "provider": "groq"
+}
