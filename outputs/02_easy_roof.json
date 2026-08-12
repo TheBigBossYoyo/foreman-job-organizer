@@ -18,6 +18,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "Replaced damaged shingles on the north slope.",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -36,6 +37,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "completed shingle repair, north slope.",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -54,6 +56,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "Roofing Depot, shingles and nails, $486.20.",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -72,6 +75,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "Final cleanup complete.",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
@@ -79,6 +83,7 @@
   "open_actions": [],
   "overall_summary": "The damaged shingles on the north slope were replaced, a receipt for shingles and nails was recorded, and the final cleanup is complete.",
   "warnings": [
+    "The receipt date was inferred from the surrounding context.",
     "item_002: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-07-23. It is not written on this item's own line, so it was most likely copied from another one."
   ],

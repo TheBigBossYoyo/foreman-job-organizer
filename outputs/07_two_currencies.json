@@ -5,19 +5,20 @@
   "items": [
     {
       "item_id": "item_001",
-      "category": "schedule",
+      "category": "contractor_update",
       "date": "2026-08-01",
       "people": [],
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Slab pouring and curing schedule",
-      "summary": "The slab was poured and needs five days to cure before laying tiles.",
+      "title": "Slab poured",
+      "summary": "The slab was poured and needs five days to cure before laying anything.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "slab poured, five days to cure before we lay anything",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -36,6 +37,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "tiles from Carrelage Sud, 640.00 TND",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -54,6 +56,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "sealant from the US supplier, $48.20",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -72,6 +75,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "invoice 2210 paid in full, 1,150.00 TND",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -92,6 +96,7 @@
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "Nadia asked for a copy of both receipts by email",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
@@ -99,7 +104,7 @@
   "open_actions": [
     "Send the receipts to the client by email."
   ],
-  "overall_summary": "The slab was poured, receipts for tiles and sealant were recorded, an invoice was paid, and the client requested a copy of the receipts.",
+  "overall_summary": "The slab was poured, two receipts were recorded, an invoice was paid, and the client requested the receipts.",
   "warnings": [
     "The dates for the tile and sealant receipts were not provided.",
     "The date for the invoice payment was not provided.",

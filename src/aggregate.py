@@ -98,6 +98,9 @@ def summarize(result):
 
     return {
         "item_count": len(items),
+        # Items that fold in a second mention of the same event. Counted so the
+        # screen can say why there are fewer rows than there were lines.
+        "restated": sum(1 for item in items if item.restatements),
         "needs_review": sum(1 for item in items if needs_review(item)),
         "undated": sum(1 for item in items if item.date is None),
         "spend": spend_by_currency(items),

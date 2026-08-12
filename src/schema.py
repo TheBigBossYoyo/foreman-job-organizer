@@ -36,6 +36,13 @@ class JobItem(BaseModel):
     priority: Priority = "medium"
     confidence: Confidence = "medium"
     source_excerpt: str
+    # The other times this same event was written down, quoted from the input.
+    # One event is one item, but a foreman who noted the inspection twice said
+    # it twice, and dropping the second mention silently would be inventing a
+    # tidier record than the one that exists. Quotes rather than a count,
+    # because a count cannot be checked against anything. src/restatements.py
+    # verifies every one of these against the input and drops the rest.
+    restatements: list[str] = Field(default_factory=list)
     # Set by src/guardrails.py after validation, not by the model. These are the
     # reasons a human should look at an item, and why.
     flags: list[str] = Field(default_factory=list)

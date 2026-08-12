@@ -4,8 +4,6 @@
   "property_address": "7 Cedar Court",
   "items": [
     {"category": "inspection", "date": "2026-08-05", "action_required": false, "amount": null, "currency": null},
-    {"category": "inspection", "date": null, "action_required": false, "amount": null, "currency": null},
-    {"category": "delivery", "date": null, "action_required": false, "amount": null, "currency": null},
     {"category": "delivery", "date": null, "action_required": false, "amount": null, "currency": null}
   ]
 }

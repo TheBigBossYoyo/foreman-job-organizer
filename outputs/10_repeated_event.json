@@ -18,6 +18,9 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "passed the final roof inspection, the inspector signed off",
+      "restatements": [
+        "the roof inspection went through, all good on the sign-off"
+      ],
       "flags": [],
       "compliance_notes": null
     },
@@ -36,13 +39,17 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "84 Lumber dropped the gutter stock and downspouts this morning",
+      "restatements": [
+        "delivery from 84 Lumber came in with the gutter sections and downspouts"
+      ],
       "flags": [],
       "compliance_notes": null
     }
   ],
   "open_actions": [],
-  "overall_summary": "The final roof inspection was passed and the gutter stock and downspouts were delivered.",
+  "overall_summary": "The final roof inspection was passed and the gutter stock and downspouts were delivered from 84 Lumber.",
   "warnings": [
+    "No date was provided for the gutter stock and downspouts delivery beyond the same day as the inspection.",
     "item_002: dropped the date 2026-08-05. It is not written on this item's own line, so it was most likely copied from another one."
   ],
   "provider": "groq"

@@ -223,3 +223,55 @@ def test_an_alarm_and_a_quiet_flag_on_one_item_keep_their_own_styles():
 
     assert 'class="jo-flag"' in html
     assert 'class="jo-flag quiet"' in html
+
+
+# --- one event written down more than once ----------------------------------
+
+def test_a_folded_event_shows_the_other_wording_it_covers():
+    # The whole reason the fold is allowed. If the second line is not on the
+    # page, the tool has silently thrown away something that was said.
+    html = page_html(run_with_result(
+        with_first_item(restatements=["crew confirmed the cabinets are out"])
+    ))
+
+    assert "crew confirmed the cabinets are out" in html
+    assert 'class="jo-src echo"' in html
+
+
+def test_a_folded_event_says_how_many_times_it_was_said():
+    html = page_html(run_with_result(
+        with_first_item(restatements=["crew confirmed the cabinets are out"])
+    ))
+
+    assert "said twice" in html
+
+
+def test_three_mentions_are_counted_not_called_twice():
+    html = page_html(run_with_result(with_first_item(restatements=["one line", "two line"])))
+
+    assert "said 3 times" in html
+    assert "said twice" not in html
+
+
+def test_an_event_said_once_carries_no_echo_at_all():
+    # Every ordinary item has an empty list. Announcing "said once" on all of
+    # them is the medium-priority mistake again.
+    html = page_html(run_with_result())
+
+    assert "said twice" not in html
+    assert 'class="jo-src echo"' not in html
+
+
+def test_the_page_counts_the_folded_events_in_the_summary():
+    html = page_html(run_with_result(with_first_item(restatements=["crew confirmed"])))
+
+    assert "events written down twice" in html
+
+
+def test_markup_inside_a_restatement_is_escaped_like_everything_else():
+    html = page_html(run_with_result(
+        with_first_item(restatements=["<script>alert(1)</script>"])
+    ))
+
+    assert "<script>" not in html
+    assert "&lt;script&gt;" in html

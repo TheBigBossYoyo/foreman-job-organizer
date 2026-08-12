@@ -18,6 +18,7 @@
       "priority": "high",
       "confidence": "high",
       "source_excerpt": "7/27 demo done. opened up the shower wall and there is moisture behind it",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -36,6 +37,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "photo_0431.jpg - dark staining, lower left of the shower framing",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -50,12 +52,13 @@
       "amount": null,
       "currency": null,
       "title": "Tile start date inquiry",
-      "summary": "The client inquired whether the moisture issue would delay the tile start date.",
+      "summary": "The client inquired if the moisture issue would delay the tile start date.",
       "action_required": true,
       "action": "Respond to the client regarding the potential delay in tile start date.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "does the moisture thing push the tile start on friday??",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -69,13 +72,14 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Lopez site visit",
-      "summary": "Lopez may visit the site on Thursday PM to take a look.",
+      "title": "Lopez visit",
+      "summary": "Lopez may visit on Thursday PM to take a look.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "low",
       "source_excerpt": "lopez said he might be able to swing by thursday pm to take a look",
+      "restatements": [],
       "flags": [
         "low_confidence"
       ],
@@ -83,19 +87,20 @@
     },
     {
       "item_id": "item_005",
-      "category": "issue",
+      "category": "delivery",
       "date": null,
       "people": [],
       "location": null,
       "amount": null,
       "currency": null,
       "title": "Vanity delivery delay",
-      "summary": "The vanity supplier reported a delay without providing a firm delivery date.",
+      "summary": "The vanity supplier called and reported a delay without providing a firm date.",
       "action_required": true,
       "action": "Follow up with the supplier to obtain a revised delivery date.",
       "priority": "medium",
-      "confidence": "high",
+      "confidence": "medium",
       "source_excerpt": "vanity - supplier called, delayed, wouldnt give me a firm date",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
@@ -105,11 +110,11 @@
     "Respond to the client regarding the potential delay in tile start date.",
     "Follow up with the supplier to obtain a revised delivery date."
   ],
-  "overall_summary": "The demo was completed, revealing a moisture issue, and the client inquired about the impact on the tile start date. Lopez may visit the site, and the vanity delivery is delayed.",
+  "overall_summary": "The demo was completed, revealing a moisture issue, and the client inquired about the impact on the tile start date. Lopez may visit on Thursday, and the vanity delivery is delayed.",
   "warnings": [
     "The date of the demo was not provided in a standard format.",
-    "The exact calendar dates for Friday and Thursday were not provided.",
-    "The date of the photo and the potential site visit were not provided.",
+    "The exact calendar dates for Thursday and Friday were not provided.",
+    "The date of the vanity delivery delay was not provided.",
     "1 of 5 items were flagged for review by the guardrails."
   ],
   "provider": "groq"

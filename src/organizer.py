@@ -7,6 +7,7 @@ from . import providers
 from .dates import ground_dates
 from .guardrails import enforce_all
 from .prompts import SYSTEM_PROMPT, build_user_prompt
+from .restatements import ground_restatements
 from .schema import JobOrganizationResult
 
 
@@ -74,6 +75,11 @@ def organize_job_stream(raw_text, model=None):
     # here and still have been copied off a neighbouring line, so compare each
     # one against the line it came from and drop the ones that are not there.
     ground_dates(result, raw_text)
+
+    # The same test one field along. Folding two mentions of one event into a
+    # single item is allowed; claiming a line said something it never said is
+    # not, so every restatement is checked against the input too.
+    ground_restatements(result, raw_text)
 
     # Guardrails run last, so they see the dates that actually survived
     # grounding rather than the ones the model claimed.

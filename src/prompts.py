@@ -18,7 +18,11 @@ Rules:
    - Every null date must have a matching note in "warnings".
 4. Currency must be a three-letter code, such as USD, EUR, GBP, or TND.
 5. Split the input into separate items when it contains distinct events.
-6. "source_excerpt" must quote a short supporting fragment from the input.
+6. "source_excerpt" must quote a short supporting fragment from the input,
+   copied exactly and continuously from ONE line. Never join text from two
+   lines into a single quote, and never tidy up the wording. If an item covers
+   more than one line, quote one line here and put the others in
+   "restatements".
 7. If an issue, deadline, missing item, approval, repair, payment, inspection,
    or follow-up requires attention, set action_required to true and write a
    concise action.
@@ -34,7 +38,18 @@ Rules:
      that quotes the client is "client_update" whatever it asks about, so a
      client asking for a revised completion date is client_update, not
      schedule.
-9. Return ONLY one valid JSON object. Do not use markdown fences or commentary.
+9. When the same event is written down more than once in different words,
+   return ONE item for it. Put the first mention in "source_excerpt" and every
+   later wording in "restatements", each quoted from the input exactly as it
+   appears there. Never drop the later wording; record it.
+   - Fold only when it is the same real event. Two deliveries from the same
+     supplier on different days are two items, not one said twice.
+   - If you are not sure two lines describe the same event, keep them separate.
+     A wrongly split event is a smaller mistake than a wrongly merged one.
+   - Example: "the permit came through" followed later by "we got the permit
+     approved" is one item, with source_excerpt "the permit came through" and
+     restatements ["we got the permit approved"].
+10. Return ONLY one valid JSON object. Do not use markdown fences or commentary.
 
 The output must follow this exact shape:
 {
@@ -56,7 +71,8 @@ The output must follow this exact shape:
       "action": null,
       "priority": "low | medium | high | urgent",
       "confidence": "low | medium | high",
-      "source_excerpt": ""
+      "source_excerpt": "",
+      "restatements": []
     }
   ],
   "open_actions": [],
@@ -95,7 +111,8 @@ WORKED_EXAMPLE_OUTPUT = """
       "action": "Document the damage and arrange replacement doors.",
       "priority": "high",
       "confidence": "high",
-      "source_excerpt": "Cabinets arrived, but two upper doors are scratched."
+      "source_excerpt": "Cabinets arrived, but two upper doors are scratched.",
+      "restatements": []
     },
     {
       "item_id": "item_002",
@@ -111,7 +128,8 @@ WORKED_EXAMPLE_OUTPUT = """
       "action": null,
       "priority": "low",
       "confidence": "high",
-      "source_excerpt": "Home Supply, cabinet hardware, $184.50."
+      "source_excerpt": "Home Supply, cabinet hardware, $184.50.",
+      "restatements": []
     },
     {
       "item_id": "item_003",
@@ -127,7 +145,8 @@ WORKED_EXAMPLE_OUTPUT = """
       "action": "Confirm whether the inspection can be moved to Monday.",
       "priority": "medium",
       "confidence": "medium",
-      "source_excerpt": "Can we move Friday's inspection to Monday?"
+      "source_excerpt": "Can we move Friday's inspection to Monday?",
+      "restatements": []
     }
   ],
   "open_actions": [

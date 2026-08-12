@@ -6,7 +6,7 @@
     {
       "item_id": "item_001",
       "category": "issue",
-      "date": null,
+      "date": "2026-08-03",
       "people": [
         "framing crew",
         "Dave"
@@ -15,12 +15,15 @@
       "amount": null,
       "currency": null,
       "title": "Framing progress and injury",
-      "summary": "The framing crew was on site, the north wall studs were completed, and a crew member was injured by a strap end.",
+      "summary": "The framing crew was on site, the north wall studs were completed, and a crew member was injured.",
       "action_required": true,
       "action": "Follow up on Dave's injury and ensure proper medical attention if needed.",
       "priority": "urgent",
       "confidence": "high",
-      "source_excerpt": "Dave cut his forearm on a strap end, first aid kit used, he finished the day",
+      "source_excerpt": "framing crew on site, north wall studs up",
+      "restatements": [
+        "Dave cut his forearm on a strap end, first aid kit used, he finished the day"
+      ],
       "flags": [
         "safety_review"
       ],
@@ -35,14 +38,17 @@
       "amount": null,
       "currency": null,
       "title": "Photo of the strap that caused injury",
-      "summary": "A photo of the strap that caught Dave's forearm.",
+      "summary": "A photo was taken of the strap that caused the injury.",
       "action_required": false,
       "action": null,
-      "priority": "low",
+      "priority": "urgent",
       "confidence": "high",
       "source_excerpt": "photo_1188.jpg - the strap that caught him, still sticking out of the plate",
-      "flags": [],
-      "compliance_notes": null
+      "restatements": [],
+      "flags": [
+        "safety_review"
+      ],
+      "compliance_notes": "Injury or safety language detected. Needs a human review before any action, and may carry a reporting obligation."
     },
     {
       "item_id": "item_003",
@@ -52,13 +58,14 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Strap end capping",
-      "summary": "The supply house has not yet responded about capping the strap ends.",
+      "title": "Strap end capping issue",
+      "summary": "The strap ends need to be capped, but the supply house has not responded yet.",
       "action_required": true,
       "action": "Follow up with the supply house about capping the strap ends.",
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "still need to hear back from the supply house about capping the strap ends",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -70,13 +77,14 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Framing inspection",
-      "summary": "The framing inspection passed.",
+      "title": "Framing inspection passed",
+      "summary": "The framing inspection was passed.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "2026-08-04 - inspection passed on the framing",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
@@ -85,13 +93,12 @@
     "Follow up on Dave's injury and ensure proper medical attention if needed.",
     "Follow up with the supply house about capping the strap ends."
   ],
-  "overall_summary": "The framing crew made progress, a crew member was injured, and the framing inspection passed.",
+  "overall_summary": "The framing crew made progress, a crew member was injured, a photo was taken of the hazard, an issue with strap end capping was identified, and the framing inspection was passed.",
   "warnings": [
-    "No date was provided for the follow-up with the supply house.",
-    "item_001: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
+    "The date of the supply house follow-up is not specified.",
     "item_002: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
     "item_003: dropped the date 2026-08-03. It is not written on this item's own line, so it was most likely copied from another one.",
-    "1 of 4 items were flagged for review by the guardrails."
+    "2 of 4 items were flagged for review by the guardrails."
   ],
   "provider": "groq"
 }

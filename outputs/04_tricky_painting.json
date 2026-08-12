@@ -12,12 +12,13 @@
       "amount": null,
       "currency": null,
       "title": "Living room painting status",
-      "summary": "The living room painting is complete except for touch-ups.",
+      "summary": "The living room painting is done except for touch-ups.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "living room done except touch ups",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -32,12 +33,13 @@
       "amount": null,
       "currency": null,
       "title": "Bedroom color issue",
-      "summary": "The homeowner reported that the bedroom color looks wrong, but did not specify the color code.",
+      "summary": "The homeowner reported that the bedroom color looks wrong, but did not specify which color code is incorrect.",
       "action_required": true,
-      "action": "Confirm the correct bedroom color with the homeowner.",
+      "action": "Clarify which bedroom color code is incorrect and resolve the issue.",
       "priority": "high",
       "confidence": "medium",
       "source_excerpt": "homeowner says the bedroom color looks wrong - didnt say which code",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -56,6 +58,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "paint house receipt - rollers, tape, primer - 118.90 TND",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -67,26 +70,27 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Work continuation",
-      "summary": "Work needs to be paused until the bedroom color is confirmed.",
+      "title": "Bedroom color confirmation",
+      "summary": "The bedroom color needs to be confirmed before proceeding with the work.",
       "action_required": true,
-      "action": "Confirm the bedroom color before proceeding with the work.",
-      "priority": "high",
+      "action": "Confirm the bedroom color with the homeowner before continuing.",
+      "priority": "medium",
       "confidence": "high",
       "source_excerpt": "need to confirm bedroom color before we keep going",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
   ],
   "open_actions": [
-    "Confirm the correct bedroom color with the homeowner.",
-    "Confirm the bedroom color before proceeding with the work."
+    "Clarify which bedroom color code is incorrect and resolve the issue.",
+    "Confirm the bedroom color with the homeowner before continuing."
   ],
-  "overall_summary": "The living room painting is almost complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
+  "overall_summary": "The living room painting is nearly complete, but there is an issue with the bedroom color, and a receipt for painting supplies was recorded.",
   "warnings": [
-    "The date for the living room painting completion was not provided.",
-    "The date for the receipt was not provided.",
-    "The exact bedroom color code was not provided."
+    "The date of the living room painting update was not provided.",
+    "The date of the bedroom color issue report was not provided.",
+    "The date of the painting supplies receipt was not provided."
   ],
   "provider": "groq"
 }

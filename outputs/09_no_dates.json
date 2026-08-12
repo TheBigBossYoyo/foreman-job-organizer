@@ -13,13 +13,14 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Tile work start confirmation",
+      "title": "Tile work start condition",
       "summary": "The tile guy confirmed he can start once the vanity is out.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "tile guy confirmed he can start once the vanity is out",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -31,13 +32,14 @@
       "location": null,
       "amount": null,
       "currency": null,
-      "title": "Vanity removal and water line capping",
+      "title": "Vanity removal",
       "summary": "The old vanity was pulled and the water lines were capped.",
       "action_required": false,
       "action": null,
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "pulled the old vanity and capped the water lines",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -58,6 +60,7 @@
       "priority": "medium",
       "confidence": "medium",
       "source_excerpt": "homeowner asked if we can match the existing baseboard",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     },
@@ -76,6 +79,7 @@
       "priority": "low",
       "confidence": "high",
       "source_excerpt": "picked up thinset and a box of spacers, receipt is in the truck",
+      "restatements": [],
       "flags": [
         "missing_amount"
       ],
@@ -96,6 +100,7 @@
       "priority": "high",
       "confidence": "high",
       "source_excerpt": "grout haze on the finished floor, needs a second wipe-down",
+      "restatements": [],
       "flags": [],
       "compliance_notes": null
     }
@@ -104,10 +109,11 @@
     "Determine if matching the existing baseboard is feasible.",
     "Perform a second wipe-down to remove the grout haze."
   ],
-  "overall_summary": "The tile guy confirmed start, the old vanity was removed, the homeowner requested baseboard matching, thinset and spacers were purchased, and grout haze was found on the finished floor.",
+  "overall_summary": "The tile guy is waiting for the vanity to be removed, the old vanity was pulled, the homeowner requested baseboard matching, thinset and spacers were purchased, and the finished floor has grout haze.",
   "warnings": [
-    "The dates for the events were not provided.",
+    "The date for the tile guy to start work was not provided.",
     "The receipt for thinset and spacers is not readily available as it is in the truck.",
+    "The date for the second wipe-down was not provided.",
     "1 of 5 items were flagged for review by the guardrails."
   ],
   "provider": "groq"

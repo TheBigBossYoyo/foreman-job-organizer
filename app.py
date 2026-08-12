@@ -155,6 +155,23 @@ CSS = """
 /* Context, not an alarm. Same shape so the row still scans, no red. */
 .jo-flag.quiet { color: #64748B; background: #F6F7F9; border-color: #E7EAEE; }
 
+/* ---- one event, written down more than once ---- */
+/* A pill, not a number in a corner: the reader needs to know the timeline is
+   shorter than the input before wondering where a line went. Rounded rather
+   than square so it reads as a note about the row, not another flag on it. */
+.jo-echo {
+  font-size: .62rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: #6D28D9; background: #F7F5FF; border: 1px solid #E9E4FD;
+  padding: .05rem .42rem; border-radius: 999px;
+}
+/* The later wordings sit under the line they repeat, sharing its indent so
+   they read as one stack. Dashed, because a solid second rule looks like a
+   second item. */
+.jo-src.echo {
+  margin-top: .22rem; margin-left: .55rem;
+  border-left: 2px dashed #E4E7EC; color: #A6B0BC;
+}
+
 /* ---- priority ---- */
 /* Urgent gets the loudest thing on the row and nothing else does. The bar is
    read before any text, which is the point: on a long job the injury should be
@@ -281,6 +298,11 @@ def render_numbers(summary):
             "items undated in the source",
             False,
         ))
+    # Explains a timeline shorter than the input without making the reader
+    # count rows against lines to notice it.
+    if summary["restated"]:
+        cells.append((str(summary["restated"]), "events written down twice", False))
+
     if summary["needs_review"]:
         cells.append((str(summary["needs_review"]), "need review", True))
 
@@ -309,6 +331,11 @@ def render_job_head(result):
         f'<div class="jo-job-meta">{shown}</div></div>',
         unsafe_allow_html=True,
     )
+
+
+def said_label(mentions):
+    """'said twice', 'said 3 times'. Never 'said 1 times', and never for one."""
+    return "said twice" if mentions == 2 else f"said {mentions} times"
 
 
 def render_row(item):
@@ -344,6 +371,12 @@ def render_row(item):
             label = ", ".join(flag.replace("_", " ") for flag in flags)
             parts.append(f'<span class="{style}">{escape(label)}</span>')
 
+    # Says why this row covers more of the input than its quote does. Without
+    # it the folded lines are simply gone from the page.
+    restatements = item.get("restatements") or []
+    if restatements:
+        parts.append(f'<span class="jo-echo">{escape(said_label(len(restatements) + 1))}</span>')
+
     if item["amount"] is not None:
         amount = f'{item["amount"]:,.2f} {item["currency"] or ""}'.strip()
         parts.append(f'<span class="jo-amt">{escape(amount)}</span>')
@@ -360,6 +393,11 @@ def render_row(item):
         parts.append(f'<div class="jo-note">{escape(item["compliance_notes"])}</div>')
 
     parts.append(f'<div class="jo-src">{escape(item["source_excerpt"])}</div>')
+    # Every other time the same event was written down, under the line it
+    # repeats. One event stays one row; nothing said gets thrown away.
+    for echo in restatements:
+        parts.append(f'<div class="jo-src echo">{escape(echo)}</div>')
+
     parts.append("</div></div>")
     return "".join(parts)
 
