@@ -6,6 +6,8 @@ from pathlib import Path
 import streamlit as st
 
 from src.aggregate import ordered_items, summarize
+from src.calendar_export import counts as calendar_counts
+from src.calendar_export import to_ics
 from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
@@ -311,6 +313,21 @@ def render_job_head(result):
     )
 
 
+def calendar_note(events, todos, left_out):
+    """Plain English for what the .ics does and does not contain."""
+    if not events and not todos:
+        return "Nothing to put in a calendar: no item is dated or needs an action."
+
+    parts = [f"{events} dated event{'' if events == 1 else 's'}",
+             f"{todos} to-do{'' if todos == 1 else 's'} with no due date"]
+    note = "Calendar: " + " and ".join(parts) + "."
+    if not events:
+        note += " Nothing in this job stream said when, so nothing was given a day."
+    if left_out:
+        note += f" {left_out} item{'' if left_out == 1 else 's'} left out: a record, not a task."
+    return note
+
+
 def render_row(item):
     """One timeline entry. Every value is escaped — this text came from a model
     reading arbitrary input, so it is never treated as markup.
@@ -477,13 +494,24 @@ if "result" in st.session_state:
             for warning in result["warnings"]:
                 st.caption(warning)
 
-    left, right = st.columns(2)
+    events, todos, not_in_calendar = calendar_counts(validated)
+
+    left, middle, right = st.columns(3)
     left.download_button(
         "Download JSON",
         data=json.dumps(result, indent=2, ensure_ascii=False),
         file_name="organized_job.json",
         mime="application/json",
         use_container_width=True,
+    )
+    middle.download_button(
+        "Download calendar",
+        data=to_ics(validated),
+        file_name="job.ics",
+        mime="text/calendar",
+        use_container_width=True,
+        # Nothing to put in it is a real state, not a broken button.
+        disabled=not (events or todos),
     )
     if right.button("Save to outputs", use_container_width=True):
         # Saves what is on screen. Re-running the organizer here would cost
@@ -492,3 +520,9 @@ if "result" in st.session_state:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
         st.success(f"Saved to {path}")
+
+    # Says what is in the calendar before anyone opens it. On a job where no
+    # line carried a date this reads "0 dated events", which is the date rule
+    # turning up somewhere a reader actually feels it rather than a claim in a
+    # README.
+    st.caption(calendar_note(events, todos, not_in_calendar))

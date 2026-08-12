@@ -223,3 +223,52 @@ def test_an_alarm_and_a_quiet_flag_on_one_item_keep_their_own_styles():
 
     assert 'class="jo-flag"' in html
     assert 'class="jo-flag quiet"' in html
+
+
+# --- calendar export ---------------------------------------------------------
+
+def test_the_calendar_note_says_when_nothing_was_dated():
+    # The demo sample's shape. This sentence is where the date rule becomes
+    # visible to someone who never reads the README.
+    from app import calendar_note
+
+    note = calendar_note(0, 3, 2)
+
+    assert "0 dated events" in note
+    assert "Nothing in this job stream said when" in note
+
+
+def test_the_calendar_note_is_singular_for_one_of_each():
+    from app import calendar_note
+
+    note = calendar_note(1, 1, 1)
+
+    assert "1 dated event" in note and "1 dated events" not in note
+    assert "1 to-do with no due date" in note
+
+
+def test_the_calendar_note_handles_having_nothing_at_all():
+    from app import calendar_note
+
+    assert "Nothing to put in a calendar" in calendar_note(0, 0, 4)
+
+
+def test_the_page_states_what_the_calendar_contains():
+    # Asserted on the rendered caption, not on the helper: the helper being
+    # right is worth nothing if the page never calls it.
+    app = run_with_result()
+    captions = [caption.value for caption in app.caption]
+
+    assert any(text.startswith("Calendar:") for text in captions)
+
+
+def test_an_all_undated_job_says_so_on_the_page():
+    # 03_tricky_bathroom's shape: nothing dated, some of it actionable. The
+    # calendar is all to-dos, and the page says why rather than looking broken.
+    items = [{**item, "date": None} for item in RESULT["items"]]
+    items[0] = {**items[0], "action_required": True, "action": "Investigate the moisture"}
+    app = run_with_result({**RESULT, "items": items})
+    captions = " ".join(caption.value for caption in app.caption)
+
+    assert "0 dated events" in captions
+    assert "Nothing in this job stream said when" in captions
