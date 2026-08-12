@@ -9,6 +9,8 @@ from src.aggregate import ordered_items, summarize
 from src.calendar_export import counts as calendar_counts
 from src.calendar_export import to_ics
 from src.job_record import to_html
+from src.phone_import import describe as describe_import
+from src.phone_import import parse_export
 from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
@@ -232,6 +234,31 @@ def load_selected_sample():
         del st.session_state[key]
 
 
+def load_uploaded_export():
+    """Read a chat export into the box, as a callback rather than inline.
+
+    It has to be a callback: session state for a widget can only be set before
+    that widget is created, and the text area is built further down the script.
+
+    A file that turns out not to be an export leaves the box alone and says so.
+    Wiping someone's pasted text because they picked the wrong file would be a
+    worse outcome than an unhelpful message.
+    """
+    upload = st.session_state.get("export_upload")
+    if upload is None:
+        return
+
+    stream, stats = parse_export(upload.getvalue().decode("utf-8", errors="replace"))
+    st.session_state["import_note"] = describe_import(stats)
+    if not stats["messages"]:
+        return
+
+    st.session_state["raw_text"] = stream
+    st.session_state.pop("result", None)
+    for key in [key for key in st.session_state if key.startswith("action_")]:
+        del st.session_state[key]
+
+
 def format_date(iso_date):
     """2026-07-21 becomes 21 Jul, which scans far better down a narrow column."""
     if not iso_date:
@@ -417,6 +444,19 @@ with st.sidebar:
         # Still useful after editing the box by hand: picking the same name
         # again fires no change event, so there has to be a way back.
         st.button("Reload", use_container_width=True, on_click=load_selected_sample)
+
+    # A real job record does not arrive as a tidy paste, it arrives as a chat
+    # export. Reading one is the closest this gets to real input.
+    st.markdown('<div class="jo-side-h">Or a phone export</div>', unsafe_allow_html=True)
+    st.file_uploader(
+        "Chat export",
+        type=["txt"],
+        key="export_upload",
+        on_change=load_uploaded_export,
+        label_visibility="collapsed",
+    )
+    if st.session_state.get("import_note"):
+        st.caption(st.session_state["import_note"])
 
     # All three, always, with the reason each is or is not answering. A provider
     # that is simply missing from the list cannot be told apart from one this
