@@ -8,6 +8,7 @@ import streamlit as st
 from src.aggregate import ordered_items, summarize
 from src.calendar_export import counts as calendar_counts
 from src.calendar_export import to_ics
+from src.job_record import to_html
 from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
@@ -313,6 +314,12 @@ def render_job_head(result):
     )
 
 
+def slug(name):
+    """A safe, readable filename stem from a model-written project name."""
+    kept = [c.lower() if c.isalnum() else "_" for c in (name or "job")]
+    return "".join(kept).strip("_")[:50] or "job"
+
+
 def calendar_note(events, todos, left_out):
     """Plain English for what the .ics does and does not contain."""
     if not events and not todos:
@@ -513,7 +520,16 @@ if "result" in st.session_state:
         # Nothing to put in it is a real state, not a broken button.
         disabled=not (events or todos),
     )
-    if right.button("Save to outputs", use_container_width=True):
+    right.download_button(
+        "Download job record",
+        data=to_html(validated, summary),
+        file_name=f"{slug(result.get('project_name'))}_record.html",
+        mime="text/html",
+        use_container_width=True,
+        help="A printable page: the timeline, every source quote, and the warnings.",
+    )
+
+    if st.button("Save to outputs", use_container_width=True):
         # Saves what is on screen. Re-running the organizer here would cost
         # another call and could return something different.
         path = Path("outputs") / f"streamlit_{datetime.now():%Y%m%d_%H%M%S}.json"
