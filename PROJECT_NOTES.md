@@ -195,23 +195,85 @@ decide categories in code where the input gives a marker to decide on.
 Stopped at run C rather than trying a fourth prompt. Re-rolling until the number
 looks better is how a measurement stops meaning anything.
 
-## The de-duplication question — open
+## The de-duplication question — built, measured, reverted
 
 `10_repeated_event` states an inspection twice and a delivery twice, in
 different words. The answer key expects four items. The model returned two: it
-recognised each restatement and folded it in. That is both segmentation errors
+recognised each restatement and folded it in. That was both segmentation errors
 on that sample and most of the gap between 91% and higher.
 
-The key is not obviously right. A foreman reading a timeline probably wants one
-inspection, not the same one twice. But nothing asked for de-duplication, it is
-not in the prompt, and the model is doing it silently — which means it is also
-free to merge two events that only *sound* alike. That is exactly the 06 failure
-wearing a friendlier face.
+This was written up as an open question needing a person rather than a commit.
+It got one, and the answer is on the branch `restatements-experiment`.
 
-Not decided here. Deciding it means either rewriting the key and documenting
-de-duplication as intended, or keeping the key and making the model stop. Both
-need a second opinion, and a run of `10` where the two events are genuinely
-different to see whether it over-merges.
+**What was built.** The third option, rather than either side of the argument:
+one item per event, with every other wording kept beside it. A `restatements`
+field on the item, holding the later wordings as quotes. `src/restatements.py`
+checks each one against the input and drops any the input does not support, the
+same shape as date grounding — the model proposes the fold, the input decides
+whether the line exists. The timeline gained a "said twice" pill and stacked the
+folded lines under the line they repeat, so nothing said is off the screen.
+
+**It worked on the sample it was designed for.** `10` went 13/23 to 13/13, both
+folds captured and verified, and date grounding still caught the model copying
+the inspection's date onto the delivery.
+
+**It broke `08_dense_stream`, which was 33/33 and scored 22/33.** The model used
+`restatements` as a bucket for related lines rather than repeated ones:
+
+    crew arrived 7am, stripped the old batts out
+      folded: skip delivered same morning, half full by lunch
+      folded: found knob and tube wiring in the north bay, stopped work
+
+Those are three events — a start, a delivery and an issue — not one event said
+three times. This is the argument the key was making, demonstrated: a model free
+to decide what counts as the same event will merge things that are merely
+adjacent. It landed on the dense sample, which is also where the other
+prototype's blank-line chunker failed.
+
+| | Before | With the fold |
+|---|---|---|
+| Field accuracy | 241/265 (91%) | 232/255 (91%) |
+| `08_dense_stream` | 33/33 | **22/33** |
+| `10_repeated_event` | 13/23 | 13/13 |
+| Segmentation errors | 3 | 3 |
+
+The headline percentage is unchanged and the tool is worse. Reverted.
+
+**A second finding on the way through.** The first run of the change had the
+model quoting `framing crew on site, north wall studs up, Dave cut his forearm
+on a strap end` on `06` — two input lines spliced together with a comma, a
+string that is nowhere in the sample. Asking it to quote restatements exactly
+taught it to build quotes. A rule was added that a `source_excerpt` must be
+continuous text from one line, which fixed it. Worth remembering: this project
+claims in three places that no remaining error is an invented fact, and one
+prompt rule was enough to make that false.
+
+**Kept honest:** the worked example in the prompt rule used "the permit came
+through" rather than anything from `data/samples`. Teaching a rule with the text
+it will be scored on is not a measurement.
+
+**Where this leaves the question.** The key stays at four items. If someone
+picks this up, the fold belongs in code, not in the prompt — decided after the
+model returns, by comparing two items against each other, with anything it
+rejects surfaced as a warning rather than silently dropped. That is the date
+lesson for the fourth time.
+
+## action_required — read, and left alone
+
+The two misses, both the model saying false where the key says true.
+
+- `04` "living room done except touch ups" — **key right, model wrong.** The line
+  names outstanding work in its own words. Nothing arguable about it.
+- `03` "lopez said he might be able to swing by thursday pm" — **arguable.** The
+  key reads an unconfirmed visit as something to chase. The model reads it as
+  someone else's intention with nothing asked of the contractor. Both defensible.
+
+**Changed nothing.** One clear miss is not worth a prompt rule, and today's
+de-duplication experiment is the strongest evidence yet for why: a rule written
+to fix named items fixed them and broke a sample that had been perfect. Rule 7
+would need "unfinished work" added to its list, which is exactly the shape of
+change that has moved the total inside the noise band every time it has been
+tried. The reading is recorded so nobody re-opens it as an unexamined bug.
 
 ## The 06 result
 
@@ -251,17 +313,21 @@ Three things worked in the same sample:
 **3. Check item count in code.** Superseded — see "This evening". Counting
 lines was measured and rejected; coverage replaced it.
 
-**5. action_required.** Two misses, both on the model saying false where the key
-says true: "might be able to swing by thursday pm" and "living room done except
-touch ups". Both are work that is not finished. Prompt problem or key problem —
-decide by reading, then measure once.
+**5. action_required.** Done — read, and left alone. See above.
 
 **7. Stability at 10 runs.** Three runs of eight is thin. Worth doing only if
-someone has API budget spare.
+someone has API budget spare. Not done.
 
-**The de-duplication decision.** See above. Needs a person, not a commit.
+**The de-duplication decision.** Done. Built, measured, reverted. See above.
 
-Build freezes Wednesday.
+**The line coverage warning.** Still the right next thing and deliberately not
+built today. It only adds warnings, but it would want a batch re-run to be worth
+anything, and this morning already produced one regression from a change that
+looked safe. The freeze is the point. `coverage.py` in the scratchpad notes has
+the measured version; `providers.HEADER_PATTERNS` is the header fix it needs.
+
+Build froze Wednesday, 12 August, after the de-duplication experiment came back
+and was reverted. `main` is 241/265 with 144 tests.
 
 ## This evening
 
