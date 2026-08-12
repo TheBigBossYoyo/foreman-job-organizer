@@ -160,15 +160,31 @@ Measured on Groq. Every file in `outputs/` records which provider produced it.
 
 - **3 segmentation errors.** One merge on `06_safety_incident`, and two on
   `10_repeated_event`, where the model collapsed each event that was stated
-  twice into a single item. The answer key expects both mentions. Whether
-  de-duplicating is right is an open decision, not a bug — see PROJECT_NOTES.
-- **7 category disagreements**, three of them arguable rather than wrong. Some are arguable: *"demo done … there is
-  moisture behind it"* as contractor update vs issue. That call lives in
-  `data/expected/`.
-- **2 missed action flags** on items that plainly ask for something.
+  twice into a single item.
+- **6 category disagreements**, three of them arguable rather than wrong:
+  *"demo done … there is moisture behind it"* as contractor update vs issue.
+  That call lives in `data/expected/`.
+- **2 missed action flags.** One is a real miss — *"living room done except
+  touch ups"* names unfinished work. The other is arguable.
 
-Next: a check on item count in code, and the category split into wrong vs
-arguable.
+### The de-duplication question, and why the score isn't higher
+
+The two segmentation errors on `10_repeated_event` are a disagreement, not a
+bug. That sample states an inspection twice and a delivery twice in different
+words; the key expects four items and the model returns two, having folded each
+restatement in.
+
+We built the third option — one item per event, keeping the other wording beside
+it as a verified quote — and measured it. It fixed `10`, and made the model fold
+a skip delivery and a wiring discovery into the line about the crew arriving on
+`08_dense_stream`, which had been 33/33 and scored 22/33. Three events, not one
+said three times. Reverted; the code is on `restatements-experiment`.
+
+A model free to decide what counts as the same event will merge things that are
+merely adjacent. If someone picks this up, the fold belongs in code.
+
+Next: a warning when an input line is quoted by no item, so a merge surfaces
+itself, and categories decided in code wherever the input gives a marker.
 
 ---
 
