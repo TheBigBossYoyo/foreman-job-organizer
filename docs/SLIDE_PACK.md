@@ -56,8 +56,16 @@ and adds a warning. It does not guess.**
 
 ## 3. Screenshot
 
-See `docs/screenshots/`. Read the README in that folder — the shots need to be
-taken from a live run and there is a note there about which three to take.
+Three, in `docs/screenshots/`, all from a live run with Groq answering:
+
+| File | What it shows |
+|---|---|
+| `01-app-landing.png` | The app on open — sidebar, provider status, input box |
+| `02-timeline.png` | A finished run on `03_tricky_bathroom` — the full timeline |
+| `03-warnings.png` | Open actions as checkboxes, and the warnings expanded |
+
+`02-timeline.png` carries a slide on its own. The README in that folder lists
+what to point at in it.
 
 ---
 
