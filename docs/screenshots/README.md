@@ -1,6 +1,6 @@
 # Screenshots for the deck
 
-Taken 12 August 2026 from a live run on `main` (`2a023a1`). Groq answered, not
+Taken 12 August 2026 from a live run on `main`. Groq answered, not
 the local fallback — the sidebar in every shot shows which provider was active,
 so the picture states its own provenance.
 
@@ -8,7 +8,8 @@ so the picture states its own provenance.
 |---|---|
 | `01-app-landing.png` | The app on open — sidebar, provider status, sample loaded, input box |
 | `02-timeline.png` | A finished run on `03_tricky_bathroom` — the full timeline |
-| `03-warnings.png` | Open actions as checkboxes, and the warnings expanded |
+| `03-warnings.png` | Open actions as checkboxes, the warnings expanded, and the three downloads |
+| `04-job-record.png` | The printable job record, rendered from `06_safety_incident` |
 
 `02-timeline.png` carries a slide on its own. If you use only one, use that.
 
@@ -20,6 +21,10 @@ What to point at in `02`:
   instead of filing it as a booking.
 - **The grey line under each item** is the source excerpt. Every row traces back
   to the input line it came from.
+
+`04-job-record.png` is the printable record, not the app. It is the one output
+meant to leave the building, so it carries the generated date, the engine that
+produced it, and the warnings in full.
 
 ## Retaking them
 

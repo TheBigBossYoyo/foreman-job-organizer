@@ -327,7 +327,53 @@ looked safe. The freeze is the point. `coverage.py` in the scratchpad notes has
 the measured version; `providers.HEADER_PATTERNS` is the header fix it needs.
 
 Build froze Wednesday, 12 August, after the de-duplication experiment came back
-and was reverted. `main` is 241/265 with 144 tests.
+and was reverted. `main` was 241/265 with 144 tests.
+
+## After the freeze — three outputs, and why they were allowed
+
+The freeze said bug fixes only, and then three features went in anyway. Worth
+recording why, because "we froze and then didn't" is the kind of thing that
+should not be discovered later in a commit log.
+
+The de-duplication regression came from changing the **prompt**, which is
+upstream of everything: it moves what the model returns, so it moves the score,
+the outputs and the tests. These three read a finished result and write a file.
+They cannot change a single output and they cannot move 241/265 — verified after
+each one. That is a different category of risk from what broke `08` this
+morning, and it is the reason the freeze bent rather than broke.
+
+What it does still cost is talk time, which is the real budget now. Ten minutes,
+and the packet says running long is the most common failure. All three are demo
+beats rather than slides, and all three are the first things to cut.
+
+**1. Calendar export (`src/calendar_export.py`).** A grounded date becomes a
+VEVENT; an action with no date becomes a VTODO with no DUE; anything else is
+left out. iCalendar already had the right answer, so nothing has to be guessed.
+On `03` that is three to-dos and no events, and the page says so in words. This
+is the date rule turning up somewhere a reader feels it rather than a claim in a
+README.
+
+**2. Job record (`src/job_record.py`).** One printable page per job. This is the
+first thing built that answers slide two on its own terms — the details that
+decide a dispute live in someone's phone, and JSON does not fix that. Warnings
+are printed rather than hidden behind an expander, and the page carries the date
+and the engine that produced it. A record that cannot be checked should not be
+mistaken for one that can.
+
+**3. Phone import (`src/phone_import.py`).** Reads a WhatsApp export, which is
+the shape a job record actually arrives in. The decision worth defending is the
+timestamps: an export stamps every line with a send time, and using it would
+fill in the dates two thirds of the items lack — wrongly. The sample has a
+message sent on the 5th saying "building control came round last tuesday". Send
+times say when something was typed, not when it happened. They are reported to
+the person importing and never written into the stream.
+
+Its sample lives in `data/phone_exports/`, not `data/samples/`, on purpose: the
+scored set stays at ten and the denominator does not move.
+
+The line all three hold: **more ways in and out, no new ways to guess.**
+
+`main` is 241/265 with 212 tests.
 
 ## This evening
 

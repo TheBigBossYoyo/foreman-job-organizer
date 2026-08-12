@@ -128,6 +128,40 @@ item.
 Then hand off. **Do not** open the JSON download unless asked; it costs 30
 seconds and says less than the screen does.
 
+### Optional beats — cut these first
+
+Two extra things exist and both are good. Neither is worth going over ten
+minutes for. Rehearse the talk without them, and add one back only if you land
+under time twice in a row.
+
+**9a. The job record (0:30).** Click **Download job record**, open it.
+
+> That's one printable page: the timeline, the quote behind every entry, the
+> outstanding work, and the warnings — printed, not hidden. It carries the date
+> and which engine produced it. Slide two said the details that decide a billing
+> dispute live in someone's phone. That's the thing you'd actually attach to an
+> email.
+
+**9b. The calendar (0:25).** Click **Download calendar**, and read the caption
+under the button aloud — *"0 dated events, 3 to-dos with no due date. Nothing in
+this job stream said when."*
+
+> iCalendar has events and it has to-dos, and a to-do doesn't need a due date.
+> So the ones we know the day for are events, and the rest are tasks with no
+> deadline. To put "Thursday PM" on a calendar we'd have to pick a Thursday, and
+> that's the thing we spent the week teaching it not to do.
+
+**An alternative opening, if you'd rather show real input.** Sidebar → upload
+`data/phone_exports/whatsapp_deck_build.txt`. It reads a WhatsApp export, and
+the caption says what it did and did not use:
+
+> Every line in that export has a send time on it, and we throw them away. One
+> message was sent on the 5th saying "building control came round last tuesday".
+> A send time tells you when someone typed it, not when the work happened.
+
+This is the strongest answer to "would this work on real data", but it replaces
+the `03` opening rather than adding to it. Pick one; don't do both.
+
 ### If it fails
 
 Two failure modes, two responses. Rehearse both once.

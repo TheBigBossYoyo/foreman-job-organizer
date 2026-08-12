@@ -2,7 +2,7 @@
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-144%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-212%20passing-2ea44f)
 ![Accuracy](https://img.shields.io/badge/field%20accuracy-241%2F265%20(91%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
@@ -66,7 +66,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 144 tests
+pytest                  # 212 tests
 ```
 
 ---
@@ -193,7 +193,8 @@ itself, and categories decided in code wherever the input gives a marker.
 ```text
 ├── app.py                  Streamlit interface
 ├── data/
-│   ├── samples/            ten made-up job streams
+│   ├── samples/            ten made-up job streams, the scored set
+│   ├── phone_exports/      a made-up chat export, for the importer
 │   └── expected/           hand-written answers, the scorer's ground truth
 ├── outputs/                generated JSON + results log
 ├── src/
@@ -207,10 +208,48 @@ itself, and categories decided in code wherever the input gives a marker.
 │   ├── score.py            field-by-field accuracy
 │   ├── stability.py        how much the same input moves between runs
 │   ├── batch.py            run the whole folder
+│   ├── calendar_export.py  .ics — events only where a date was written
+│   ├── job_record.py       a printable record of one job
+│   ├── phone_import.py     read a phone chat export as input
 │   └── text.py             shared normalisation
-├── tests/                  144 tests
+├── tests/                  212 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
+
+---
+
+## 📤 What comes out
+
+Four things, all offline — no account, no network, nothing to sign into.
+
+| | Output | Note |
+|---|---|---|
+| 📋 | **The timeline** | on screen, with a source quote on every row |
+| 🧾 | **JSON** | the validated result, same shape every run |
+| 📆 | **A calendar** (`.ics`) | see below |
+| 📄 | **A job record** | one printable page: timeline, quotes, warnings, and which engine produced it |
+
+The calendar is the interesting one. A date that was actually written becomes a
+`VEVENT` on that day; an action with no date becomes a `VTODO` with **no** due
+date; a record that is neither is left out. iCalendar already had the right
+answer, so nothing has to be guessed.
+
+On `03_tricky_bathroom` that is three to-dos and no events at all, and the app
+says so: *"0 dated events. Nothing in this job stream said when, so nothing was
+given a day."* Resolving "thursday pm" into a real Thursday is the same
+invention `src/dates.py` exists to prevent.
+
+## 📥 What can go in
+
+Text, pasted — or a **phone chat export**, which is how a job record actually
+arrives. `src/phone_import.py` reads a WhatsApp export, rejoins messages the
+file format wrapped, and drops the app's own noise.
+
+It ignores the timestamps on purpose. An export stamps every line with a send
+time, and using it would fill in the dates most items lack — wrongly. The sample
+export has a message sent on the 5th saying *"building control came round last
+tuesday"*. A send time says when something was typed, not when it happened. The
+window is reported to the person importing and never written into the stream.
 
 ---
 
