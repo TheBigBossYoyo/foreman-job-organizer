@@ -214,14 +214,26 @@ called it. A receipt with no amount gets flagged. Phone numbers and card numbers
 are redacted from the titles and summaries. These fire regardless of what the
 model returns.
 
-**One honest open question.** `10_repeated_event` states an inspection twice and
-a delivery twice in different words. The answer key expects four items; the model
-returned two, because it silently de-duplicated them. We have not decided who is
-right. A foreman probably wants one inspection, not two — but nothing asked the
-model to de-duplicate, and a model that merges things that merely *sound* alike
-is the `06` failure wearing a friendlier face. It is most of the gap between 91%
-and higher. Presenting an undecided question with the argument for both sides is
-better than pretending we have no open items.
+**The experiment that failed, and why it belongs on a slide.**
+`10_repeated_event` states an inspection twice and a delivery twice in different
+words. The key expects four items; the model returned two, silently
+de-duplicating. So we built the fix — one item per event, keeping the other
+wording beside it as a quote checked against the input — and measured it.
+
+| Sample | Before | After |
+|---|---|---|
+| `10_repeated_event` | 13/23 | **13/13** |
+| `08_dense_stream` | **33/33** | **22/33** |
+
+On the dense sample it folded a skip delivery and a wiring discovery into the
+line about the crew arriving. Three events, not one said three times. Reverted;
+the code is on the `restatements-experiment` branch.
+
+The line to end on: *a model free to decide what counts as the same event will
+merge things that are merely adjacent.* The fold belongs in code, decided after
+the model answers — which is the same lesson as the dates, for the fourth time.
+An experiment that failed and was kept in the write-up is worth more than a
+feature that shipped.
 
 **The merge, if it comes up.** Two prototypes existed: this one and a teammate's
 Python port of a PHP app. They were merged rather than chosen between. Kept from
