@@ -30,6 +30,31 @@ job.
 
 import re
 
+# WhatsApp on iOS writes an invisible left-to-right mark before the opening
+# bracket, and again before an attachment marker. Nothing shows it, and it
+# pushes the line out of the ^\[ anchor below: on a real 15-month export, 343
+# of 956 messages failed to parse and were glued onto the message above as if
+# they had wrapped. That is the merge this module exists to avoid, done
+# silently, so the marks come off before anything else looks at the line.
+BIDI = dict.fromkeys(map(ord, "‎‏‪‫‬⁦⁧⁨⁩"))
+
+# The media placeholder is localised: "<Media omitted>" on an English phone,
+# "<pièce jointe : IMG-0001.jpg>" on a French one, and the NOISE list below
+# only ever knew the English wording. A filename on its own is not a job
+# event, but an attachment can be sent with a caption, so the marker is
+# removed and the message survives only if something was said alongside it.
+ATTACHMENT = re.compile(
+    r"<\s*(?:pièce jointe|fichier joint|archivo adjunto|allegato"
+    r"|anhang|bijlage|attached|attachment)\s*:[^>]*>",
+    re.I,
+)
+
+
+def strip_bidi(text):
+    """Drop the direction marks WhatsApp writes around timestamps and media."""
+    return (text or "").translate(BIDI)
+
+
 # WhatsApp exports come in two shapes depending on platform and locale:
 #   [03/08/2026, 07:14:22] Dan Reyes: message
 #   03/08/2026, 07:14 - Dan Reyes: message
@@ -75,6 +100,7 @@ def is_noise(text):
 
 def parse_line(line):
     """(date, sender, text) for a message line, or None if it is not one."""
+    line = strip_bidi(line)
     for pattern in (BRACKETED, DASHED):
         match = pattern.match(line)
         if match:
@@ -105,6 +131,7 @@ def parse_export(raw_text):
             continue
 
         date, sender, text = parsed
+        text = ATTACHMENT.sub("", text).strip()
         if not sender or is_noise(text):
             dropped += 1
             continue

@@ -164,3 +164,42 @@ def test_a_file_that_is_not_an_export_reports_nothing_found():
     _, stats = parse_export("Project: something\nsome notes\nmore notes")
 
     assert stats["messages"] == 0
+
+
+# --- what a real export threw at it ------------------------------------------
+
+def test_an_invisible_direction_mark_does_not_swallow_the_message():
+    # iOS writes U+200E before the bracket. It anchored ^\[ out of the match,
+    # so the line parsed as a wrap and was glued onto the message above.
+    export = (
+        "[05/12/2024 16:57:40] Ana: footings poured this morning\n"
+        "\u200e[05/12/2024 17:02:11] Bruno: inspector booked for friday\n"
+    )
+
+    stream, stats = parse_export(export)
+
+    assert stats["messages"] == 2
+    assert "Bruno: inspector booked for friday" in stream
+
+
+def test_a_french_attachment_marker_counts_as_noise():
+    # NOISE only knew "<Media omitted>". A French phone writes this instead,
+    # and 275 of them would have become photo items about nothing.
+    _, stats = parse_export(
+        "[05/12/2024 16:57:40] Ana: \u200e<pi\u00e8ce jointe : 0007-PHOTO.jpg>\n"
+    )
+
+    assert stats["messages"] == 0
+    assert stats["dropped"] == 1
+
+
+def test_a_caption_survives_its_attachment():
+    # Dropping the whole message would lose what the photo was of.
+    stream, stats = parse_export(
+        "[05/12/2024 16:57:40] Ana: \u200e<pi\u00e8ce jointe : 0007-PHOTO.jpg> "
+        "crack in the north retaining wall\n"
+    )
+
+    assert stats["messages"] == 1
+    assert "crack in the north retaining wall" in stream
+    assert "PHOTO.jpg" not in stream
