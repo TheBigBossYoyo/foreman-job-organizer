@@ -2,7 +2,7 @@
 
 **VTSP · Technical track · Option C**
 
-![Tests](https://img.shields.io/badge/tests-212%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-219%20passing-2ea44f)
 ![Accuracy](https://img.shields.io/badge/field%20accuracy-241%2F265%20(91%25)-2ea44f)
 ![Python](https://img.shields.io/badge/python-3.14-3776AB)
 ![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
@@ -66,7 +66,7 @@ Also useful:
 ```bash
 python -m src.batch     # organize every sample, write JSON + a CSV log
 python -m src.score     # score those outputs against the answer key
-pytest                  # 212 tests
+pytest                  # 219 tests
 ```
 
 ---
@@ -211,7 +211,7 @@ itself, and categories decided in code wherever the input gives a marker.
 │   ├── job_record.py       a printable record of one job
 │   ├── phone_import.py     read a phone chat export as input
 │   └── text.py             shared normalisation
-├── tests/                  212 tests
+├── tests/                  219 tests
 └── PRESENTATION.md         slide plan and demo script
 ```
 
