@@ -4,6 +4,8 @@ The load-bearing test is the one asserting a send date never reaches the job
 stream. Everything else is format handling.
 """
 
+import re
+
 from pathlib import Path
 
 from src.phone_import import describe, is_noise, parse_export, parse_line
@@ -221,3 +223,30 @@ def test_a_wrapped_tail_cannot_smuggle_the_send_time_back_in():
     assert stats["messages"] == 1
     assert "waiting on the final sign-off" in stream
     assert "2025-12-05" not in stream
+
+
+# --- the bigger fixture ------------------------------------------------------
+
+BARN = Path("data/phone_exports/ridgeway_barn.txt").read_text(encoding="utf-8")
+
+
+def test_the_barn_export_parses_every_line_it_should():
+    # Written in the shape a real iOS export arrives in: direction marks,
+    # attachment filenames, a report wrapped across five lines. The counts are
+    # the guard — if a parser change starts eating messages, this moves.
+    stream, stats = parse_export(BARN)
+
+    assert stats["messages"] == 22
+    assert stats["dropped"] == 4          # encryption notice, group created, 2 bare photos
+    assert len(stats["senders"]) == 6
+    assert "Weekly report, week 33: * Groundworks" in stream   # the wrap rejoined
+
+
+def test_the_barn_export_leaks_no_send_times():
+    # Six attachments, every filename spelling out the moment it was sent.
+    # None of those may reach the job stream as text a date can be read from.
+    stream, _ = parse_export(BARN)
+
+    assert not re.search(r"\d{4}-\d{2}-\d{2}", stream)
+    assert "PHOTO" not in stream
+    assert "east gable before we start" in stream   # but the caption survives
