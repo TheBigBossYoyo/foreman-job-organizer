@@ -397,7 +397,7 @@ scored set stays at ten and the denominator does not move.
 
 The line all three hold: **more ways in and out, no new ways to guess.**
 
-`main` is 241/265 with 227 tests.
+`main` is 241/265 with 225 tests.
 
 ## This evening
 
