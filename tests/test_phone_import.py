@@ -203,3 +203,21 @@ def test_a_caption_survives_its_attachment():
     assert stats["messages"] == 1
     assert "crack in the north retaining wall" in stream
     assert "PHOTO.jpg" not in stream
+
+
+def test_a_wrapped_tail_cannot_smuggle_the_send_time_back_in():
+    # The attachment filename spells out the send timestamp. Glued onto the
+    # message body it becomes a date genuinely present on the source line, so
+    # date grounding accepts it — the send time this module discards, arriving
+    # through the back door. Found on a real export.
+    export = (
+        "[05/12/2025 13:55:42] Ana: * observation :\n"
+        "waiting on the final sign-off before plastering "
+        "\u200e<pi\u00e8ce jointe : 0728-PHOTO-2025-12-05-13-55-42.jpg>\n"
+    )
+
+    stream, stats = parse_export(export)
+
+    assert stats["messages"] == 1
+    assert "waiting on the final sign-off" in stream
+    assert "2025-12-05" not in stream

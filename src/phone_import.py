@@ -125,7 +125,15 @@ def parse_export(raw_text):
         if parsed is None:
             # No timestamp: this is the tail of a message that wrapped in the
             # export. Formatting, not a second event, so it rejoins the one above.
-            tail = line.strip()
+            #
+            # The marker has to come off here too. A wrapped tail carrying
+            # "<pièce jointe : 0728-PHOTO-2025-12-05-13-55-42.jpg>" glues the
+            # filename into the message body, and that filename is the send
+            # timestamp written out in full. Date grounding then finds
+            # 2025-12-05 genuinely present on the item's source line and keeps
+            # it. That is the send time this module throws away, coming back in
+            # through the one door it wasn't watching.
+            tail = ATTACHMENT.sub("", strip_bidi(line)).strip()
             if tail and messages:
                 messages[-1]["text"] = f"{messages[-1]['text']} {tail}".strip()
             continue
