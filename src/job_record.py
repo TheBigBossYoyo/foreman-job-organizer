@@ -24,24 +24,7 @@ is not a thing. Everything is inlined, so the file works with no network.
 from datetime import date as date_cls, datetime
 from html import escape
 
-CATEGORY_LABELS = {
-    "photo": "Photo",
-    "receipt": "Receipt",
-    "client_update": "Client update",
-    "contractor_update": "Site work",
-    "inspection": "Inspection",
-    "delivery": "Delivery",
-    "schedule": "Schedule",
-    "issue": "Issue",
-    "payment": "Payment",
-    "other": "Other",
-}
-
-PROVIDER_LABELS = {
-    "anthropic": "Anthropic Claude",
-    "groq": "Groq",
-    "local": "the local rule-based engine",
-}
+from .labels import CATEGORY_LABELS, PROVIDER_PHRASES
 
 STYLE = """
 @page { margin: 18mm 16mm; }
@@ -197,7 +180,7 @@ def to_html(result, summary=None, generated=None):
     `generated` is injectable so a test can assert on the whole document.
     """
     stamp = (generated or datetime.now()).strftime("%d %B %Y")
-    provider = PROVIDER_LABELS.get(result.provider, result.provider or "an unknown engine")
+    provider = PROVIDER_PHRASES.get(result.provider, result.provider or "an unknown engine")
     actions = (summary or {}).get("open_actions") or result.open_actions
 
     identity = " · ".join(

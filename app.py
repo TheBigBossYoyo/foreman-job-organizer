@@ -9,9 +9,10 @@ from src.aggregate import ordered_items, summarize
 from src.calendar_export import counts as calendar_counts
 from src.calendar_export import to_ics
 from src.job_record import to_html
+from src.labels import CATEGORY_COLORS, CATEGORY_LABELS, PROVIDER_LABELS
+from src.organizer import JobOrganizerError, organize_job_stream
 from src.phone_import import describe as describe_import
 from src.phone_import import parse_export
-from src.organizer import JobOrganizerError, organize_job_stream
 from src.providers import provider_status, resolve_chain
 from src.schema import JobOrganizationResult
 from src.text import normalize
@@ -20,12 +21,6 @@ SAMPLE_DIR = Path("data/samples")
 
 st.set_page_config(page_title="Job Organizer", page_icon="🏗️", layout="centered")
 
-PROVIDER_LABELS = {
-    "anthropic": "Anthropic Claude",
-    "groq": "Groq",
-    "local": "Local engine",
-}
-
 # Green only for the one actually answering. A configured-but-idle backup and an
 # unconfigured provider are different facts and should not share a colour.
 STATE_COLORS = {
@@ -33,19 +28,6 @@ STATE_COLORS = {
     "standby": "#CBD5E1",
     "no key": "#FCA5A5",
     "off": "#E2E8F0",
-}
-
-CATEGORY_LABELS = {
-    "photo": "Photo",
-    "receipt": "Receipt",
-    "client_update": "Client",
-    "contractor_update": "Site work",
-    "inspection": "Inspection",
-    "delivery": "Delivery",
-    "schedule": "Schedule",
-    "issue": "Issue",
-    "payment": "Payment",
-    "other": "Other",
 }
 
 # Flags that mean "look at this now" against flags that are only context. They
@@ -57,21 +39,6 @@ ALARM_FLAGS = {"safety_review", "possible_pii"}
 # every ordinary item "medium" is ten words that never change.
 LOUD_PRIORITIES = {"urgent", "high"}
 
-# One colour per category, carried only by the timeline dot. Colour is the
-# cheapest way to let someone find the receipts in a long list, and the dot is
-# enough of it — tinting whole rows turns a record into a highlighter drawing.
-CATEGORY_COLORS = {
-    "photo": "#8B5CF6",
-    "receipt": "#EA580C",
-    "client_update": "#2563EB",
-    "contractor_update": "#0F766E",
-    "inspection": "#16A34A",
-    "delivery": "#D97706",
-    "schedule": "#0EA5E9",
-    "issue": "#DC2626",
-    "payment": "#059669",
-    "other": "#94A3B8",
-}
 
 CSS = """
 <style>

@@ -299,7 +299,8 @@ fields at once, so the two counts are worth saying separately.
   line and an injury line in one item.
 - **Two on `10_repeated_event`**, where the model folded each event that was
   stated twice into one item. That one is a disagreement, not a bug — see below.
-- **Six category disagreements**, three of them genuinely arguable.
+- **Seven category disagreements**, three arguable and four wrong. Three of the
+  four are the same prompt rule over-firing, which is the interesting part.
 - **Two missed action flags**, one clear and one arguable.
 
 **The open question, if you have thirty seconds for it.** On `10` the model

@@ -138,20 +138,15 @@ three losses are items that were never produced).
 
 ## Category misses — wrong vs arguable
 
-The split @vjvidhaan could not run. Every miss read against the input line, not
-against the model's own excerpt.
+Re-done against the current outputs on 12 August. The first version of this
+section was written before the tie-break rules went into the prompt and listed
+three misses the rules then fixed — `03` lopez, `09` tile guy and `05` photo are
+all correct now and none of them appears in the miss list any more. A triage
+that names misses which no longer exist sends the next reader hunting for
+nothing, so it is replaced rather than appended to.
 
-**Model wrong, key right — 3.** All three checked against every other item in
-the keys that shares the category, and the keys are consistent.
-
-- `03` "lopez said he might be able to swing by thursday pm" — key schedule,
-  model contractor_update. Soft timing, no date.
-- `09` "tile guy confirmed he can start once the vanity is out" — same, timing
-  relative to another event.
-- `05` "photo: 3 boards look warped, see pic" — key photo, model issue. The line
-  opens with `photo:`. The model dropped that prefix from its own
-  `source_excerpt` and then classified what was left. Judging its own rewrite
-  instead of the input, which is the date bug wearing a different hat.
+Seven category misses. Every one read against the input line, not against the
+model's own excerpt.
 
 **Arguable — 3.** No action. Recorded so nobody re-opens them as bugs.
 
@@ -162,9 +157,38 @@ the keys that shares the category, and the keys are consistent.
 - `06` "still need to hear back from the supply house about capping the strap
   ends" — key contractor_update, model issue. An open safety follow-up.
 
-**Keys changed: none.** Two looked wrong until the source line was read. The
-photo key was checked against all five photo items in the set; every one opens
-with a marker.
+**Model wrong — 4, and three of them are one rule.**
+
+- `04` "need to confirm bedroom color before we keep going" — key issue, model
+  **schedule**. The line is a blocker, not a statement about timing.
+- `07` "slab poured, five days to cure before we lay anything" — key
+  contractor_update, model **schedule**. The line reports work done; the curing
+  time is a note on it.
+- `05` "can you send me the revised completion date" — key client_update, model
+  **schedule**. The client is asking, so it is a client update whatever it asks
+  about.
+- `05` "inv 1048 PAID $1,250.00" — key payment, model receipt. Not the rule,
+  just wrong: the line says PAID.
+
+### What that pattern means
+
+The `schedule` tie-break added in run B says a line is schedule when its point
+is when something will happen. It fixed the two misses it was written for, and
+it now accounts for **three of the four wrong categories** — a blocker, a
+progress note and a client question, none of which is about timing.
+
+This is sharper than what was recorded at the time. The conclusion then was that
+the rules "moved the items they named and shuffled others", inside the ±1 band.
+It was not shuffling. The rule was systematically over-applying, and the total
+stayed flat because it fixed as many as it broke. A flat score hid a real
+regression, which is an argument for reading the miss list and not only the
+number.
+
+The precedence qualifier from run C was supposed to stop exactly the `05` case
+and did not, which was already recorded and now has a third confirmation.
+
+**Keys changed: none**, in either pass. Two looked wrong until the source line
+was read.
 
 ## What the tie-break rules did
 

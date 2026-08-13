@@ -161,9 +161,8 @@ Measured on Groq. Every file in `outputs/` records which provider produced it.
 - **3 segmentation errors.** One merge on `06_safety_incident`, and two on
   `10_repeated_event`, where the model collapsed each event that was stated
   twice into a single item.
-- **6 category disagreements**, three of them arguable rather than wrong:
-  *"demo done … there is moisture behind it"* as contractor update vs issue.
-  That call lives in `data/expected/`.
+- **7 category disagreements**, three arguable and four wrong — and three of the
+  four are a single prompt rule over-firing. See PROJECT_NOTES.
 - **2 missed action flags.** One is a real miss — *"living room done except
   touch ups"* names unfinished work. The other is arguable.
 
