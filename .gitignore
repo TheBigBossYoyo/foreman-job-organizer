@@ -11,3 +11,9 @@ outputs/streamlit_*.json
 
 # Program-provided guideline packets, not our work
 *.docx
+
+# PyCharm project config
+.idea/
+
+# Decks live here but are not source
+*.pptx
