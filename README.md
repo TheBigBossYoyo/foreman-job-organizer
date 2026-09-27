@@ -1,19 +1,24 @@
-﻿# 🏗️ Foreman AI Job Organizer
+# Foreman AI Job Organizer
 
-**VTSP · Technical track · Option C**
+VTSP, Technical track, Option C.
 
-![Tests](https://img.shields.io/badge/tests-225%20passing-2ea44f)
-![Accuracy](https://img.shields.io/badge/field%20accuracy-241%2F265%20(91%25)-2ea44f)
-![Python](https://img.shields.io/badge/python-3.14-3776AB)
-![Providers](https://img.shields.io/badge/Claude%20→%20Groq%20→%20local-EA580C)
+Turns a messy contractor job stream (texts, receipts, photo captions,
+supplier calls) into a structured timeline with open actions and a source
+quote for every item.
 
-Turns a messy contractor job stream — texts, receipts, photo captions, supplier
-calls — into a structured timeline with open actions and a source quote for
-every item.
+## Team
 
----
+This is a two-person build. I (Youssef) wrote the pipeline, the schema, the
+date-grounding check, and the scorer. My teammate, **@vjvidhaan**, built a
+parallel prototype early on with the provider chain (Claude, then Groq, then
+a local fallback with no key required) and guardrails enforced in code
+rather than left to the prompt; we merged that into this version instead of
+picking one over the other. He also added two of the ten test samples
+(repeated events, and a sample with no dates at all) with their answer keys,
+and a guardrails fix so a documentation photo doesn't get wrongly flagged as
+needing action.
 
-## 👀 Example
+## Example
 
 In:
 
@@ -30,36 +35,35 @@ Client update: Sofia approved the quartz countertop sample.
 
 Out:
 
-| When | What | | |
+| When | What | Note | Amount |
 |---|---|---|---|
-| **21 Jul** | 🏗️ Site work | Cabinet removal | |
-| **no date** | 🧾 Receipt | Drywall and screws receipt | **142.75 USD** |
-| **22 Jul** | 🚚 Delivery | New cabinet delivery | |
-| **no date** | 💬 Client | Quartz countertop sample approval | |
+| 21 Jul | Site work | Cabinet removal | |
+| no date | Receipt | Drywall and screws receipt | 142.75 USD |
+| 22 Jul | Delivery | New cabinet delivery | |
+| no date | Client | Quartz countertop sample approval | |
 
-The receipt sits under a dated line and still comes back with no date, because
-its own line never gave one.
+The receipt sits under a dated line and still comes back with no date,
+because its own line never gave one: we ground every date to the line it
+actually appears on, not the item above it.
 
----
-
-## 🚀 Running it
+## Running it
 
 ```bash
 python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-No API key needed to try it. Without one it falls back to a local rule-based
-engine, which is much worse — the app says so in red.
+No API key is needed to try it. Without one it falls back to a local
+rule-based engine, which is noticeably worse, and the app says so.
 
-For real output, copy `.env.example` to `.env`:
+For real output, copy `.env.example` to `.env` and add a key:
 
 ```text
 ANTHROPIC_API_KEY=your_key_here     # tried first
-GROQ_API_KEY=your_key_here          # the backup
+GROQ_API_KEY=your_key_here          # backup
 ```
 
-> ⚠️ `.env` is gitignored. Never commit a key.
+`.env` is gitignored, so don't commit a key.
 
 Also useful:
 
@@ -69,194 +73,93 @@ python -m src.score     # score those outputs against the answer key
 pytest                  # 225 tests
 ```
 
----
+## Providers
 
-## 🔌 Providers
+Three, tried in order, first one that answers wins: **Anthropic Claude** (if
+`ANTHROPIC_API_KEY` is set), then **Groq** (if Claude has no key or its call
+failed), then a **local, rule-based** fallback that needs nothing. The local
+engine returns the same validated JSON shape, so nothing downstream cares
+which one ran; it's a safety net, not something we'd want to demo. It
+matches keywords instead of reading, and scores far lower than either model
+on our own accuracy check. You can pin one provider with
+`AI_PROVIDER=anthropic|groq|local`.
 
-Three, tried in order. First one that answers wins.
+## Pipeline
 
-| | Provider | Needs | Used when |
-|---|---|---|---|
-| 1️⃣ | **Anthropic Claude** | `ANTHROPIC_API_KEY` | Whenever the key is set |
-| 2️⃣ | **Groq** | `GROQ_API_KEY` | Anthropic has no key, or its call failed |
-| 3️⃣ | **Local rule-based** | nothing | Neither model is reachable |
+The input goes through: building the prompt (instructions, schema, a worked
+example, the missing-data rule) → the provider chain (`src/providers.py`) →
+pulling the JSON out of the reply (it isn't always only JSON) → validating it
+against a Pydantic schema (`src/schema.py`, no invented categories) →
+grounding dates so a date has to appear on the item's own line
+(`src/dates.py`) → guardrails for safety, money, and PII
+(`src/guardrails.py`) → aggregating into a timeline with totals and open
+actions (`src/aggregate.py`).
 
-The local engine returns the same validated JSON, so nothing downstream changes.
-It matches keywords instead of reading. On the original five samples it scored
-86/150 against the model's 118/125 — a safety net, not a demo.
+## Guardrails
 
-Pin one with `AI_PROVIDER=anthropic|groq|local`.
+Enforced in code, not just asked for in the prompt: injury language forces
+an urgent flag no matter what category the model picked; a receipt or
+payment with no amount is flagged; phone numbers, SSNs, and card numbers are
+redacted from titles and summaries (the note says the source excerpt still
+has them); a failed provider is named in the warnings; and a date not
+written on the item's own line is dropped with a warning attached.
 
----
+Missing-data rule: if something is absent or ambiguous, we return `null` and
+add a warning rather than guess.
 
-## ⚙️ Pipeline
+## Accuracy
 
-```
-raw text
-   │
-   ├─ build the prompt      instructions · schema · worked example · missing-data rule
-   ├─ call the chain        src/providers.py
-   ├─ slice out the JSON    the reply isn't always only JSON
-   ├─ validate              src/schema.py — Pydantic, no invented categories
-   ├─ ground the dates      src/dates.py — a date must be on the item's own line
-   ├─ enforce guardrails    src/guardrails.py — safety · money · PII
-   └─ aggregate             src/aggregate.py — timeline, totals, actions
-```
-
----
-
-## 🛡️ Guardrails
-
-Enforced in `src/guardrails.py`, not asked for in the prompt:
-
-- 🚨 Injury language forces an urgent review flag, whatever the model called it,
-  and the timeline shows that item as urgent
-- 💵 A receipt or payment with no amount is flagged
-- 🔒 Phone numbers, SSNs and card numbers are redacted from titles and summaries;
-  the note states that the source excerpt still contains them
-- 🔁 A failed provider is named in the warnings
-- 📅 A date not written on the item's own line is dropped with a warning
-
-**Missing-data rule:** if something is absent or ambiguous, return `null`, add a
-warning, don't guess.
-
----
-
-## 📊 Accuracy
-
-`python -m src.score` compares `outputs/` against the hand-written answers in
-`data/expected/` — 265 fields across 10 samples.
+`python -m src.score` compares `outputs/` against hand-written answers in
+`data/expected/`: 265 fields across 10 samples.
 
 | Measure | Result |
 |---|---|
-| Field accuracy | **241/265 (91%)** |
+| Field accuracy | 241/265 (91%) |
 | Samples with no errors | 4/10 |
-| Date fields correct | **44/47** |
+| Date fields correct | 44/47 |
 
-The score also reports the shape of what went wrong: **3 segmentation errors, 9
-field errors**. Those are different problems. A segmentation error is one event
-merged or dropped and costs five fields at once, so one of them is worth more
-than five field errors.
+The 24 misses split into two different kinds of problem: 3 segmentation
+errors (one event merged or dropped, which costs several fields at once) and
+9 field errors (a single wrong value). We track them separately because a
+flat total can hide one getting worse while another gets better; that
+happened once, when a new tie-break rule fixed two miscategorized items and
+silently broke three others.
 
-Every date the model put on an item it produced is right. All three date losses
-are items it never produced at all.
+Temperature is 0, which isn't fully deterministic: repeated runs of the same
+samples move by a field or two between runs. `python -m src.stability --runs
+N` measures that spread. Everything above was measured on Groq; every file
+in `outputs/` records which provider actually produced it.
 
-It was 192/214 before the scorer stopped matching items by position. On the same
-eight samples the new scorer read 201/214 — the nine recovered fields were all on
-`06_safety_incident`, which was being charged fifteen times for one merged line.
-The model did not change. The measurement did.
+More detail on individual misses and the tradeoffs behind them is in
+`PROJECT_NOTES.md`.
 
-The original five samples scored 118/125 for the third run in a row.
+## What comes out
 
-Temperature is 0, which is not deterministic. Three consecutive runs scored 117,
-118, 118 — so ±1 on fields. `python -m src.stability --runs N` measures that,
-and the item count alongside it.
+Four things, all offline: no account, no network call besides the model API,
+nothing to sign into.
 
-Measured on Groq. Every file in `outputs/` records which provider produced it.
+- The timeline, on screen, with a source quote on every row.
+- JSON, the validated result, the same shape every run.
+- A calendar (`.ics`): a date that was actually written becomes an event on
+  that day; an action with no date becomes a to-do with no due date;
+  anything that's neither is left out, rather than guessed at.
+- A job record, one printable page with the timeline, quotes, warnings, and
+  which engine produced it.
 
-### Known errors
+## What can go in
 
-24 misses in two kinds.
+Plain pasted text, or a phone chat export. `src/phone_import.py` reads a
+WhatsApp-style export, rejoins messages the export format wrapped across
+multiple lines, and strips the app's own noise. It deliberately ignores the
+export's send timestamps, since using them would fill in dates for items
+that never actually stated one, which is exactly the kind of invention
+`src/dates.py` exists to prevent.
 
-- **3 segmentation errors.** One merge on `06_safety_incident`, and two on
-  `10_repeated_event`, where the model collapsed each event that was stated
-  twice into a single item.
-- **7 category disagreements**, three arguable and four wrong — and three of the
-  four are a single prompt rule over-firing. See PROJECT_NOTES.
-- **2 missed action flags.** One is a real miss — *"living room done except
-  touch ups"* names unfinished work. The other is arguable.
+## Privacy
 
-### The de-duplication question, and why the score isn't higher
+All sample data is made up. We never used real Foreman customer, employee,
+or company data. Everything in `data/samples/` is invented, and the app
+sidebar repeats that rule.
 
-The two segmentation errors on `10_repeated_event` are a disagreement, not a
-bug. That sample states an inspection twice and a delivery twice in different
-words; the key expects four items and the model returns two, having folded each
-restatement in.
-
-We built the third option — one item per event, keeping the other wording beside
-it as a verified quote — and measured it. It fixed `10`, and made the model fold
-a skip delivery and a wiring discovery into the line about the crew arriving on
-`08_dense_stream`, which had been 33/33 and scored 22/33. Three events, not one
-said three times. Reverted; the code is on `restatements-experiment`.
-
-A model free to decide what counts as the same event will merge things that are
-merely adjacent. If someone picks this up, the fold belongs in code.
-
-Next: a warning when an input line is quoted by no item, so a merge surfaces
-itself, and categories decided in code wherever the input gives a marker.
-
----
-
-## 📁 Repository
-
-```text
-├── app.py                  Streamlit interface
-├── data/
-│   ├── samples/            ten made-up job streams, the scored set
-│   ├── phone_exports/      two made-up chat exports, for the importer
-│   └── expected/           hand-written answers, the scorer's ground truth
-├── outputs/                generated JSON + results log
-├── src/
-│   ├── providers.py        Claude → Groq → local
-│   ├── organizer.py        the core pipeline
-│   ├── prompts.py          system prompt, schema, worked example
-│   ├── schema.py           Pydantic contract
-│   ├── dates.py            date grounding
-│   ├── guardrails.py       safety · money · PII
-│   ├── aggregate.py        timeline, totals, derived actions
-│   ├── score.py            field-by-field accuracy
-│   ├── stability.py        how much the same input moves between runs
-│   ├── batch.py            run the whole folder
-│   ├── calendar_export.py  .ics — events only where a date was written
-│   ├── job_record.py       a printable record of one job
-│   ├── phone_import.py     read a phone chat export as input
-│   └── text.py             shared normalisation
-├── tests/                  225 tests
-└── PRESENTATION.md         slide plan and demo script
-```
-
----
-
-## 📤 What comes out
-
-Four things, all offline — no account, no network, nothing to sign into.
-
-| | Output | Note |
-|---|---|---|
-| 📋 | **The timeline** | on screen, with a source quote on every row |
-| 🧾 | **JSON** | the validated result, same shape every run |
-| 📆 | **A calendar** (`.ics`) | see below |
-| 📄 | **A job record** | one printable page: timeline, quotes, warnings, and which engine produced it |
-
-The calendar is the interesting one. A date that was actually written becomes a
-`VEVENT` on that day; an action with no date becomes a `VTODO` with **no** due
-date; a record that is neither is left out. iCalendar already had the right
-answer, so nothing has to be guessed.
-
-On `03_tricky_bathroom` that is three to-dos and no events at all, and the app
-says so: *"0 dated events. Nothing in this job stream said when, so nothing was
-given a day."* Resolving "thursday pm" into a real Thursday is the same
-invention `src/dates.py` exists to prevent.
-
-## 📥 What can go in
-
-Text, pasted — or a **phone chat export**, which is how a job record actually
-arrives. `src/phone_import.py` reads a WhatsApp export, rejoins messages the
-file format wrapped, and drops the app's own noise.
-
-It ignores the timestamps on purpose. An export stamps every line with a send
-time, and using it would fill in the dates most items lack — wrongly. The sample
-export has a message sent on the 5th saying *"building control came round last
-tuesday"*. A send time says when something was typed, not when it happened. The
-window is reported to the person importing and never written into the stream.
-
----
-
-## 🔐 Privacy
-
-> Made-up sample data only. Never use real Foreman customer, employee or company
-> data. Everything in `data/samples/` is invented. The rule is repeated in the
-> app sidebar.
-
-<sub>Built for the 2026 Venture &amp; Tech Summer Program. A prototype, not a
-production system.</sub>
+This was built for the 2026 Venture & Tech Summer Program. It's a prototype
+for a technical-track assignment, not a production tool.
